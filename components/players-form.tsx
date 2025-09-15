@@ -2,8 +2,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 
-import { PlayerName } from "@/lib/types";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { FlatList, View } from "react-native";
 import { z } from "zod";
@@ -22,15 +22,7 @@ const createPlayersSchema = (gameSize: number) => {
   return z.object(Object.fromEntries(playerFields));
 };
 
-export function PlayersForm({
-  gameSize,
-  playerNames,
-  setPlayerNames,
-}: {
-  gameSize: string;
-  playerNames: PlayerName[];
-  setPlayerNames: (players: PlayerName[]) => void;
-}) {
+export function PlayersForm({ gameSize }: { gameSize: string }) {
   const gameSizeNum = parseInt(gameSize);
   const schema = createPlayersSchema(gameSizeNum);
 
@@ -41,10 +33,7 @@ export function PlayersForm({
   } = useForm({
     resolver: zodResolver(schema) as any,
     defaultValues: Object.fromEntries(
-      Array.from({ length: gameSizeNum }, (_, index) => [
-        `player${index}`,
-        playerNames[index]?.name || "",
-      ])
+      Array.from({ length: gameSizeNum }, (_, index) => [`player${index}`, ""])
     ),
   });
 
@@ -54,12 +43,10 @@ export function PlayersForm({
   }));
 
   const onSubmit = (data: Record<string, string>) => {
-    setPlayerNames(
-      Object.keys(data).map((key) => ({
-        id: key,
-        name: data[key],
-      }))
-    );
+    router.replace({
+      pathname: "/game",
+      params: { gameSize, players: JSON.stringify(data) },
+    });
   };
   return (
     <View className='flex-1 w-full'>

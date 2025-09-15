@@ -3,7 +3,7 @@ import { PlayersForm } from "@/components/players-form";
 import { PointsSelection } from "@/components/points-selection";
 import { Text } from "@/components/ui/text";
 import { POINTS } from "@/constants/points";
-import { PlayerName, Point } from "@/lib/types";
+import { Point } from "@/lib/types";
 import { useState } from "react";
 import {
   Keyboard,
@@ -15,7 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Index() {
   const [gameSize, setGameSize] = useState("2");
-  const [playerNames, setPlayerNames] = useState<PlayerName[]>([]);
+
   const [points, setPoints] = useState<Point>(POINTS.default); // default to 150
   return (
     <SafeAreaView className='flex-1 bg-background'>
@@ -37,11 +37,7 @@ export default function Index() {
           className='flex-1'
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-          <PlayersForm
-            gameSize={gameSize}
-            playerNames={playerNames}
-            setPlayerNames={setPlayerNames}
-          />
+          <PlayersForm gameSize={gameSize} />
         </KeyboardAvoidingView>
       </Pressable>
     </SafeAreaView>
