@@ -1,27 +1,25 @@
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Text } from "@/components/ui/text";
-import { POINTS } from "@/constants/points";
+import { POINTS } from "@/lib/constants";
 import { Point } from "@/lib/types";
+import { useGame } from "@/stores/use-game";
 import * as Haptics from "expo-haptics";
 import { View } from "react-native";
-import { Label } from "./ui/label";
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
-export function PointsSelection({
-  value,
-  onValueChange: onChange,
-}: {
-  value?: Point;
-  onValueChange?: (value: Point) => void;
-}) {
+
+export function WinningLimit() {
+  const winningLimit = useGame((state) => state.winningLimit);
+  const updateWinningLimit = useGame((state) => state.updateWinningLimit);
   function onLabelPress(label: Point) {
     return () => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      onChange?.(label);
+      updateWinningLimit(Number(label));
     };
   }
 
   function onValueChange(value: Point) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onChange?.(value);
+    updateWinningLimit(Number(value));
   }
   return (
     <View className='w-full mt-4'>
@@ -33,10 +31,10 @@ export function PointsSelection({
       </Text>
       <RadioGroup
         className='text-xl mx-auto flex-row'
-        value={value}
+        value={winningLimit.toString()}
         onValueChange={(value) => onValueChange(value as Point)}
       >
-        {POINTS.values.map((point) => (
+        {POINTS.map((point) => (
           <View
             key={point}
             className='flex-row items-center gap-2'

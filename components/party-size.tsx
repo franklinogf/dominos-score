@@ -1,15 +1,14 @@
 import { Text } from "@/components/ui/text";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { PARTY_SIZES } from "@/lib/constants";
+import { useGame } from "@/stores/use-game";
 import * as Haptics from "expo-haptics";
 import { View } from "react-native";
-const PartySizes = ["2", "3", "4", "5", "6", "7", "8"] as const;
-export function PartySize({
-  value,
-  onValueChange,
-}: {
-  value: string;
-  onValueChange: (value: string) => void;
-}) {
+
+export function PartySize() {
+  const gameSize = useGame((state) => state.gameSize);
+  const updateGameSize = useGame((state) => state.updateGameSize);
+
   return (
     <View className='w-full mt-4'>
       <Text
@@ -23,16 +22,16 @@ export function PartySize({
         className='mx-auto'
         variant='outline'
         size='lg'
-        value={value}
+        value={gameSize.toString()}
         onValueChange={(value) => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          onValueChange(value ?? "1");
+          updateGameSize(value !== undefined ? Number(value) : 2);
         }}
       >
-        {PartySizes.map((size, index) => (
+        {PARTY_SIZES.map((size, index) => (
           <PartySizeButton
             isFirst={index === 0}
-            isLast={index === PartySizes.length - 1}
+            isLast={index === PARTY_SIZES.length - 1}
             key={size}
             label={size}
           />

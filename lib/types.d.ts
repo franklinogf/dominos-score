@@ -1,3 +1,3 @@
-import { POINTS } from "@/constants/points";
+import { POINTS } from "@/lib/constants";
 
-export type Point = (typeof POINTS)["values"][number];
+export type Point = (typeof POINTS)[number];

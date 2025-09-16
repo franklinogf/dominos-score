@@ -2,12 +2,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useGame } from "@/stores/use-game";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { Controller, useForm } from "react-hook-form";
 import { FlatList, View } from "react-native";
 import { z } from "zod";
-import { Button } from "./ui/button";
 
 // Create dynamic schema based on game size
 const createPlayersSchema = (gameSize: number) => {
@@ -22,9 +24,11 @@ const createPlayersSchema = (gameSize: number) => {
   return z.object(Object.fromEntries(playerFields));
 };
 
-export function PlayersForm({ gameSize }: { gameSize: string }) {
-  const gameSizeNum = parseInt(gameSize);
-  const schema = createPlayersSchema(gameSizeNum);
+export function PlayersForm() {
+  const gameSize = useGame((state) => state.gameSize);
+  const players = useGame((state) => state.players);
+  const updatePlayers = useGame((state) => state.updatePlayers);
+  const schema = createPlayersSchema(gameSize);
 
   const {
     control,
@@ -33,33 +37,35 @@ export function PlayersForm({ gameSize }: { gameSize: string }) {
   } = useForm({
     resolver: zodResolver(schema) as any,
     defaultValues: Object.fromEntries(
-      Array.from({ length: gameSizeNum }, (_, index) => [`player${index}`, ""])
+      Array.from({ length: gameSize }, (_, index) => [
+        `player${index}`,
+        players[`player${index}`] || "",
+      ])
     ),
   });
 
-  const playersData = Array.from({ length: gameSizeNum }, (_, index) => ({
+  const playersData = Array.from({ length: gameSize }, (_, index) => ({
     index,
     fieldName: `player${index}` as const,
   }));
 
   const onSubmit = (data: Record<string, string>) => {
-    router.replace({
-      pathname: "/game",
-      params: { gameSize, players: JSON.stringify(data) },
-    });
+    updatePlayers(data);
+    router.replace("/game");
   };
   return (
     <View className='flex-1 w-full'>
       <FlatList
+        key={gameSize}
         bounces={false}
         className='mt-8 w-full flex-1'
         data={playersData}
         keyExtractor={(item) => item.fieldName}
-        numColumns={2}
+        numColumns={gameSize > 3 ? 2 : 1}
         renderItem={({ item }) => (
           <View
             key={item.index}
-            className='w-1/2 px-4 mb-4'
+            className={cn("w-full px-4 mb-4", { "w-1/2": gameSize > 3 })}
           >
             <Label
               htmlFor={`player-name-${item.index}`}
