@@ -65,6 +65,7 @@ export function PlayersForm() {
       losses: 0,
       isPlaying: tournamentMode ? false : true,
       isWinner: false,
+      score: [],
     }));
 
     addPlayers(players);

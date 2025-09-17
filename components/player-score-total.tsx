@@ -5,9 +5,7 @@ import { View } from "react-native";
 import { Text } from "./ui/text";
 
 export function PlayerScoreTotal({ player }: { player: Player }) {
-  const gameScore = useGame((state) => state.gameScore);
-  const scores = gameScore[player.id] || [];
-  const total = scores.reduce((acc, score) => acc + score.value, 0);
+  const total = player.score.reduce((acc, score) => acc + score.value, 0);
   const winningLimit = useGame((state) => state.winningLimit);
   return (
     <View className='flex-1 mx-2'>

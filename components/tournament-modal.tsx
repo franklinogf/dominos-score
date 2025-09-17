@@ -1,3 +1,4 @@
+import { Player } from "@/lib/types";
 import { useGame } from "@/stores/use-game";
 import { useTournamentModal } from "@/stores/use-tournament-modal";
 import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
@@ -58,9 +59,9 @@ function PlayersList() {
 
   const activePlayersCount = players.filter((p) => p.isPlaying).length;
 
-  const handlePlayerToggle = (playerId: string, isPlaying: boolean) => {
+  const handlePlayerToggle = (player: Player, isPlaying: boolean) => {
     impactAsync(ImpactFeedbackStyle.Light);
-    updatePlayerActivity(playerId, isPlaying);
+    updatePlayerActivity(player, isPlaying);
   };
 
   return (
@@ -92,7 +93,7 @@ function PlayersList() {
               key={player.id}
               onPress={() => {
                 if (!isDisabled) {
-                  handlePlayerToggle(player.id, !player.isPlaying);
+                  handlePlayerToggle(player, !player.isPlaying);
                 }
               }}
               className={`
@@ -117,7 +118,7 @@ function PlayersList() {
                 disabled={isDisabled}
                 checked={player.isPlaying}
                 onCheckedChange={(checked) =>
-                  handlePlayerToggle(player.id, checked)
+                  handlePlayerToggle(player, checked)
                 }
               />
             </Pressable>

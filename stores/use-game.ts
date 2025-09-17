@@ -1,5 +1,5 @@
 import { GameStatus } from "@/lib/enums";
-import { GameScore, Player, Score } from "@/lib/types";
+import type { Player, Score } from "@/lib/types";
 import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
 
@@ -7,35 +7,34 @@ type GameState = {
   gameStatus: GameStatus;
   tournamentMode: boolean;
   players: Player[];
-  gameScore: GameScore;
   gameSize: number;
   winningLimit: number;
   toggleTournamentMode: () => void;
   updateGameSize: (size: number) => void;
   updateWinningLimit: (limit: number) => void;
   addPlayers: (players: Player[]) => void;
-  addScoreToPlayer: (playerId: string, score: number) => void;
-  removeScoreFromPlayer: (playerId: string, scoreId: string) => void;
-  changePlayerActivity: (playerId: string, isPlaying: boolean) => void;
+  addScoreToPlayer: (player: Player, score: number) => void;
+  removeScoreFromPlayer: (player: Player, scoreId: string) => void;
+  changePlayerActivity: (player: Player, isPlaying: boolean) => void;
   updateGameStatus: (status: GameStatus) => void;
 };
 
-function checkWinnerWhenUpdatingScore(playerId: string, playerScores: Score[]) {
+function checkWinnerWhenUpdatingScore(player: Player) {
   const winningLimit = useGame.getState().winningLimit;
-  const newTotal = playerScores.reduce((acc, score) => acc + score.value, 0);
-  if (newTotal >= winningLimit) {
-    useGame.setState((state) => ({
-      players: state.players.map((player) =>
-        player.id === playerId ? { ...player, isWinner: true } : player
-      ),
-    }));
-  }
+  const newTotal = player.score.reduce((acc, score) => acc + score.value, 0);
+
+  useGame.setState((state) => ({
+    players: state.players.map((player) =>
+      player.id === player.id
+        ? { ...player, isWinner: newTotal >= winningLimit ? true : false }
+        : player
+    ),
+  }));
 }
 
 export const useGame = create<GameState>((set) => ({
   gameStatus: GameStatus.NotStarted,
   tournamentMode: false,
-  gameScore: {},
   players: [],
   gameSize: 2,
   winningLimit: 150,
@@ -45,36 +44,39 @@ export const useGame = create<GameState>((set) => ({
   updateWinningLimit: (limit) => set({ winningLimit: limit }),
   updateGameSize: (size) => set({ gameSize: size }),
   addPlayers: (players) => set({ players }),
-  addScoreToPlayer: (playerId, scoreValue) =>
+  addScoreToPlayer: (player, scoreValue) =>
     set((state) => {
-      const playerScores = state.gameScore[playerId] || [];
       const newScore: Score = {
         id: randomUUID(),
         value: scoreValue,
       };
-      checkWinnerWhenUpdatingScore(playerId, [...playerScores, newScore]);
+      checkWinnerWhenUpdatingScore(player);
       return {
-        gameScore: {
-          ...state.gameScore,
-          [playerId]: [...playerScores, newScore],
-        },
+        players: state.players.map((p) =>
+          p.id === player.id ? { ...p, score: [...p.score, newScore] } : p
+        ),
       };
     }),
-  removeScoreFromPlayer: (playerId, scoreId) =>
+  removeScoreFromPlayer: (player, scoreId) =>
     set((state) => {
-      const playerScores = state.gameScore[playerId] || [];
-      checkWinnerWhenUpdatingScore(playerId, playerScores);
+      const playerScores =
+        state.players.find((p) => p.id === player.id)?.score || [];
+      checkWinnerWhenUpdatingScore(player);
       return {
-        gameScore: {
-          ...state.gameScore,
-          [playerId]: playerScores.filter((score) => score.id !== scoreId),
-        },
+        players: state.players.map((p) =>
+          p.id === player.id
+            ? {
+                ...p,
+                score: playerScores.filter((score) => score.id !== scoreId),
+              }
+            : p
+        ),
       };
     }),
-  changePlayerActivity: (playerId, isPlaying) =>
+  changePlayerActivity: (player, isPlaying) =>
     set((state) => {
       const updatedPlayers = state.players.map((player) =>
-        player.id === playerId ? { ...player, isPlaying } : player
+        player.id === player.id ? { ...player, isPlaying } : player
       );
       return { players: updatedPlayers };
     }),

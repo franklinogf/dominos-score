@@ -43,7 +43,7 @@ function PlayerButton({ name, player }: { name: string; player: Player }) {
         size='lg'
         onLongPress={() => {
           impactAsync(ImpactFeedbackStyle.Heavy);
-          addScoreToPlayer(player.id, LONG_PRESS_SCORE);
+          addScoreToPlayer(player, LONG_PRESS_SCORE);
         }}
       >
         {player.losses > 0 && (

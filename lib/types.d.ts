@@ -5,8 +5,6 @@ export type Score = {
   id: string;
   value: number;
 };
-export type GameScore = Record<string, Score[]>; // playerId -> Score[]
-
 export interface Player {
   id: string;
   name: string;
@@ -14,4 +12,5 @@ export interface Player {
   losses: number;
   isPlaying: boolean;
   isWinner: boolean;
+  score: Score[];
 }
