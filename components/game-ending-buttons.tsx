@@ -73,7 +73,7 @@ export function GameEndingButtons() {
       <Button
         size='sm'
         variant='destructive'
-        className='flex-1 '
+        className='flex-1'
         onPress={handleEndGame}
       >
         <Text>{endGameLabel}</Text>
