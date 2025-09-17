@@ -9,6 +9,7 @@ type GameState = {
   players: Player[];
   gameSize: number;
   winningLimit: number;
+  winnerPlayerId: string | null;
   toggleTournamentMode: () => void;
   updateGameSize: (size: number) => void;
   updateWinningLimit: (limit: number) => void;
@@ -19,23 +20,53 @@ type GameState = {
   updateGameStatus: (status: GameStatus) => void;
 };
 
-function checkWinnerWhenUpdatingScore(player: Player) {
-  const winningLimit = useGame.getState().winningLimit;
-  const newTotal = player.score.reduce((acc, score) => acc + score.value, 0);
+function checkWinnerWhenUpdatingScore() {
+  const state = useGame.getState();
+  const winningLimit = state.winningLimit;
+  const players = state.players;
 
-  useGame.setState((state) => ({
-    players: state.players.map((player) =>
-      player.id === player.id
-        ? { ...player, isWinner: newTotal >= winningLimit ? true : false }
-        : player
-    ),
-  }));
+  // Find the first player who has reached the winning limit
+  const winner = players.find((player) => {
+    const total = player.score.reduce((acc, score) => acc + score.value, 0);
+    return total >= winningLimit;
+  });
+
+  if (winner) {
+    useGame.setState(() => ({
+      winnerPlayerId: winner.id,
+      gameStatus: GameStatus.Finished,
+    }));
+  } else {
+    // Reset winner if no player meets the winning condition
+    useGame.setState(() => ({
+      winnerPlayerId: null,
+      gameStatus: GameStatus.InProgress,
+    }));
+  }
 }
 
 export const useGame = create<GameState>((set) => ({
+  winnerPlayerId: null,
   gameStatus: GameStatus.NotStarted,
   tournamentMode: false,
-  players: [],
+  players: [
+    {
+      id: "player0",
+      name: "OMAR",
+      score: [],
+      isPlaying: false,
+      losses: 0,
+      wins: 0,
+    },
+    {
+      id: "player1",
+      name: "ALI",
+      score: [],
+      isPlaying: false,
+      losses: 0,
+      wins: 0,
+    },
+  ],
   gameSize: 2,
   winningLimit: 150,
   updateGameStatus: (status) => set({ gameStatus: status }),
@@ -44,25 +75,31 @@ export const useGame = create<GameState>((set) => ({
   updateWinningLimit: (limit) => set({ winningLimit: limit }),
   updateGameSize: (size) => set({ gameSize: size }),
   addPlayers: (players) => set({ players }),
-  addScoreToPlayer: (player, scoreValue) =>
+  addScoreToPlayer: (player, scoreValue) => {
     set((state) => {
+      if (state.gameStatus === GameStatus.Finished) return {};
       const newScore: Score = {
         id: randomUUID(),
         value: scoreValue,
       };
-      checkWinnerWhenUpdatingScore(player);
       return {
+        gameStatus: GameStatus.InProgress,
         players: state.players.map((p) =>
           p.id === player.id ? { ...p, score: [...p.score, newScore] } : p
         ),
       };
-    }),
-  removeScoreFromPlayer: (player, scoreId) =>
+    });
+
+    // Check winner after state update
+    setTimeout(() => checkWinnerWhenUpdatingScore(), 0);
+  },
+  removeScoreFromPlayer: (player, scoreId) => {
     set((state) => {
       const playerScores =
         state.players.find((p) => p.id === player.id)?.score || [];
-      checkWinnerWhenUpdatingScore(player);
+
       return {
+        gameStatus: GameStatus.InProgress,
         players: state.players.map((p) =>
           p.id === player.id
             ? {
@@ -72,11 +109,16 @@ export const useGame = create<GameState>((set) => ({
             : p
         ),
       };
-    }),
+    });
+
+    // Check winner after state update
+    setTimeout(() => checkWinnerWhenUpdatingScore(), 0);
+  },
   changePlayerActivity: (player, isPlaying) =>
     set((state) => {
-      const updatedPlayers = state.players.map((player) =>
-        player.id === player.id ? { ...player, isPlaying } : player
+      const playerId = player.id;
+      const updatedPlayers = state.players.map((p) =>
+        p.id === playerId ? { ...p, isPlaying } : p
       );
       return { players: updatedPlayers };
     }),

@@ -12,6 +12,7 @@ import Animated, {
 
 export function PlayerScoreList({ player }: { player: Player }) {
   const removeScoreFromPlayer = useGame((state) => state.removeScoreFromPlayer);
+  const winnerPlayerId = useGame((state) => state.winnerPlayerId);
 
   return (
     <Animated.FlatList
@@ -19,40 +20,46 @@ export function PlayerScoreList({ player }: { player: Player }) {
       itemLayoutAnimation={SequencedTransition}
       data={player.score}
       keyExtractor={(item) => item.id}
-      renderItem={({ item }) => (
-        <Animated.View
-          entering={ZoomIn}
-          exiting={FlipOutXUp}
-          className='mb-2 w-[85px] max-w-[100px] mx-auto'
-        >
-          <Button
-            disabled={player.isWinner}
-            className='p-0'
-            onLongPress={() => {
-              impactAsync(ImpactFeedbackStyle.Heavy);
-              Alert.alert(
-                "Remove Score",
-                `Remove ${item.value} points from ${player.name}?`,
-                [
-                  {
-                    text: "Cancel",
-                    style: "cancel",
-                  },
-                  {
-                    text: "OK",
-                    style: "destructive",
-                    onPress: () => removeScoreFromPlayer(player, item.id),
-                  },
-                ]
-              );
-            }}
-            variant='outline'
-            size='lg'
+      renderItem={({ item, index }) => {
+        const isLastItem = index === player.score.length - 1;
+        return (
+          <Animated.View
+            entering={ZoomIn}
+            exiting={FlipOutXUp}
+            className='mb-2 w-[85px] max-w-[100px] mx-auto'
           >
-            <Text className='text-2xl'>{item.value}</Text>
-          </Button>
-        </Animated.View>
-      )}
+            <Button
+              disabled={
+                (player.id === winnerPlayerId && !isLastItem) ||
+                (player.id !== winnerPlayerId && winnerPlayerId !== null)
+              }
+              className='p-0'
+              onLongPress={() => {
+                impactAsync(ImpactFeedbackStyle.Heavy);
+                Alert.alert(
+                  "Remove Score",
+                  `Remove ${item.value} points from ${player.name}?`,
+                  [
+                    {
+                      text: "Cancel",
+                      style: "cancel",
+                    },
+                    {
+                      text: "OK",
+                      style: "destructive",
+                      onPress: () => removeScoreFromPlayer(player, item.id),
+                    },
+                  ]
+                );
+              }}
+              variant='outline'
+              size='lg'
+            >
+              <Text className='text-2xl'>{item.value}</Text>
+            </Button>
+          </Animated.View>
+        );
+      }}
     />
   );
 }

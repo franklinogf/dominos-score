@@ -2,6 +2,7 @@ import { PlayerScoreList } from "@/components/player-score-list";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { LONG_PRESS_SCORE } from "@/lib/constants";
+import { GameStatus } from "@/lib/enums";
 import { Player } from "@/lib/types";
 import { useGame } from "@/stores/use-game";
 import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
@@ -11,8 +12,9 @@ import { FlatList, View } from "react-native";
 export function PlayersButtons() {
   const players = useGame((state) => state.players);
   const activePlayers = players.filter((p) => p.isPlaying);
+  const gameStatus = useGame((state) => state.gameStatus);
 
-  if (activePlayers.length === 0) {
+  if (activePlayers.length === 0 || gameStatus === GameStatus.NotStarted) {
     router.replace("/");
     return null;
   }
@@ -36,9 +38,11 @@ export function PlayersButtons() {
 
 function PlayerButton({ name, player }: { name: string; player: Player }) {
   const addScoreToPlayer = useGame((state) => state.addScoreToPlayer);
+  const gameStatus = useGame((state) => state.gameStatus);
   return (
     <View className='flex-1 mx-2'>
       <Button
+        disabled={gameStatus === GameStatus.Finished}
         className='px-0 relative overflow-hidden'
         size='lg'
         onLongPress={() => {

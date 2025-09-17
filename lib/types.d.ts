@@ -11,6 +11,5 @@ export interface Player {
   wins: number;
   losses: number;
   isPlaying: boolean;
-  isWinner: boolean;
   score: Score[];
 }
