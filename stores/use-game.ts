@@ -13,6 +13,7 @@ type GameState = {
   updatePlayers: (players: Record<string, string>) => void;
   addScoreToPlayer: (playerKey: string, score: number) => void;
   removeScoreFromPlayer: (playerKey: string, scoreId: string) => void;
+  toggleTournamentMode: () => void;
 };
 
 export const useGame = create<GameState>((set) => ({
@@ -28,6 +29,8 @@ export const useGame = create<GameState>((set) => ({
   players: {},
   gameSize: 2,
   winningLimit: 150,
+  toggleTournamentMode: () =>
+    set((state) => ({ tournamentMode: !state.tournamentMode })),
   updateWinningLimit: (limit) => set({ winningLimit: limit }),
   updateGameSize: (size) => set({ gameSize: size }),
   updatePlayers: (players) => set({ players }),

@@ -1,6 +1,8 @@
 import { PartySize } from "@/components/party-size";
 import { PlayersForm } from "@/components/players-form";
 import { WinningLimit } from "@/components/points-selection";
+import { TournamentModal } from "@/components/tournament-modal";
+import { TournamentSwitch } from "@/components/tournament-switch";
 import { Text } from "@/components/ui/text";
 import {
   Keyboard,
@@ -18,6 +20,7 @@ export default function Index() {
         onPress={Keyboard.dismiss}
       >
         <Text variant={"h1"}>Dominos app</Text>
+        <TournamentSwitch />
         <PartySize />
         <WinningLimit />
 
@@ -28,6 +31,8 @@ export default function Index() {
           <PlayersForm />
         </KeyboardAvoidingView>
       </Pressable>
+
+      <TournamentModal />
     </SafeAreaView>
   );
 }

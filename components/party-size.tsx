@@ -1,13 +1,23 @@
 import { Text } from "@/components/ui/text";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { PARTY_SIZES } from "@/lib/constants";
+import { BIG_PARTY_SIZES, PARTY_SIZES } from "@/lib/constants";
 import { useGame } from "@/stores/use-game";
 import * as Haptics from "expo-haptics";
+import { useState } from "react";
 import { View } from "react-native";
 
 export function PartySize() {
   const gameSize = useGame((state) => state.gameSize);
   const updateGameSize = useGame((state) => state.updateGameSize);
+  const tournamentMode = useGame((state) => state.tournamentMode);
+
+  const currentMaxPartySizes = tournamentMode ? BIG_PARTY_SIZES : PARTY_SIZES;
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // Ensure game size is valid when toggling tournament mode
+  if (!tournamentMode && gameSize > 4) {
+    updateGameSize(4);
+  }
 
   return (
     <View className='w-full mt-4'>
@@ -28,10 +38,10 @@ export function PartySize() {
           updateGameSize(value !== undefined ? Number(value) : 2);
         }}
       >
-        {PARTY_SIZES.map((size, index) => (
+        {currentMaxPartySizes.map((size, index) => (
           <PartySizeButton
             isFirst={index === 0}
-            isLast={index === PARTY_SIZES.length - 1}
+            isLast={index === currentMaxPartySizes.length - 1}
             key={size}
             label={size}
           />

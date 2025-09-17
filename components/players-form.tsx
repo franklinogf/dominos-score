@@ -5,6 +5,7 @@ import { Text } from "@/components/ui/text";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useGame } from "@/stores/use-game";
+import { useTournamentModal } from "@/stores/use-tournament-modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { useRef } from "react";
@@ -30,7 +31,11 @@ export function PlayersForm() {
   const players = useGame((state) => state.players);
   const updatePlayers = useGame((state) => state.updatePlayers);
   const schema = createPlayersSchema(gameSize);
+  const tournamentMode = useGame((state) => state.tournamentMode);
   const inputRef = useRef<TextInput[]>([]);
+
+  const openModal = useTournamentModal((state) => state.openModal);
+
   const {
     control,
     formState: { errors },
@@ -52,7 +57,11 @@ export function PlayersForm() {
 
   const onSubmit = (data: Record<string, string>) => {
     updatePlayers(data);
-    router.replace("/game");
+    if (tournamentMode) {
+      openModal();
+    } else {
+      router.replace("/game");
+    }
   };
   return (
     <View className='flex-1 w-full'>
@@ -96,7 +105,6 @@ export function PlayersForm() {
                   spellCheck={false}
                   autoComplete='off'
                   id={`player-name-${item.index}`}
-                  className='h-12'
                   value={value}
                   onChangeText={onChange}
                   placeholder={`Enter player ${item.index + 1} name`}
@@ -116,7 +124,7 @@ export function PlayersForm() {
           onPress={handleSubmit(onSubmit)}
           size='lg'
         >
-          <Text>Start game</Text>
+          <Text>{tournamentMode ? "Start Tournament" : "Start Game"}</Text>
         </Button>
       </View>
     </View>
