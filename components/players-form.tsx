@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { useGame } from "@/stores/use-game";
 import { useTournamentModal } from "@/stores/use-tournament-modal";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { randomUUID } from "expo-crypto";
 import { router } from "expo-router";
 import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -59,12 +58,12 @@ export function PlayersForm() {
   }));
 
   const onSubmit = (data: Record<string, string>) => {
-    const players = Object.entries(data).map(([, name]) => ({
-      id: randomUUID(),
-      name,
+    const players = Object.entries(data).map(([key, name]) => ({
+      id: key,
+      name: name.trim(),
       wins: 0,
       losses: 0,
-      isPlaying: false,
+      isPlaying: tournamentMode ? false : true,
     }));
 
     addPlayers(players);

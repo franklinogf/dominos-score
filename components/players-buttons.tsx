@@ -11,17 +11,16 @@ import Animated, {
 } from "react-native-reanimated";
 
 export function PlayersButtons() {
-  const gameSize = useGame((state) => state.gameSize);
   const players = useGame((state) => state.players);
+  const activePlayers = players.filter((p) => p.isPlaying);
 
   return (
     <FlatList
       bounces={false}
-      className='w-full'
-      contentContainerClassName='flex-1'
-      key={gameSize}
-      numColumns={gameSize}
-      data={players}
+      showsVerticalScrollIndicator={false}
+      key={activePlayers.length}
+      numColumns={activePlayers.length}
+      data={activePlayers}
       renderItem={({ item }) => (
         <PlayerButton
           name={item.name}
@@ -71,7 +70,7 @@ function PlayerButton({
                   impactAsync(ImpactFeedbackStyle.Heavy);
                   Alert.alert(
                     "Remove Score",
-                    `Are you sure you want to remove ${item.value} points from ${name}?`,
+                    `Remove ${item.value} points from ${name}?`,
                     [
                       {
                         text: "Cancel",
@@ -79,6 +78,7 @@ function PlayerButton({
                       },
                       {
                         text: "OK",
+                        style: "destructive",
                         onPress: () =>
                           removeScoreFromPlayer(playerKey, item.id),
                       },
