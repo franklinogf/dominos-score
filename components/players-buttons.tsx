@@ -1,99 +1,66 @@
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { LONG_PRESS_SCORE } from "@/lib/constants";
+import { Player } from "@/lib/types";
 import { useGame } from "@/stores/use-game";
 import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
-import { Alert, FlatList, View } from "react-native";
-import Animated, {
-  FlipOutXUp,
-  SequencedTransition,
-  ZoomIn,
-} from "react-native-reanimated";
+import { router } from "expo-router";
+import { FlatList, View } from "react-native";
+import { PlayerScoreList } from "./player-score-list";
 
 export function PlayersButtons() {
   const players = useGame((state) => state.players);
   const activePlayers = players.filter((p) => p.isPlaying);
 
+  if (activePlayers.length === 0) {
+    router.replace("/");
+    return null;
+  }
+
   return (
-    <FlatList
-      bounces={false}
-      showsVerticalScrollIndicator={false}
-      key={activePlayers.length}
-      numColumns={activePlayers.length}
-      data={activePlayers}
-      renderItem={({ item }) => (
-        <PlayerButton
-          name={item.name}
-          playerKey={item.id}
-        />
-      )}
-    />
+    <>
+      <FlatList
+        bounces={false}
+        showsVerticalScrollIndicator={false}
+        key={activePlayers.length}
+        numColumns={activePlayers.length}
+        data={activePlayers}
+        renderItem={({ item }) => (
+          <PlayerButton
+            name={item.name}
+            player={item}
+          />
+        )}
+      />
+    </>
   );
 }
 
-function PlayerButton({
-  name,
-  playerKey,
-}: {
-  name: string;
-  playerKey: string;
-}) {
-  const score = useGame((state) => state.score);
+function PlayerButton({ name, player }: { name: string; player: Player }) {
   const addScoreToPlayer = useGame((state) => state.addScoreToPlayer);
-  const removeScoreFromPlayer = useGame((state) => state.removeScoreFromPlayer);
   return (
     <View className='flex-1 mx-2'>
       <Button
+        className='px-0 relative overflow-hidden'
         size='lg'
         onLongPress={() => {
           impactAsync(ImpactFeedbackStyle.Heavy);
-          addScoreToPlayer(playerKey, LONG_PRESS_SCORE);
+          addScoreToPlayer(player.id, LONG_PRESS_SCORE);
         }}
       >
+        {player.losses > 0 && (
+          <Text className='absolute -top-0.5 left-0.5 text-red-500/90 font-bold text-3xl'>
+            {player.losses}
+          </Text>
+        )}
+        {player.wins > 0 && (
+          <Text className='absolute -top-0.5 right-0.5 text-green-500/90 font-bold text-3xl'>
+            {player.wins}
+          </Text>
+        )}
         <Text className='line-clamp-1'>{name}</Text>
       </Button>
-      <View>
-        <Animated.FlatList
-          className='mt-2'
-          itemLayoutAnimation={SequencedTransition}
-          data={score[playerKey] || []}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Animated.View
-              entering={ZoomIn}
-              exiting={FlipOutXUp}
-              className='mb-2 w-[85px] max-w-[100px] mx-auto'
-            >
-              <Button
-                className='p-0'
-                onLongPress={() => {
-                  impactAsync(ImpactFeedbackStyle.Heavy);
-                  Alert.alert(
-                    "Remove Score",
-                    `Remove ${item.value} points from ${name}?`,
-                    [
-                      {
-                        text: "Cancel",
-                        style: "cancel",
-                      },
-                      {
-                        text: "OK",
-                        style: "destructive",
-                        onPress: () =>
-                          removeScoreFromPlayer(playerKey, item.id),
-                      },
-                    ]
-                  );
-                }}
-                variant='outline'
-                size='lg'
-              >
-                <Text className='text-2xl'>{item.value}</Text>
-              </Button>
-            </Animated.View>
-          )}
-        />
-      </View>
+      <PlayerScoreList player={player} />
     </View>
   );
 }

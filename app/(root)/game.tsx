@@ -1,6 +1,6 @@
 import { PlayersButtons } from "@/components/players-buttons";
+import { Separator } from "@/components/ui/separator";
 import { Text } from "@/components/ui/text";
-import { Link } from "expo-router";
 // import { router, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -15,15 +15,8 @@ export default function Game() {
       </Text>
 
       <PlayersButtons />
-      {/* <Separator className='my-4' /> */}
-      {/* <PlayersScores /> */}
-
-      <Link
-        href='/'
-        className='m-4'
-      >
-        <Text>Go back</Text>
-      </Link>
+      <Separator className='my-4' />
+      {/* <Scores /> */}
     </SafeAreaView>
   );
 }

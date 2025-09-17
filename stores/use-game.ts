@@ -7,7 +7,7 @@ type GameState = {
   gameStatus: GameStatus;
   tournamentMode: boolean;
   players: Player[];
-  score: GameScore;
+  gameScore: GameScore;
   gameSize: number;
   winningLimit: number;
   toggleTournamentMode: () => void;
@@ -23,7 +23,7 @@ type GameState = {
 export const useGame = create<GameState>((set) => ({
   gameStatus: GameStatus.NotStarted,
   tournamentMode: false,
-  score: {},
+  gameScore: {},
   players: [],
   gameSize: 2,
   winningLimit: 150,
@@ -35,24 +35,24 @@ export const useGame = create<GameState>((set) => ({
   addPlayers: (players) => set({ players }),
   addScoreToPlayer: (playerId, scoreValue) =>
     set((state) => {
-      const playerScores = state.score[playerId] || [];
+      const playerScores = state.gameScore[playerId] || [];
       const newScore: Score = {
         id: randomUUID(),
         value: scoreValue,
       };
       return {
-        score: {
-          ...state.score,
+        gameScore: {
+          ...state.gameScore,
           [playerId]: [...playerScores, newScore],
         },
       };
     }),
   removeScoreFromPlayer: (playerId, scoreId) =>
     set((state) => {
-      const playerScores = state.score[playerId] || [];
+      const playerScores = state.gameScore[playerId] || [];
       return {
-        score: {
-          ...state.score,
+        gameScore: {
+          ...state.gameScore,
           [playerId]: playerScores.filter((score) => score.id !== scoreId),
         },
       };
