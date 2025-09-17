@@ -12,16 +12,18 @@ export function GameEndingButtons() {
   const tournamentMode = useGame((state) => state.tournamentMode);
   const startNewRound = useGame((state) => state.startNewRound);
   const endRound = useGame((state) => state.endRound);
+  const endRoundLabel = tournamentMode ? "End Round" : "Restart";
+  const endGameLabel = tournamentMode ? "End Tournament" : "End Game";
 
   const handleEndRound = () => {
     impactAsync(ImpactFeedbackStyle.Medium);
-    Alert.alert("End Round", "Are you sure you want to end this round?", [
+    Alert.alert(endRoundLabel, "Are you sure you want to end this round?", [
       {
         text: "Cancel",
         style: "cancel",
       },
       {
-        text: "End Round",
+        text: endRoundLabel,
         style: "destructive",
         onPress: () => {
           impactAsync(ImpactFeedbackStyle.Heavy);
@@ -39,7 +41,7 @@ export function GameEndingButtons() {
   const handleEndGame = () => {
     impactAsync(ImpactFeedbackStyle.Medium);
     Alert.alert(
-      "End Game",
+      endGameLabel,
       "Are you sure you want to end the entire game? This will reset all scores.",
       [
         {
@@ -47,7 +49,7 @@ export function GameEndingButtons() {
           style: "cancel",
         },
         {
-          text: "End Game",
+          text: endGameLabel,
           style: "destructive",
           onPress: () => {
             impactAsync(ImpactFeedbackStyle.Heavy);
@@ -65,7 +67,7 @@ export function GameEndingButtons() {
         className='flex-1 bg-orange-400 active:bg-orange-400/80'
         onPress={handleEndRound}
       >
-        <Text>End Round</Text>
+        <Text>{endRoundLabel}</Text>
       </Button>
 
       <Button
@@ -74,7 +76,7 @@ export function GameEndingButtons() {
         className='flex-1 '
         onPress={handleEndGame}
       >
-        <Text>{tournamentMode ? "End Tournament" : "End Game"}</Text>
+        <Text>{endGameLabel}</Text>
       </Button>
     </View>
   );

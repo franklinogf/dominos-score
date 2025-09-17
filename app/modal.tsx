@@ -57,26 +57,15 @@ export default function TournamentModal() {
         <View className='mt-auto pt-6'>
           <Button
             onPress={handleSubmit}
-            className={`
-                  shadow-sm
-                  ${
-                    activePlayersCount >= 2 && activePlayersCount <= 4
-                      ? "bg-primary"
-                      : "bg-muted opacity-50"
-                  }
-                `}
+            variant={
+              activePlayersCount < 2 || activePlayersCount > 4
+                ? "outline"
+                : "default"
+            }
+            className={`shadow-sm`}
             disabled={activePlayersCount < 2 || activePlayersCount > 4}
           >
-            <Text
-              className={`
-                  font-medium
-                  ${
-                    activePlayersCount >= 2 && activePlayersCount <= 4
-                      ? "text-primary-foreground"
-                      : "text-muted-foreground"
-                  }
-                `}
-            >
+            <Text>
               {activePlayersCount < 2
                 ? "Select at least 2 players"
                 : activePlayersCount > 4
@@ -132,7 +121,7 @@ function PlayersList() {
       <View className='bg-card rounded-xl border border-border/50 overflow-hidden shadow-sm'>
         {players.map((player, index) => {
           const isDisabled =
-            (activePlayersCount === 2 && player.isPlaying) ||
+            (activePlayersCount === 1 && player.isPlaying) ||
             (activePlayersCount === 4 && !player.isPlaying);
 
           return (
