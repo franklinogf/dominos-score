@@ -7,7 +7,7 @@ import { Player } from "@/lib/types";
 import { useGame } from "@/stores/use-game";
 import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
 import { router } from "expo-router";
-import { FlatList, View } from "react-native";
+import { Alert, FlatList, View } from "react-native";
 
 export function PlayersButtons() {
   const players = useGame((state) => state.players);
@@ -39,12 +39,46 @@ export function PlayersButtons() {
 function PlayerButton({ name, player }: { name: string; player: Player }) {
   const addScoreToPlayer = useGame((state) => state.addScoreToPlayer);
   const gameStatus = useGame((state) => state.gameStatus);
+
+  const handleAddCustomScore = () => {
+    impactAsync(ImpactFeedbackStyle.Light);
+    Alert.prompt(
+      "Add Score",
+      `Enter score for ${name}:`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Add",
+          onPress: (score: string | undefined) => {
+            // Allow empty input to cancel without error
+            if (!score || score.trim() === "") {
+              return; // Simply cancel if empty
+            }
+
+            const numericScore = parseInt(score, 10);
+            if (!isNaN(numericScore) && numericScore > 0) {
+              impactAsync(ImpactFeedbackStyle.Medium);
+              addScoreToPlayer(player, numericScore);
+            }
+          },
+        },
+      ],
+      "plain-text",
+      "",
+      "number-pad"
+    );
+  };
+
   return (
     <View className='flex-1 mx-2'>
       <Button
         disabled={gameStatus === GameStatus.Finished}
         className='px-0 relative overflow-hidden'
         size='lg'
+        onPress={handleAddCustomScore}
         onLongPress={() => {
           impactAsync(ImpactFeedbackStyle.Heavy);
           addScoreToPlayer(player, LONG_PRESS_SCORE);
