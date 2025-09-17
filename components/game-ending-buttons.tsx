@@ -22,8 +22,8 @@ export function GameEndingButtons() {
         style: "destructive",
         onPress: () => {
           impactAsync(ImpactFeedbackStyle.Heavy);
-          // Logic to end round - maybe navigate to tournament modal for next round
-          router.push("/");
+          updateGameStatus(GameStatus.Finished);
+          router.push("/modal");
         },
       },
     ]);

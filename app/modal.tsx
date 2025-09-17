@@ -78,7 +78,7 @@ export default function TournamentModal() {
             </Text>
           </Button>
 
-          {gameStatus === GameStatus.Ready && (
+          {gameStatus === GameStatus.NotStarted && (
             <View className='mt-4'>
               <Button
                 variant='outline'
@@ -97,7 +97,7 @@ export default function TournamentModal() {
 function PlayersList() {
   const players = useGame((state) => state.players);
   const updatePlayerActivity = useGame((state) => state.changePlayerActivity);
-
+  console.log(JSON.stringify(players, null, 2));
   const activePlayersCount = players.filter((p) => p.isPlaying).length;
 
   const handlePlayerToggle = (player: Player, isPlaying: boolean) => {
