@@ -3,6 +3,7 @@ import { Text } from "@/components/ui/text";
 import { Player } from "@/lib/types";
 import { useGame } from "@/stores/use-game";
 import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
+import { useEffect, useRef } from "react";
 import { Alert } from "react-native";
 import Animated, {
   FlipOutXUp,
@@ -13,9 +14,33 @@ import Animated, {
 export function PlayerScoreList({ player }: { player: Player }) {
   const removeScoreFromPlayer = useGame((state) => state.removeScoreFromPlayer);
   const winnerPlayerId = useGame((state) => state.winnerPlayerId);
+  const flatListRef = useRef<any>(null);
+
+  // Auto-scroll to the end when new scores are added
+  useEffect(() => {
+    if (player.score.length > 0) {
+      // Small delay to ensure the item is rendered before scrolling
+      setTimeout(() => {
+        try {
+          flatListRef.current?.scrollToEnd({ animated: true });
+        } catch {
+          // Fallback: scroll to index if scrollToEnd doesn't work
+          try {
+            flatListRef.current?.scrollToIndex({
+              index: player.score.length - 1,
+              animated: true,
+            });
+          } catch {
+            console.log("Auto-scroll not available for this list");
+          }
+        }
+      }, 150);
+    }
+  }, [player.score.length]);
 
   return (
     <Animated.FlatList
+      ref={flatListRef}
       className='mt-2 flex-1 px-2'
       itemLayoutAnimation={SequencedTransition}
       data={player.score}
