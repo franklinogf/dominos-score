@@ -3,5 +3,4 @@ export enum GameStatus {
   Ready,
   InProgress,
   Finished,
-  Paused,
 }
