@@ -16,7 +16,7 @@ export function PlayerScoreList({ player }: { player: Player }) {
 
   return (
     <Animated.FlatList
-      className='mt-2'
+      className='mt-2 flex-1 px-2'
       itemLayoutAnimation={SequencedTransition}
       data={player.score}
       keyExtractor={(item) => item.id}

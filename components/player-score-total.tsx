@@ -57,7 +57,7 @@ export function PlayerScoreTotal({ player }: { player: Player }) {
   }));
 
   return (
-    <View className='flex-1 mx-2'>
+    <View className='flex-1 px-2'>
       <Animated.View style={animatedStyle}>
         <Text
           className={cn("text-2xl font-extrabold text-center", {

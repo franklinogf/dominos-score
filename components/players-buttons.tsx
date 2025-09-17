@@ -1,7 +1,5 @@
-import { PlayerScoreList } from "@/components/player-score-list";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
-import { LONG_PRESS_SCORE } from "@/lib/constants";
 import { GameStatus } from "@/lib/enums";
 import { Player } from "@/lib/types";
 import { useGame } from "@/stores/use-game";
@@ -66,7 +64,7 @@ function PlayerButton({ name, player }: { name: string; player: Player }) {
   };
 
   return (
-    <View className='flex-1 mx-2'>
+    <View className='flex-1 px-2'>
       <Button
         disabled={gameStatus === GameStatus.Finished}
         className='px-0 relative overflow-hidden'
@@ -74,7 +72,7 @@ function PlayerButton({ name, player }: { name: string; player: Player }) {
         onPress={handleAddCustomScore}
         onLongPress={() => {
           impactAsync(ImpactFeedbackStyle.Heavy);
-          addScoreToPlayer(player, LONG_PRESS_SCORE);
+          addScoreToPlayer(player, 10);
         }}
       >
         {player.losses > 0 && (
@@ -87,9 +85,8 @@ function PlayerButton({ name, player }: { name: string; player: Player }) {
             {player.wins}
           </Text>
         )}
-        <Text className='line-clamp-1'>{name}</Text>
+        <Text className='line-clamp-1 uppercase'>{name}</Text>
       </Button>
-      <PlayerScoreList player={player} />
     </View>
   );
 }
