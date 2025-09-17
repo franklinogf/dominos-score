@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 
 import { Button } from "@/components/ui/button";
+import { GameStatus } from "@/lib/enums";
 import { cn } from "@/lib/utils";
 import { useGame } from "@/stores/use-game";
 import { useTournamentModal } from "@/stores/use-tournament-modal";
@@ -34,6 +35,7 @@ export function PlayersForm() {
   const schema = createPlayersSchema(gameSize);
   const tournamentMode = useGame((state) => state.tournamentMode);
   const inputRef = useRef<TextInput[]>([]);
+  const updateGameStatus = useGame((state) => state.updateGameStatus);
 
   const openModal = useTournamentModal((state) => state.openModal);
 
@@ -69,6 +71,7 @@ export function PlayersForm() {
     if (tournamentMode) {
       openModal();
     } else {
+      updateGameStatus(GameStatus.Ready);
       router.replace("/game");
     }
   };

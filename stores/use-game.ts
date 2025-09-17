@@ -1,8 +1,10 @@
+import { GameStatus } from "@/lib/enums";
 import { GameScore, Player, Score } from "@/lib/types";
 import { randomUUID } from "expo-crypto";
 import { create } from "zustand";
 
 type GameState = {
+  gameStatus: GameStatus;
   tournamentMode: boolean;
   players: Player[];
   score: GameScore;
@@ -14,29 +16,18 @@ type GameState = {
   addPlayers: (players: Player[]) => void;
   addScoreToPlayer: (playerId: string, score: number) => void;
   removeScoreFromPlayer: (playerId: string, scoreId: string) => void;
+  changePlayerActivity: (playerId: string, isPlaying: boolean) => void;
+  updateGameStatus: (status: GameStatus) => void;
 };
 
 export const useGame = create<GameState>((set) => ({
+  gameStatus: GameStatus.NotStarted,
   tournamentMode: false,
   score: {},
-  players: [
-    {
-      id: randomUUID(),
-      name: "Player 1",
-      wins: 0,
-      losses: 0,
-      isPlaying: false,
-    },
-    {
-      id: randomUUID(),
-      name: "Player 2",
-      wins: 0,
-      losses: 0,
-      isPlaying: false,
-    },
-  ],
+  players: [],
   gameSize: 2,
   winningLimit: 150,
+  updateGameStatus: (status) => set({ gameStatus: status }),
   toggleTournamentMode: () =>
     set((state) => ({ tournamentMode: !state.tournamentMode })),
   updateWinningLimit: (limit) => set({ winningLimit: limit }),
@@ -65,5 +56,12 @@ export const useGame = create<GameState>((set) => ({
           [playerId]: playerScores.filter((score) => score.id !== scoreId),
         },
       };
+    }),
+  changePlayerActivity: (playerId, isPlaying) =>
+    set((state) => {
+      const updatedPlayers = state.players.map((player) =>
+        player.id === playerId ? { ...player, isPlaying } : player
+      );
+      return { players: updatedPlayers };
     }),
 }));
