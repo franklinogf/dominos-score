@@ -18,6 +18,8 @@ type GameState = {
   removeScoreFromPlayer: (player: Player, scoreId: string) => void;
   changePlayerActivity: (player: Player, isPlaying: boolean) => void;
   updateGameStatus: (status: GameStatus) => void;
+  endGame: () => void;
+  startNewRound: () => void;
 };
 
 function checkWinnerWhenUpdatingScore() {
@@ -69,6 +71,17 @@ export const useGame = create<GameState>((set) => ({
   ],
   gameSize: 2,
   winningLimit: 150,
+  endGame: () =>
+    set(() => ({
+      gameStatus: GameStatus.NotStarted,
+      winnerPlayerId: null,
+      players: [],
+    })),
+  startNewRound: () =>
+    set((state) => ({
+      gameStatus: GameStatus.Ready,
+      players: state.players.map((p) => ({ ...p, score: [] })),
+    })),
   updateGameStatus: (status) => set({ gameStatus: status }),
   toggleTournamentMode: () =>
     set((state) => ({ tournamentMode: !state.tournamentMode })),

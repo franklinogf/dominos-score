@@ -13,6 +13,8 @@ export default function TournamentModal() {
   const players = useGame((state) => state.players);
   const gameStatus = useGame((state) => state.gameStatus);
   const updateGameStatus = useGame((state) => state.updateGameStatus);
+  const startNewRound = useGame((state) => state.startNewRound);
+
   const activePlayersCount = players.filter((p) => p.isPlaying).length;
 
   function handleSubmit() {
@@ -21,13 +23,18 @@ export default function TournamentModal() {
       return; // Don't proceed if invalid player count
     }
     impactAsync(ImpactFeedbackStyle.Medium);
-    updateGameStatus(GameStatus.Ready);
+    startNewRound();
+    // Dismiss modal and navigate to game, preventing back navigation
+
+    router.dismissAll();
     router.replace("/game");
   }
 
   function handleBack() {
     router.back();
-    updateGameStatus(GameStatus.NotStarted);
+    updateGameStatus(
+      gameStatus === GameStatus.Ready ? GameStatus.NotStarted : gameStatus
+    );
     impactAsync(ImpactFeedbackStyle.Light);
   }
   return (
@@ -78,16 +85,14 @@ export default function TournamentModal() {
             </Text>
           </Button>
 
-          {gameStatus === GameStatus.NotStarted && (
-            <View className='mt-4'>
-              <Button
-                variant='outline'
-                onPress={handleBack}
-              >
-                <Text>Cancel</Text>
-              </Button>
-            </View>
-          )}
+          <View className='mt-4'>
+            <Button
+              variant='outline'
+              onPress={handleBack}
+            >
+              <Text>Cancel</Text>
+            </Button>
+          </View>
         </View>
       </View>
     </SafeAreaView>

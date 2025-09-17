@@ -10,6 +10,8 @@ import { router } from "expo-router";
 export function GameEndingButtons() {
   const updateGameStatus = useGame((state) => state.updateGameStatus);
   const tournamentMode = useGame((state) => state.tournamentMode);
+  const startNewRound = useGame((state) => state.startNewRound);
+
   const handleEndRound = () => {
     impactAsync(ImpactFeedbackStyle.Medium);
     Alert.alert("End Round", "Are you sure you want to end this round?", [
@@ -22,8 +24,11 @@ export function GameEndingButtons() {
         style: "destructive",
         onPress: () => {
           impactAsync(ImpactFeedbackStyle.Heavy);
-          updateGameStatus(GameStatus.Finished);
-          router.push("/modal");
+          if (tournamentMode) {
+            router.push("/modal");
+          } else {
+            startNewRound();
+          }
         },
       },
     ]);

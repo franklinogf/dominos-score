@@ -4,7 +4,6 @@ import { GameTotal } from "@/components/game-total";
 import { PlayersButtons } from "@/components/players-buttons";
 import { Separator } from "@/components/ui/separator";
 import { Text } from "@/components/ui/text";
-import { GameStatus } from "@/lib/enums";
 import { useGame } from "@/stores/use-game";
 import { router } from "expo-router";
 import { View } from "react-native";
@@ -13,10 +12,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function Game() {
   const players = useGame((state) => state.players);
   const activePlayersCount = players.filter((p) => p.isPlaying).length;
-  const gameStatus = useGame((state) => state.gameStatus);
   const tournamentMode = useGame((state) => state.tournamentMode);
 
-  if (activePlayersCount === 0 || gameStatus === GameStatus.NotStarted) {
+  if (activePlayersCount === 0) {
     router.replace("/");
     return null;
   }
