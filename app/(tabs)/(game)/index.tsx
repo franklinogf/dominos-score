@@ -1,7 +1,6 @@
 import { PartySize } from "@/components/party-size";
 import { PlayersForm } from "@/components/players-form";
 import { WinningLimit } from "@/components/points-selection";
-import { TournamentModal } from "@/components/tournament-modal";
 import { TournamentSwitch } from "@/components/tournament-switch";
 import { Text } from "@/components/ui/text";
 import {
@@ -32,8 +31,6 @@ export default function Index() {
           <PlayersForm />
         </KeyboardAvoidingView>
       </Pressable>
-
-      <TournamentModal />
     </SafeAreaView>
   );
 }

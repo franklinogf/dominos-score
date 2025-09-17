@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { GameStatus } from "@/lib/enums";
 import { cn } from "@/lib/utils";
 import { useGame } from "@/stores/use-game";
-import { useTournamentModal } from "@/stores/use-tournament-modal";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
 import { useRef } from "react";
@@ -35,8 +34,6 @@ export function PlayersForm() {
   const tournamentMode = useGame((state) => state.tournamentMode);
   const inputRef = useRef<TextInput[]>([]);
   const updateGameStatus = useGame((state) => state.updateGameStatus);
-
-  const openModal = useTournamentModal((state) => state.openModal);
 
   const {
     control,
@@ -70,8 +67,7 @@ export function PlayersForm() {
 
     addPlayers(players);
     if (tournamentMode) {
-      updateGameStatus(GameStatus.Ready);
-      openModal();
+      router.push("/modal");
     } else {
       updateGameStatus(GameStatus.Ready);
       router.replace("/game");

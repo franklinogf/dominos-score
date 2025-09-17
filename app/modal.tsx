@@ -1,18 +1,18 @@
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Text } from "@/components/ui/text";
+import { GameStatus } from "@/lib/enums";
 import { Player } from "@/lib/types";
 import { useGame } from "@/stores/use-game";
-import { useTournamentModal } from "@/stores/use-tournament-modal";
 import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
 import { router } from "expo-router";
-import { Modal, Pressable, View } from "react-native";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { Button } from "./ui/button";
-import { Switch } from "./ui/switch";
-import { Text } from "./ui/text";
+import { Pressable, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-export function TournamentModal() {
-  const isOpen = useTournamentModal((state) => state.isOpen);
-  const closeModal = useTournamentModal((state) => state.closeModal);
+export default function TournamentModal() {
   const players = useGame((state) => state.players);
+  const gameStatus = useGame((state) => state.gameStatus);
+  const updateGameStatus = useGame((state) => state.updateGameStatus);
   const activePlayersCount = players.filter((p) => p.isPlaying).length;
 
   function handleSubmit() {
@@ -20,39 +20,37 @@ export function TournamentModal() {
       impactAsync(ImpactFeedbackStyle.Heavy);
       return; // Don't proceed if invalid player count
     }
-
     impactAsync(ImpactFeedbackStyle.Medium);
-    closeModal();
+    updateGameStatus(GameStatus.Ready);
     router.replace("/game");
   }
+
+  function handleBack() {
+    router.back();
+    updateGameStatus(GameStatus.NotStarted);
+    impactAsync(ImpactFeedbackStyle.Light);
+  }
   return (
-    <Modal
-      presentationStyle='fullScreen'
-      animationType='slide'
-      visible={isOpen}
-      onRequestClose={closeModal}
-    >
-      <SafeAreaProvider>
-        <SafeAreaView className='flex-1 bg-background'>
-          <View className='flex-1 px-6 py-4'>
-            <View className='mb-6 pt-2'>
-              <Text
-                variant='h1'
-                className='text-center'
-              >
-                Tournament
-              </Text>
-              <Text className='text-center text-muted-foreground mt-2'>
-                Select players for this round
-              </Text>
-            </View>
+    <SafeAreaView className='flex-1 bg-background'>
+      <View className='flex-1 px-6 py-4'>
+        <View className='mb-6 pt-2'>
+          <Text
+            variant='h1'
+            className='text-center'
+          >
+            Tournament
+          </Text>
+          <Text className='text-center text-muted-foreground mt-2'>
+            Select players for this round
+          </Text>
+        </View>
 
-            <PlayersList />
+        <PlayersList />
 
-            <View className='mt-auto pt-6'>
-              <Button
-                onPress={handleSubmit}
-                className={`
+        <View className='mt-auto pt-6'>
+          <Button
+            onPress={handleSubmit}
+            className={`
                   shadow-sm
                   ${
                     activePlayersCount >= 2 && activePlayersCount <= 4
@@ -60,10 +58,10 @@ export function TournamentModal() {
                       : "bg-muted opacity-50"
                   }
                 `}
-                disabled={activePlayersCount < 2 || activePlayersCount > 4}
-              >
-                <Text
-                  className={`
+            disabled={activePlayersCount < 2 || activePlayersCount > 4}
+          >
+            <Text
+              className={`
                   font-medium
                   ${
                     activePlayersCount >= 2 && activePlayersCount <= 4
@@ -71,19 +69,28 @@ export function TournamentModal() {
                       : "text-muted-foreground"
                   }
                 `}
-                >
-                  {activePlayersCount < 2
-                    ? "Select at least 2 players"
-                    : activePlayersCount > 4
-                      ? "Too many players selected"
-                      : "Start Game"}
-                </Text>
+            >
+              {activePlayersCount < 2
+                ? "Select at least 2 players"
+                : activePlayersCount > 4
+                  ? "Too many players selected"
+                  : "Start Game"}
+            </Text>
+          </Button>
+
+          {gameStatus === GameStatus.Ready && (
+            <View className='mt-4'>
+              <Button
+                variant='outline'
+                onPress={handleBack}
+              >
+                <Text>Cancel</Text>
               </Button>
             </View>
-          </View>
-        </SafeAreaView>
-      </SafeAreaProvider>
-    </Modal>
+          )}
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }
 
