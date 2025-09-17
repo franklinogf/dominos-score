@@ -2,6 +2,7 @@ import { Player } from "@/lib/types";
 import { useGame } from "@/stores/use-game";
 import { useTournamentModal } from "@/stores/use-tournament-modal";
 import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
+import { router } from "expo-router";
 import { Modal, Pressable, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Button } from "./ui/button";
@@ -11,7 +12,19 @@ import { Text } from "./ui/text";
 export function TournamentModal() {
   const isOpen = useTournamentModal((state) => state.isOpen);
   const closeModal = useTournamentModal((state) => state.closeModal);
+  const players = useGame((state) => state.players);
+  const activePlayersCount = players.filter((p) => p.isPlaying).length;
 
+  function handleSubmit() {
+    if (activePlayersCount < 2 || activePlayersCount > 4) {
+      impactAsync(ImpactFeedbackStyle.Heavy);
+      return; // Don't proceed if invalid player count
+    }
+
+    impactAsync(ImpactFeedbackStyle.Medium);
+    closeModal();
+    router.replace("/game");
+  }
   return (
     <Modal
       presentationStyle='fullScreen'
@@ -38,11 +51,32 @@ export function TournamentModal() {
 
             <View className='mt-auto pt-6'>
               <Button
-                onPress={closeModal}
-                className='bg-primary shadow-sm'
+                onPress={handleSubmit}
+                className={`
+                  shadow-sm
+                  ${
+                    activePlayersCount >= 2 && activePlayersCount <= 4
+                      ? "bg-primary"
+                      : "bg-muted opacity-50"
+                  }
+                `}
+                disabled={activePlayersCount < 2 || activePlayersCount > 4}
               >
-                <Text className='text-primary-foreground font-medium'>
-                  Continue
+                <Text
+                  className={`
+                  font-medium
+                  ${
+                    activePlayersCount >= 2 && activePlayersCount <= 4
+                      ? "text-primary-foreground"
+                      : "text-muted-foreground"
+                  }
+                `}
+                >
+                  {activePlayersCount < 2
+                    ? "Select at least 2 players"
+                    : activePlayersCount > 4
+                      ? "Too many players selected"
+                      : "Start Game"}
                 </Text>
               </Button>
             </View>

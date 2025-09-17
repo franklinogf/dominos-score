@@ -6,18 +6,11 @@ import { GameStatus } from "@/lib/enums";
 import { Player } from "@/lib/types";
 import { useGame } from "@/stores/use-game";
 import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
-import { router } from "expo-router";
 import { Alert, FlatList, View } from "react-native";
 
 export function PlayersButtons() {
   const players = useGame((state) => state.players);
   const activePlayers = players.filter((p) => p.isPlaying);
-  const gameStatus = useGame((state) => state.gameStatus);
-
-  if (activePlayers.length === 0 || gameStatus === GameStatus.NotStarted) {
-    router.replace("/");
-    return null;
-  }
 
   return (
     <FlatList

@@ -70,10 +70,11 @@ export function PlayersForm() {
 
     addPlayers(players);
     if (tournamentMode) {
+      updateGameStatus(GameStatus.Ready);
       openModal();
     } else {
       updateGameStatus(GameStatus.Ready);
-      router.push("/game");
+      router.replace("/game");
     }
   };
   return (
