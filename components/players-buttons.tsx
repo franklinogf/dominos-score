@@ -1,3 +1,4 @@
+import { PlayerScoreList } from "@/components/player-score-list";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { LONG_PRESS_SCORE } from "@/lib/constants";
@@ -6,7 +7,6 @@ import { useGame } from "@/stores/use-game";
 import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
 import { router } from "expo-router";
 import { FlatList, View } from "react-native";
-import { PlayerScoreList } from "./player-score-list";
 
 export function PlayersButtons() {
   const players = useGame((state) => state.players);
@@ -18,21 +18,19 @@ export function PlayersButtons() {
   }
 
   return (
-    <>
-      <FlatList
-        bounces={false}
-        showsVerticalScrollIndicator={false}
-        key={activePlayers.length}
-        numColumns={activePlayers.length}
-        data={activePlayers}
-        renderItem={({ item }) => (
-          <PlayerButton
-            name={item.name}
-            player={item}
-          />
-        )}
-      />
-    </>
+    <FlatList
+      bounces={false}
+      showsVerticalScrollIndicator={false}
+      key={activePlayers.length}
+      numColumns={activePlayers.length}
+      data={activePlayers}
+      renderItem={({ item }) => (
+        <PlayerButton
+          name={item.name}
+          player={item}
+        />
+      )}
+    />
   );
 }
 

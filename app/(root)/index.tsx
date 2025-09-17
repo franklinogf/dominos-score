@@ -16,6 +16,7 @@ export default function Index() {
   return (
     <SafeAreaView className='flex-1 bg-background'>
       <Pressable
+        accessible={false}
         className='flex-1'
         onPress={Keyboard.dismiss}
       >

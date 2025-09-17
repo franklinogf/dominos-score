@@ -15,10 +15,16 @@ export default function RootLayout() {
 
       <Tabs
         screenOptions={{
-          tabBarShowLabel: false,
+          // tabBarShowLabel: false,
+
           headerShown: false,
           tabBarActiveTintColor: currentTheme.primary,
           tabBarInactiveTintColor: currentTheme.mutedForeground,
+          tabBarLabelStyle: {
+            fontSize: 14,
+            fontWeight: "600",
+          },
+          animation: "shift",
         }}
       >
         <Tabs.Screen

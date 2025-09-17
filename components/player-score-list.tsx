@@ -11,13 +11,14 @@ import Animated, {
 } from "react-native-reanimated";
 
 export function PlayerScoreList({ player }: { player: Player }) {
-  const score = useGame((state) => state.gameScore);
+  const gameScore = useGame((state) => state.gameScore);
   const removeScoreFromPlayer = useGame((state) => state.removeScoreFromPlayer);
+
   return (
     <Animated.FlatList
       className='mt-2'
       itemLayoutAnimation={SequencedTransition}
-      data={score[player.id] || []}
+      data={gameScore[player.id] || []}
       keyExtractor={(item) => item.id}
       renderItem={({ item }) => (
         <Animated.View
@@ -26,12 +27,13 @@ export function PlayerScoreList({ player }: { player: Player }) {
           className='mb-2 w-[85px] max-w-[100px] mx-auto'
         >
           <Button
+            disabled={player.isWinner}
             className='p-0'
             onLongPress={() => {
               impactAsync(ImpactFeedbackStyle.Heavy);
               Alert.alert(
                 "Remove Score",
-                `Remove ${item.value} points from ${name}?`,
+                `Remove ${item.value} points from ${player.name}?`,
                 [
                   {
                     text: "Cancel",

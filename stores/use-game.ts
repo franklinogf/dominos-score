@@ -20,6 +20,18 @@ type GameState = {
   updateGameStatus: (status: GameStatus) => void;
 };
 
+function checkWinnerWhenUpdatingScore(playerId: string, playerScores: Score[]) {
+  const winningLimit = useGame.getState().winningLimit;
+  const newTotal = playerScores.reduce((acc, score) => acc + score.value, 0);
+  if (newTotal >= winningLimit) {
+    useGame.setState((state) => ({
+      players: state.players.map((player) =>
+        player.id === playerId ? { ...player, isWinner: true } : player
+      ),
+    }));
+  }
+}
+
 export const useGame = create<GameState>((set) => ({
   gameStatus: GameStatus.NotStarted,
   tournamentMode: false,
@@ -40,6 +52,7 @@ export const useGame = create<GameState>((set) => ({
         id: randomUUID(),
         value: scoreValue,
       };
+      checkWinnerWhenUpdatingScore(playerId, [...playerScores, newScore]);
       return {
         gameScore: {
           ...state.gameScore,
@@ -50,6 +63,7 @@ export const useGame = create<GameState>((set) => ({
   removeScoreFromPlayer: (playerId, scoreId) =>
     set((state) => {
       const playerScores = state.gameScore[playerId] || [];
+      checkWinnerWhenUpdatingScore(playerId, playerScores);
       return {
         gameScore: {
           ...state.gameScore,

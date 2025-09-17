@@ -1,12 +1,16 @@
+import { GameTotal } from "@/components/game-total";
 import { PlayersButtons } from "@/components/players-buttons";
 import { Separator } from "@/components/ui/separator";
 import { Text } from "@/components/ui/text";
-// import { router, useRouter } from "expo-router";
+import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Game() {
   return (
-    <SafeAreaView className='flex-1 bg-background'>
+    <SafeAreaView
+      edges={["top", "left", "right"]}
+      className='flex-1 bg-background'
+    >
       <Text
         variant='h1'
         className='mb-4'
@@ -14,9 +18,15 @@ export default function Game() {
         Game
       </Text>
 
-      <PlayersButtons />
-      <Separator className='my-4' />
-      {/* <Scores /> */}
+      <View className='flex-1'>
+        <PlayersButtons />
+      </View>
+
+      <Separator className='my-2' />
+
+      <View className='h-16'>
+        <GameTotal />
+      </View>
     </SafeAreaView>
   );
 }

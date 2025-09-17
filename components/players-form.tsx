@@ -64,6 +64,7 @@ export function PlayersForm() {
       wins: 0,
       losses: 0,
       isPlaying: tournamentMode ? false : true,
+      isWinner: false,
     }));
 
     addPlayers(players);
@@ -71,7 +72,7 @@ export function PlayersForm() {
       openModal();
     } else {
       updateGameStatus(GameStatus.Ready);
-      router.replace("/game");
+      router.push("/game");
     }
   };
   return (
