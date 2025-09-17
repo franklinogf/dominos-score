@@ -4,6 +4,7 @@ import { Text } from "@/components/ui/text";
 
 import { Button } from "@/components/ui/button";
 import { GameStatus } from "@/lib/enums";
+import { Player } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { useGame } from "@/stores/use-game";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -55,13 +56,12 @@ export function PlayersForm() {
   }));
 
   const onSubmit = (data: Record<string, string>) => {
-    const players = Object.entries(data).map(([key, name]) => ({
+    const players: Player[] = Object.entries(data).map(([key, name]) => ({
       id: key,
       name: name.trim(),
       wins: 0,
       losses: 0,
       isPlaying: tournamentMode ? false : true,
-      isWinner: false,
       score: [],
     }));
 

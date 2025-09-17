@@ -15,7 +15,6 @@ export function PlayersButtons() {
       {activePlayers.map((player) => (
         <PlayerButton
           key={player.id}
-          name={player.name}
           player={player}
         />
       ))}
@@ -23,7 +22,13 @@ export function PlayersButtons() {
   );
 }
 
-function PlayerButton({ name, player }: { name: string; player: Player }) {
+function PlayerButton({ player }: { player: Player }) {
+  console.log(
+    "Rendering PlayerButton for:",
+    player.name,
+    player.wins,
+    player.losses
+  );
   const addScoreToPlayer = useGame((state) => state.addScoreToPlayer);
   const gameStatus = useGame((state) => state.gameStatus);
 
@@ -31,7 +36,7 @@ function PlayerButton({ name, player }: { name: string; player: Player }) {
     impactAsync(ImpactFeedbackStyle.Light);
     Alert.prompt(
       "Add Score",
-      `Enter score for ${name}:`,
+      `Enter score for ${player.name}:`,
       [
         {
           text: "Cancel",
@@ -81,7 +86,7 @@ function PlayerButton({ name, player }: { name: string; player: Player }) {
             {player.wins}
           </Text>
         )}
-        <Text className='line-clamp-1 uppercase'>{name}</Text>
+        <Text className='line-clamp-1 uppercase'>{player.name}</Text>
       </Button>
     </View>
   );

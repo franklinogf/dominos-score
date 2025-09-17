@@ -24,8 +24,8 @@ export default function TournamentModal() {
     }
     impactAsync(ImpactFeedbackStyle.Medium);
     startNewRound();
-    // Dismiss modal and navigate to game, preventing back navigation
 
+    // Dismiss modal and navigate to game, preventing back navigation
     router.dismissAll();
     router.replace("/game");
   }
@@ -85,14 +85,16 @@ export default function TournamentModal() {
             </Text>
           </Button>
 
-          <View className='mt-4'>
-            <Button
-              variant='outline'
-              onPress={handleBack}
-            >
-              <Text>Cancel</Text>
-            </Button>
-          </View>
+          {gameStatus === GameStatus.NotStarted && (
+            <View className='mt-4'>
+              <Button
+                variant='outline'
+                onPress={handleBack}
+              >
+                <Text>Cancel</Text>
+              </Button>
+            </View>
+          )}
         </View>
       </View>
     </SafeAreaView>

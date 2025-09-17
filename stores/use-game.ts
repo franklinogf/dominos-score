@@ -18,6 +18,7 @@ type GameState = {
   removeScoreFromPlayer: (player: Player, scoreId: string) => void;
   changePlayerActivity: (player: Player, isPlaying: boolean) => void;
   updateGameStatus: (status: GameStatus) => void;
+  endRound: () => void;
   endGame: () => void;
   startNewRound: () => void;
 };
@@ -71,17 +72,46 @@ export const useGame = create<GameState>((set) => ({
   ],
   gameSize: 2,
   winningLimit: 150,
+  endRound: () =>
+    set((state) => {
+      const winnerId = state.winnerPlayerId;
+      if (!winnerId) return {}; // No winner, no changes
+      const playingPlayers = state.players.filter((p) => p.isPlaying);
+      const losersIds = playingPlayers
+        .filter((p) => p.id !== winnerId)
+        .map((p) => p.id);
+      const updatedPlayers = state.players.map((p) => {
+        if (p.id === winnerId) {
+          return { ...p, wins: p.wins + 1 };
+        }
+        if (losersIds.includes(p.id)) {
+          return { ...p, losses: p.losses + 1 };
+        }
+        return p;
+      });
+      console.log({ winnerId, updatedPlayers });
+      return {
+        winnerPlayerId: null,
+        gameStatus: GameStatus.Finished,
+        players: updatedPlayers,
+      };
+    }),
   endGame: () =>
     set(() => ({
       gameStatus: GameStatus.NotStarted,
       winnerPlayerId: null,
       players: [],
     })),
-  startNewRound: () =>
+  startNewRound: () => {
+    // First end the current round to update wins/losses
+    useGame.getState().endRound();
+
+    // Then start new round by clearing scores
     set((state) => ({
       gameStatus: GameStatus.Ready,
       players: state.players.map((p) => ({ ...p, score: [] })),
-    })),
+    }));
+  },
   updateGameStatus: (status) => set({ gameStatus: status }),
   toggleTournamentMode: () =>
     set((state) => ({ tournamentMode: !state.tournamentMode })),

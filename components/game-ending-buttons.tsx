@@ -11,6 +11,7 @@ export function GameEndingButtons() {
   const updateGameStatus = useGame((state) => state.updateGameStatus);
   const tournamentMode = useGame((state) => state.tournamentMode);
   const startNewRound = useGame((state) => state.startNewRound);
+  const endRound = useGame((state) => state.endRound);
 
   const handleEndRound = () => {
     impactAsync(ImpactFeedbackStyle.Medium);
@@ -25,6 +26,7 @@ export function GameEndingButtons() {
         onPress: () => {
           impactAsync(ImpactFeedbackStyle.Heavy);
           if (tournamentMode) {
+            endRound();
             router.push("/modal");
           } else {
             startNewRound();
@@ -60,7 +62,6 @@ export function GameEndingButtons() {
     <View className='flex-row gap-3'>
       <Button
         size='sm'
-        variant='destructive'
         className='flex-1 bg-orange-400 active:bg-orange-400/80'
         onPress={handleEndRound}
       >
