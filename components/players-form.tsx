@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useGame } from "@/stores/use-game";
 import { useTournamentModal } from "@/stores/use-tournament-modal";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { randomUUID } from "expo-crypto";
 import { router } from "expo-router";
 import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -29,7 +30,7 @@ const createPlayersSchema = (gameSize: number) => {
 export function PlayersForm() {
   const gameSize = useGame((state) => state.gameSize);
   const players = useGame((state) => state.players);
-  const updatePlayers = useGame((state) => state.updatePlayers);
+  const addPlayers = useGame((state) => state.addPlayers);
   const schema = createPlayersSchema(gameSize);
   const tournamentMode = useGame((state) => state.tournamentMode);
   const inputRef = useRef<TextInput[]>([]);
@@ -45,9 +46,9 @@ export function PlayersForm() {
     defaultValues: Object.fromEntries(
       Array.from({ length: gameSize }, (_, index) => [
         `player${index}`,
-        players[`player${index}`] || "",
+        players[index]?.name || "",
       ])
-    ),
+    ) as Record<string, string>,
   });
 
   const playersData = Array.from({ length: gameSize }, (_, index) => ({
@@ -56,7 +57,15 @@ export function PlayersForm() {
   }));
 
   const onSubmit = (data: Record<string, string>) => {
-    updatePlayers(data);
+    const players = Object.entries(data).map(([, name]) => ({
+      id: randomUUID(),
+      name,
+      wins: 0,
+      losses: 0,
+      isPlaying: false,
+    }));
+
+    addPlayers(players);
     if (tournamentMode) {
       openModal();
     } else {

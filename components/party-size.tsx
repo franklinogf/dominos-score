@@ -3,7 +3,6 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { BIG_PARTY_SIZES, PARTY_SIZES } from "@/lib/constants";
 import { useGame } from "@/stores/use-game";
 import * as Haptics from "expo-haptics";
-import { useState } from "react";
 import { View } from "react-native";
 
 export function PartySize() {
@@ -12,7 +11,6 @@ export function PartySize() {
   const tournamentMode = useGame((state) => state.tournamentMode);
 
   const currentMaxPartySizes = tournamentMode ? BIG_PARTY_SIZES : PARTY_SIZES;
-  const [modalVisible, setModalVisible] = useState(false);
 
   // Ensure game size is valid when toggling tournament mode
   if (!tournamentMode && gameSize > 4) {

@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
+import { LONG_PRESS_SCORE } from "@/lib/constants";
 import { useGame } from "@/stores/use-game";
 import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
-import { FlatList, View } from "react-native";
+import { Alert, FlatList, View } from "react-native";
 import Animated, {
   FlipOutXUp,
   SequencedTransition,
@@ -13,10 +14,6 @@ export function PlayersButtons() {
   const gameSize = useGame((state) => state.gameSize);
   const players = useGame((state) => state.players);
 
-  const playerData = Array.from({ length: gameSize }, (_, index) => [
-    players[`player${index}`] || `Player ${index + 1}`,
-    `player${index}`,
-  ]);
   return (
     <FlatList
       bounces={false}
@@ -24,11 +21,11 @@ export function PlayersButtons() {
       contentContainerClassName='flex-1'
       key={gameSize}
       numColumns={gameSize}
-      data={playerData}
+      data={players}
       renderItem={({ item }) => (
         <PlayerButton
-          name={item[0]}
-          playerKey={item[1]}
+          name={item.name}
+          playerKey={item.id}
         />
       )}
     />
@@ -51,7 +48,7 @@ function PlayerButton({
         size='lg'
         onLongPress={() => {
           impactAsync(ImpactFeedbackStyle.Heavy);
-          addScoreToPlayer(playerKey, 100);
+          addScoreToPlayer(playerKey, LONG_PRESS_SCORE);
         }}
       >
         <Text className='line-clamp-1'>{name}</Text>
@@ -72,21 +69,21 @@ function PlayerButton({
                 className='p-0'
                 onLongPress={() => {
                   impactAsync(ImpactFeedbackStyle.Heavy);
-                  removeScoreFromPlayer(playerKey, item.id);
-                  // Alert.alert(
-                  //   "Remove Score",
-                  //   `Are you sure you want to remove ${item.value} points from ${name}?`,
-                  //   [
-                  //     {
-                  //       text: "Cancel",
-                  //       style: "cancel",
-                  //     },
-                  //     {
-                  //       text: "OK",
-                  //       onPress: () => removeScoreFromPlayer(playerKey, item.id),
-                  //     },
-                  //   ]
-                  // );
+                  Alert.alert(
+                    "Remove Score",
+                    `Are you sure you want to remove ${item.value} points from ${name}?`,
+                    [
+                      {
+                        text: "Cancel",
+                        style: "cancel",
+                      },
+                      {
+                        text: "OK",
+                        onPress: () =>
+                          removeScoreFromPlayer(playerKey, item.id),
+                      },
+                    ]
+                  );
                 }}
                 variant='outline'
                 size='lg'
