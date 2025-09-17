@@ -4,26 +4,22 @@ import { GameStatus } from "@/lib/enums";
 import { Player } from "@/lib/types";
 import { useGame } from "@/stores/use-game";
 import { impactAsync, ImpactFeedbackStyle } from "expo-haptics";
-import { Alert, FlatList, View } from "react-native";
+import { Alert, View } from "react-native";
 
 export function PlayersButtons() {
   const players = useGame((state) => state.players);
   const activePlayers = players.filter((p) => p.isPlaying);
 
   return (
-    <FlatList
-      bounces={false}
-      showsVerticalScrollIndicator={false}
-      key={activePlayers.length}
-      numColumns={activePlayers.length}
-      data={activePlayers}
-      renderItem={({ item }) => (
+    <View className='flex-row'>
+      {activePlayers.map((player) => (
         <PlayerButton
-          name={item.name}
-          player={item}
+          key={player.id}
+          name={player.name}
+          player={player}
         />
-      )}
-    />
+      ))}
+    </View>
   );
 }
 
@@ -64,7 +60,7 @@ function PlayerButton({ name, player }: { name: string; player: Player }) {
   };
 
   return (
-    <View className='flex-1 px-2'>
+    <View className='flex-1 px-1'>
       <Button
         disabled={gameStatus === GameStatus.Finished}
         className='px-0 relative overflow-hidden'

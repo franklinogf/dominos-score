@@ -1,5 +1,5 @@
 import { useGame } from "@/stores/use-game";
-import { FlatList } from "react-native";
+import { View } from "react-native";
 import { PlayerScoreTotal } from "./player-score-total";
 
 export function GameTotal() {
@@ -7,12 +7,15 @@ export function GameTotal() {
   const activePlayersIds = players.filter((p) => p.isPlaying);
 
   return (
-    <FlatList
-      className='flex-1'
-      numColumns={activePlayersIds.length}
-      data={activePlayersIds}
-      keyExtractor={(item) => item.id}
-      renderItem={({ item }) => <PlayerScoreTotal player={item} />}
-    />
+    <View className='flex-1 flex-row'>
+      {activePlayersIds.map((player) => (
+        <View
+          key={player.id}
+          className='flex-1'
+        >
+          <PlayerScoreTotal player={player} />
+        </View>
+      ))}
+    </View>
   );
 }
