@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
+import { LONG_PRESS_SCORE } from "@/lib/constants";
 import { GameStatus } from "@/lib/enums";
 import { Player } from "@/lib/types";
 import { useGame } from "@/stores/use-game";
@@ -73,7 +74,7 @@ function PlayerButton({ player }: { player: Player }) {
         onPress={handleAddCustomScore}
         onLongPress={() => {
           impactAsync(ImpactFeedbackStyle.Heavy);
-          addScoreToPlayer(player, 10);
+          addScoreToPlayer(player, LONG_PRESS_SCORE);
         }}
       >
         {player.losses > 0 && (
