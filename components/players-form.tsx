@@ -7,8 +7,9 @@ import { cn } from "@/lib/utils";
 import { useGame } from "@/stores/use-game";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { router } from "expo-router";
+import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FlatList, View } from "react-native";
+import { FlatList, TextInput, View } from "react-native";
 import { z } from "zod";
 
 // Create dynamic schema based on game size
@@ -29,7 +30,7 @@ export function PlayersForm() {
   const players = useGame((state) => state.players);
   const updatePlayers = useGame((state) => state.updatePlayers);
   const schema = createPlayersSchema(gameSize);
-
+  const inputRef = useRef<TextInput[]>([]);
   const {
     control,
     formState: { errors },
@@ -78,6 +79,22 @@ export function PlayersForm() {
               name={item.fieldName}
               render={({ field: { onChange, value } }) => (
                 <Input
+                  ref={(el) => {
+                    if (el) {
+                      inputRef.current[item.index] = el;
+                    }
+                  }}
+                  returnKeyType={item.index === gameSize - 1 ? "done" : "next"}
+                  onSubmitEditing={() => {
+                    if (item.index < gameSize - 1) {
+                      inputRef.current[item.index + 1]?.focus();
+                    } else {
+                      inputRef.current[item.index]?.blur();
+                    }
+                  }}
+                  autoCorrect={false}
+                  spellCheck={false}
+                  autoComplete='off'
                   id={`player-name-${item.index}`}
                   className='h-12'
                   value={value}
