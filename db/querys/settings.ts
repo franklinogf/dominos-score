@@ -1,7 +1,7 @@
+import { db } from '@/db/database';
+import { settingsTable } from '@/db/schema';
 import { DEFAULT_LONG_PRESS_SCORE } from '@/lib/constants';
 import { eq } from 'drizzle-orm';
-import { db } from '../database';
-import { settingsTable } from '../schema';
 
 export async function getSetting(key: string): Promise<string | undefined> {
   try {
