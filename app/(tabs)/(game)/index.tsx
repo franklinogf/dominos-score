@@ -7,30 +7,38 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
-  Pressable,
+  TouchableWithoutFeedback,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Index() {
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <Pressable
-        accessible={false}
+      <KeyboardAvoidingView
         className="flex-1"
-        onPress={Keyboard.dismiss}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
       >
-        <Text variant={'h1'}>Dominos app</Text>
-        <TournamentSwitch />
-        <PartySize />
-        <WinningLimit />
-
-        <KeyboardAvoidingView
+        <TouchableWithoutFeedback
+          accessible={false}
           className="flex-1"
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          onPress={Keyboard.dismiss}
         >
-          <PlayersForm />
-        </KeyboardAvoidingView>
-      </Pressable>
+          <View className="flex-1">
+            <View className="pt-4">
+              <Text variant="h1" className="text-center mb-6">
+                Domino Tracker
+              </Text>
+            </View>
+
+            <TournamentSwitch />
+            <PartySize />
+            <WinningLimit />
+            <PlayersForm />
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

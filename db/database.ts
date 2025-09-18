@@ -11,6 +11,18 @@ const expo = SQLite.openDatabaseSync('db.db');
 
 export const db = drizzle(expo, { schema });
 
+// Function to delete/close the database connection for cleanup
+export function deleteDatabase() {
+  try {
+    expo.closeSync();
+    console.log('Database connection closed');
+    SQLite.deleteDatabaseSync('db.db');
+    console.log('Database deleted');
+  } catch (error) {
+    console.error('Error closing database:', error);
+  }
+}
+
 const defaultSettings = [
   { key: 'longPressScore', value: DEFAULT_LONG_PRESS_SCORE.toString() },
 ];

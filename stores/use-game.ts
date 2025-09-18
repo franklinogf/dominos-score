@@ -10,6 +10,8 @@ type GameState = {
   gameSize: number;
   winningLimit: number;
   winnerPlayerId: string | null;
+  currentGameId?: number;
+  currentRoundId?: number;
   toggleTournamentMode: () => void;
   updateGameSize: (size: number) => void;
   updateWinningLimit: (limit: number) => void;
@@ -21,6 +23,8 @@ type GameState = {
   endRound: () => void;
   endGame: () => void;
   startNewRound: () => void;
+  updateCurrentGameId: (id: number) => void;
+  updateCurrentRoundId: (id: number) => void;
 };
 
 function checkWinnerWhenUpdatingScore() {
@@ -52,6 +56,8 @@ export const useGame = create<GameState>((set) => ({
   winnerPlayerId: null,
   gameStatus: GameStatus.NotStarted,
   tournamentMode: false,
+  currentGameId: undefined,
+  currentRoundId: undefined,
   players: [
     {
       id: 'player0',
@@ -172,4 +178,6 @@ export const useGame = create<GameState>((set) => ({
       );
       return { players: updatedPlayers };
     }),
+  updateCurrentGameId: (id: number) => set({ currentGameId: id }),
+  updateCurrentRoundId: (id: number) => set({ currentRoundId: id }),
 }));

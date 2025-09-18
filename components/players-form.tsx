@@ -3,7 +3,8 @@ import { Label } from '@/components/ui/label';
 import { Text } from '@/components/ui/text';
 
 import { Button } from '@/components/ui/button';
-import { GameStatus } from '@/lib/enums';
+import { addNewGame } from '@/db/actions/game';
+import { GameStatus, GameType } from '@/lib/enums';
 import { Player } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useGame } from '@/stores/use-game';
@@ -35,6 +36,7 @@ export function PlayersForm() {
   const tournamentMode = useGame((state) => state.tournamentMode);
   const inputRef = useRef<TextInput[]>([]);
   const updateGameStatus = useGame((state) => state.updateGameStatus);
+  const winningLimit = useGame((state) => state.winningLimit);
 
   const {
     control,
@@ -55,7 +57,7 @@ export function PlayersForm() {
     fieldName: `player${index}` as const,
   }));
 
-  const onSubmit = (data: Record<string, string>) => {
+  const onSubmit = async (data: Record<string, string>) => {
     const players: Player[] = Object.entries(data).map(([key, name]) => ({
       id: key,
       name: name.trim(),
@@ -66,6 +68,13 @@ export function PlayersForm() {
     }));
 
     addPlayers(players);
+
+    await addNewGame({
+      gameSize,
+      type: tournamentMode ? GameType.TOURNAMENT : GameType.NORMAL,
+      winningLimit,
+    });
+
     if (tournamentMode) {
       router.push('/modal');
     } else {

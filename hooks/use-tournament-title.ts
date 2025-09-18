@@ -8,7 +8,7 @@ export function useTournamentTitle() {
 
   const title = useMemo(() => {
     if (!tournamentMode) {
-      return `Game - First to ${winningLimit}`;
+      return `First to ${winningLimit}`;
     }
 
     // Find players with the most wins, handle ties by showing all tied players
@@ -25,7 +25,7 @@ export function useTournamentTitle() {
     } else if (playersWithMostWins.length > 1) {
       // Multiple leaders tied
       const names = playersWithMostWins.map((p) => p.name).join(', ');
-      return `Tournament - Tied: ${names} (${maxWins} wins)`;
+      return `Tournament - ${names} (${maxWins} wins)`;
     }
 
     // No wins yet

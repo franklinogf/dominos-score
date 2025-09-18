@@ -9,7 +9,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Alert, Keyboard, TouchableWithoutFeedback, View } from 'react-native';
+import {
+  Alert,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
 
@@ -108,7 +115,10 @@ export default function Settings() {
               Loading...
             </Text>
           ) : (
-            <View className="space-y-6">
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+              className="flex-1"
+            >
               <FieldGroup
                 id="longPressScore"
                 label="Long Press Score"
@@ -143,7 +153,7 @@ export default function Settings() {
               >
                 <Text>{isSubmitting ? 'Saving...' : 'Save'}</Text>
               </Button>
-            </View>
+            </KeyboardAvoidingView>
           )}
         </View>
       </TouchableWithoutFeedback>

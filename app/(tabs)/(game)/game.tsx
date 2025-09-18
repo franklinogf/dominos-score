@@ -12,9 +12,9 @@ import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Game() {
-  const activePlayersCount = useGame(
-    (state) => state.players.filter((p) => p.isPlaying).length,
-  );
+  const players = useGame((state) => state.players);
+  const activePlayersCount = players.filter((p) => p.isPlaying).length;
+
   const navigation = useNavigation();
   const title = useTournamentTitle();
 
