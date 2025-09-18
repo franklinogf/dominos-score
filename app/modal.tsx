@@ -140,14 +140,26 @@ function PlayersList() {
               `}
             >
               <View className='flex-row items-center flex-1'>
-                <Text
-                  className={`
-                    flex-1 text-lg
-                    ${player.isPlaying ? "text-foreground font-medium" : "text-muted-foreground"}
-                  `}
-                >
-                  {player.name}
-                </Text>
+                <View className='flex-1'>
+                  <Text
+                    className={`
+                      text-lg
+                      ${player.isPlaying ? "text-foreground font-medium" : "text-muted-foreground"}
+                    `}
+                  >
+                    {player.name}
+                  </Text>
+                  {(player.wins > 0 || player.losses > 0) && (
+                    <Text
+                      className={`
+                        text-sm mt-1
+                        ${player.isPlaying ? "text-muted-foreground" : "text-muted-foreground/70"}
+                      `}
+                    >
+                      {player.wins} wins • {player.losses} losses
+                    </Text>
+                  )}
+                </View>
               </View>
 
               <Switch

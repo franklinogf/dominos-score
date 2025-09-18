@@ -3,16 +3,27 @@ import { GameScore } from "@/components/game-score";
 import { GameTotal } from "@/components/game-total";
 import { PlayersButtons } from "@/components/players-buttons";
 import { Separator } from "@/components/ui/separator";
-import { Text } from "@/components/ui/text";
+import { useTournamentTitle } from "@/hooks/use-tournament-title";
 import { useGame } from "@/stores/use-game";
-import { router } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
+import { router, useNavigation } from "expo-router";
+import { useCallback } from "react";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Game() {
-  const players = useGame((state) => state.players);
-  const activePlayersCount = players.filter((p) => p.isPlaying).length;
-  const tournamentMode = useGame((state) => state.tournamentMode);
+  const activePlayersCount = useGame(
+    (state) => state.players.filter((p) => p.isPlaying).length
+  );
+  const navigation = useNavigation();
+  const title = useTournamentTitle();
+
+  // Update title dynamically
+  useFocusEffect(
+    useCallback(() => {
+      navigation.setOptions({ title });
+    }, [navigation, title])
+  );
 
   if (activePlayersCount === 0) {
     router.replace("/");
@@ -20,33 +31,29 @@ export default function Game() {
   }
 
   return (
-    <SafeAreaView
-      edges={["top", "left", "right"]}
-      className='flex-1 bg-background px-2'
-    >
-      <View className='py-3'>
-        <Text
-          variant='h2'
-          className='text-center mb-3 '
-        >
-          {tournamentMode ? "Tournament in Progress" : "Game in Progress"}
-        </Text>
-        <GameEndingButtons />
-      </View>
+    <>
+      <SafeAreaView
+        edges={["left", "right"]}
+        className='flex-1 bg-background px-2'
+      >
+        <View className='py-3'>
+          <GameEndingButtons />
+        </View>
 
-      <PlayersButtons />
+        <PlayersButtons />
 
-      <Separator className='mt-2' />
+        <Separator className='mt-2' />
 
-      <View className='flex-1'>
-        <GameScore />
-      </View>
+        <View className='flex-1'>
+          <GameScore />
+        </View>
 
-      <Separator className='my-2' />
+        <Separator className='my-2' />
 
-      <View className='h-16'>
-        <GameTotal />
-      </View>
-    </SafeAreaView>
+        <View className='h-16'>
+          <GameTotal />
+        </View>
+      </SafeAreaView>
+    </>
   );
 }
