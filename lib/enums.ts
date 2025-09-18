@@ -4,3 +4,7 @@ export enum GameStatus {
   InProgress,
   Finished,
 }
+export enum GameType {
+  TOURNAMENT = 'tournament',
+  NORMAL = 'normal',
+}
