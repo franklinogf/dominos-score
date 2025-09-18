@@ -7,7 +7,7 @@ import { Player } from '@/lib/types';
 import { useGame } from '@/stores/use-game';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { useFocusEffect } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Alert, View } from 'react-native';
 
 export function PlayersButtons() {
@@ -17,14 +17,16 @@ export function PlayersButtons() {
     DEFAULT_LONG_PRESS_SCORE,
   );
 
-  useFocusEffect(() => {
-    const fetchLongPressScore = async () => {
-      const score = await getLongPressScoreSetting();
-      setLongPressScore(score);
-    };
+  useFocusEffect(
+    useCallback(() => {
+      const fetchLongPressScore = async () => {
+        const score = await getLongPressScoreSetting();
+        setLongPressScore(score);
+      };
 
-    fetchLongPressScore();
-  });
+      fetchLongPressScore();
+    }, []),
+  );
 
   return (
     <View className="flex-row">
