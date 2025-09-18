@@ -89,7 +89,6 @@ export const useGame = create<GameState>((set) => ({
         }
         return p;
       });
-      console.log({ winnerId, updatedPlayers });
       return {
         winnerPlayerId: null,
         gameStatus: GameStatus.Finished,
