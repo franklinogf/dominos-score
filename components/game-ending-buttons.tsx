@@ -64,7 +64,7 @@ export function GameEndingButtons() {
     <View className='flex-row gap-3'>
       <Button
         size='sm'
-        className='flex-1 bg-orange-400 active:bg-orange-400/80'
+        className='flex-1 bg-warning active:bg-warning/80'
         onPress={handleEndRound}
       >
         <Text>{endRoundLabel}</Text>

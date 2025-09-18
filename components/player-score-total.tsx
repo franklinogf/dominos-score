@@ -61,7 +61,7 @@ export function PlayerScoreTotal({ player }: { player: Player }) {
       <Animated.View style={animatedStyle}>
         <Text
           className={cn("text-2xl font-extrabold text-center", {
-            "text-green-500": isWinner,
+            "text-success": isWinner,
           })}
         >
           {total}
