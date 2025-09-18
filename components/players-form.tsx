@@ -1,18 +1,18 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Text } from "@/components/ui/text";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Text } from '@/components/ui/text';
 
-import { Button } from "@/components/ui/button";
-import { GameStatus } from "@/lib/enums";
-import { Player } from "@/lib/types";
-import { cn } from "@/lib/utils";
-import { useGame } from "@/stores/use-game";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { router } from "expo-router";
-import { useRef } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { FlatList, TextInput, View } from "react-native";
-import { z } from "zod";
+import { Button } from '@/components/ui/button';
+import { GameStatus } from '@/lib/enums';
+import { Player } from '@/lib/types';
+import { cn } from '@/lib/utils';
+import { useGame } from '@/stores/use-game';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { router } from 'expo-router';
+import { useRef } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { FlatList, TextInput, View } from 'react-native';
+import { z } from 'zod';
 
 // Create dynamic schema based on game size
 const createPlayersSchema = (gameSize: number) => {
@@ -21,7 +21,7 @@ const createPlayersSchema = (gameSize: number) => {
     z
       .string()
       .min(1, `Player ${index + 1} name is required`)
-      .max(10, "Name must be 10 characters or less"),
+      .max(10, 'Name must be 10 characters or less'),
   ]);
 
   return z.object(Object.fromEntries(playerFields));
@@ -45,8 +45,8 @@ export function PlayersForm() {
     defaultValues: Object.fromEntries(
       Array.from({ length: gameSize }, (_, index) => [
         `player${index}`,
-        players[index]?.name || "",
-      ])
+        players[index]?.name || '',
+      ]),
     ) as Record<string, string>,
   });
 
@@ -67,29 +67,29 @@ export function PlayersForm() {
 
     addPlayers(players);
     if (tournamentMode) {
-      router.push("/modal");
+      router.push('/modal');
     } else {
       updateGameStatus(GameStatus.Ready);
-      router.replace("/game");
+      router.replace('/game');
     }
   };
   return (
-    <View className='flex-1 w-full'>
+    <View className="flex-1 w-full">
       <FlatList
         key={gameSize}
         bounces={false}
-        className='mt-8 w-full flex-1'
+        className="mt-8 w-full flex-1"
         data={playersData}
         keyExtractor={(item) => item.fieldName}
         numColumns={gameSize > 3 ? 2 : 1}
         renderItem={({ item }) => (
           <View
             key={item.index}
-            className={cn("w-full px-4 mb-4", { "w-1/2": gameSize > 3 })}
+            className={cn('w-full px-4 mb-4', { 'w-1/2': gameSize > 3 })}
           >
             <Label
               htmlFor={`player-name-${item.index}`}
-              className='font-bold text-xl mb-2'
+              className="font-bold text-xl mb-2"
             >
               Player {item.index + 1}
             </Label>
@@ -103,7 +103,7 @@ export function PlayersForm() {
                       inputRef.current[item.index] = el;
                     }
                   }}
-                  returnKeyType={item.index === gameSize - 1 ? "done" : "next"}
+                  returnKeyType={item.index === gameSize - 1 ? 'done' : 'next'}
                   onSubmitEditing={() => {
                     if (item.index < gameSize - 1) {
                       inputRef.current[item.index + 1]?.focus();
@@ -113,7 +113,7 @@ export function PlayersForm() {
                   }}
                   autoCorrect={false}
                   spellCheck={false}
-                  autoComplete='off'
+                  autoComplete="off"
                   id={`player-name-${item.index}`}
                   value={value}
                   onChangeText={onChange}
@@ -122,19 +122,16 @@ export function PlayersForm() {
               )}
             />
             {errors[item.fieldName] && (
-              <Text className='text-destructive text-sm mt-1.5'>
+              <Text className="text-destructive text-sm mt-1.5">
                 {errors[item.fieldName]?.message}
               </Text>
             )}
           </View>
         )}
       />
-      <View className='px-4 pb-2'>
-        <Button
-          onPress={handleSubmit(onSubmit)}
-          size='lg'
-        >
-          <Text>{tournamentMode ? "Start Tournament" : "Start Game"}</Text>
+      <View className="px-4 pb-2">
+        <Button onPress={handleSubmit(onSubmit)} size="lg">
+          <Text>{tournamentMode ? 'Start Tournament' : 'Start Game'}</Text>
         </Button>
       </View>
     </View>

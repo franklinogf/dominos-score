@@ -1,7 +1,7 @@
-import { GameStatus } from "@/lib/enums";
-import type { Player, Score } from "@/lib/types";
-import { randomUUID } from "expo-crypto";
-import { create } from "zustand";
+import { GameStatus } from '@/lib/enums';
+import type { Player, Score } from '@/lib/types';
+import { randomUUID } from 'expo-crypto';
+import { create } from 'zustand';
 
 type GameState = {
   gameStatus: GameStatus;
@@ -54,16 +54,16 @@ export const useGame = create<GameState>((set) => ({
   tournamentMode: false,
   players: [
     {
-      id: "player0",
-      name: "OMAR",
+      id: 'player0',
+      name: 'OMAR',
       score: [],
       isPlaying: false,
       losses: 0,
       wins: 0,
     },
     {
-      id: "player1",
-      name: "ALI",
+      id: 'player1',
+      name: 'ALI',
       score: [],
       isPlaying: false,
       losses: 0,
@@ -135,7 +135,7 @@ export const useGame = create<GameState>((set) => ({
       return {
         gameStatus: GameStatus.InProgress,
         players: state.players.map((p) =>
-          p.id === player.id ? { ...p, score: [...p.score, newScore] } : p
+          p.id === player.id ? { ...p, score: [...p.score, newScore] } : p,
         ),
       };
     });
@@ -156,7 +156,7 @@ export const useGame = create<GameState>((set) => ({
                 ...p,
                 score: playerScores.filter((score) => score.id !== scoreId),
               }
-            : p
+            : p,
         ),
       };
     });
@@ -168,7 +168,7 @@ export const useGame = create<GameState>((set) => ({
     set((state) => {
       const playerId = player.id;
       const updatedPlayers = state.players.map((p) =>
-        p.id === playerId ? { ...p, isPlaying } : p
+        p.id === playerId ? { ...p, isPlaying } : p,
       );
       return { players: updatedPlayers };
     }),

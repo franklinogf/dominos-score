@@ -1,9 +1,9 @@
-import { Text } from "@/components/ui/text";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { BIG_PARTY_SIZES, PARTY_SIZES } from "@/lib/constants";
-import { useGame } from "@/stores/use-game";
-import * as Haptics from "expo-haptics";
-import { View } from "react-native";
+import { Text } from '@/components/ui/text';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { BIG_PARTY_SIZES, PARTY_SIZES } from '@/lib/constants';
+import { useGame } from '@/stores/use-game';
+import * as Haptics from 'expo-haptics';
+import { View } from 'react-native';
 
 export function PartySize() {
   const gameSize = useGame((state) => state.gameSize);
@@ -18,18 +18,15 @@ export function PartySize() {
   }
 
   return (
-    <View className='w-full mt-4'>
-      <Text
-        className='text-center mb-1'
-        variant='large'
-      >
+    <View className="w-full mt-4">
+      <Text className="text-center mb-1" variant="large">
         Party size
       </Text>
       <ToggleGroup
-        type='single'
-        className='mx-auto'
-        variant='outline'
-        size='lg'
+        type="single"
+        className="mx-auto"
+        variant="outline"
+        size="lg"
         value={gameSize.toString()}
         onValueChange={(value) => {
           Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -59,12 +56,8 @@ function PartySizeButton({
   isLast?: boolean;
 }) {
   return (
-    <ToggleGroupItem
-      isFirst={isFirst}
-      isLast={isLast}
-      value={label}
-    >
-      <Text className='text-4xl'>{label}</Text>
+    <ToggleGroupItem isFirst={isFirst} isLast={isLast} value={label}>
+      <Text className="text-4xl">{label}</Text>
     </ToggleGroupItem>
   );
 }

@@ -1,16 +1,16 @@
-import { Player } from "@/lib/types";
-import { cn } from "@/lib/utils";
-import { useGame } from "@/stores/use-game";
-import { useEffect } from "react";
-import { View } from "react-native";
+import { Player } from '@/lib/types';
+import { cn } from '@/lib/utils';
+import { useGame } from '@/stores/use-game';
+import { useEffect } from 'react';
+import { View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
   withSequence,
   withSpring,
-} from "react-native-reanimated";
-import { Text } from "./ui/text";
+} from 'react-native-reanimated';
+import { Text } from './ui/text';
 
 export function PlayerScoreTotal({ player }: { player: Player }) {
   const total = player.score.reduce((acc, score) => acc + score.value, 0);
@@ -29,20 +29,20 @@ export function PlayerScoreTotal({ player }: { player: Player }) {
       scale.value = withRepeat(
         withSequence(
           withSpring(1.3, { damping: 50, stiffness: 300 }),
-          withSpring(1.5, { damping: 60, stiffness: 250 })
+          withSpring(1.5, { damping: 60, stiffness: 250 }),
         ),
         -1,
-        true
+        true,
       );
 
       rotation.value = withRepeat(
         withSequence(
           withSpring(-5, { damping: 80, stiffness: 400 }),
           withSpring(0, { damping: 100, stiffness: 350 }),
-          withSpring(5, { damping: 80, stiffness: 400 })
+          withSpring(5, { damping: 80, stiffness: 400 }),
         ),
         -1,
-        true
+        true,
       );
     } else {
       // Reset animations when not winner
@@ -57,20 +57,17 @@ export function PlayerScoreTotal({ player }: { player: Player }) {
   }));
 
   return (
-    <View className='flex-1 px-2'>
+    <View className="flex-1 px-2">
       <Animated.View style={animatedStyle}>
         <Text
-          className={cn("text-2xl font-extrabold text-center", {
-            "text-success": isWinner,
+          className={cn('text-2xl font-extrabold text-center', {
+            'text-success': isWinner,
           })}
         >
           {total}
         </Text>
       </Animated.View>
-      <Text
-        variant='muted'
-        className='text-center text-lg font-medium'
-      >
+      <Text variant="muted" className="text-center text-lg font-medium">
         {winningLimit}
       </Text>
     </View>

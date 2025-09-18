@@ -1,0 +1,11 @@
+# Ignore artifacts:
+.expo
+.github
+.vscode
+node_modules
+app-example
+dist/
+web-build/
+expo-env.d.ts
+/ios
+/android
