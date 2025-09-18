@@ -1,4 +1,5 @@
 import migrations from '@/drizzle/migrations';
+import { DEFAULT_LONG_PRESS_SCORE } from '@/lib/constants';
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { migrate } from 'drizzle-orm/expo-sqlite/migrator';
@@ -10,7 +11,9 @@ const expo = SQLite.openDatabaseSync('db.db');
 
 export const db = drizzle(expo, { schema });
 
-const defaultSettings = [{ key: 'long_press_score', value: '30' }];
+const defaultSettings = [
+  { key: 'longPressScore', value: DEFAULT_LONG_PRESS_SCORE.toString() },
+];
 
 export async function initializeDatabase() {
   try {

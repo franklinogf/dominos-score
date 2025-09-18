@@ -12,4 +12,4 @@ export const BIG_PARTY_SIZES = [
   '10',
 ] as const;
 
-export const LONG_PRESS_SCORE = 30;
+export const DEFAULT_LONG_PRESS_SCORE = 30;

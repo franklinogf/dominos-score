@@ -1,29 +1,52 @@
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { LONG_PRESS_SCORE } from '@/lib/constants';
+import { getLongPressScoreSetting } from '@/db/querys/settings';
+import { DEFAULT_LONG_PRESS_SCORE } from '@/lib/constants';
 import { GameStatus } from '@/lib/enums';
 import { Player } from '@/lib/types';
 import { useGame } from '@/stores/use-game';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
+import { useEffect, useState } from 'react';
 import { Alert, View } from 'react-native';
 
 export function PlayersButtons() {
   const players = useGame((state) => state.players);
   const activePlayers = players.filter((p) => p.isPlaying);
+  const [longPressScore, setLongPressScore] = useState<number>(
+    DEFAULT_LONG_PRESS_SCORE,
+  );
+
+  useEffect(() => {
+    const fetchLongPressScore = async () => {
+      const score = await getLongPressScoreSetting();
+      setLongPressScore(score);
+    };
+
+    fetchLongPressScore();
+  }, []);
 
   return (
     <View className="flex-row">
       {activePlayers.map((player) => (
-        <PlayerButton key={player.id} player={player} />
+        <PlayerButton
+          key={player.id}
+          player={player}
+          longPressScore={longPressScore}
+        />
       ))}
     </View>
   );
 }
 
-function PlayerButton({ player }: { player: Player }) {
+function PlayerButton({
+  player,
+  longPressScore,
+}: {
+  player: Player;
+  longPressScore: number | null;
+}) {
   const addScoreToPlayer = useGame((state) => state.addScoreToPlayer);
   const gameStatus = useGame((state) => state.gameStatus);
-
   const handleAddCustomScore = () => {
     impactAsync(ImpactFeedbackStyle.Light);
     Alert.prompt(
@@ -64,8 +87,9 @@ function PlayerButton({ player }: { player: Player }) {
         size="lg"
         onPress={handleAddCustomScore}
         onLongPress={() => {
+          if (longPressScore === null) return;
           impactAsync(ImpactFeedbackStyle.Heavy);
-          addScoreToPlayer(player, LONG_PRESS_SCORE);
+          addScoreToPlayer(player, longPressScore);
         }}
       >
         {player.losses > 0 && (
