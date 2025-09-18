@@ -113,7 +113,15 @@ export const useGame = create<GameState>((set) => ({
   },
   updateGameStatus: (status) => set({ gameStatus: status }),
   toggleTournamentMode: () =>
-    set((state) => ({ tournamentMode: !state.tournamentMode })),
+    set((state) => ({
+      tournamentMode: !state.tournamentMode,
+      gameSize:
+        state.tournamentMode && state.gameSize > 4
+          ? 4
+          : !state.tournamentMode && state.gameSize === 2
+            ? 3
+            : state.gameSize,
+    })),
   updateWinningLimit: (limit) => set({ winningLimit: limit }),
   updateGameSize: (size) => set({ gameSize: size }),
   addPlayers: (players) => set({ players }),

@@ -3,7 +3,6 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { ThemeProvider } from "@react-navigation/native";
 import { PortalHost } from "@rn-primitives/portal";
 import { Tabs } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "nativewind";
 
 export default function TabsLayout() {
@@ -11,8 +10,6 @@ export default function TabsLayout() {
   const currentTheme = THEME[colorScheme ?? "dark"];
   return (
     <ThemeProvider value={NAV_THEME[colorScheme ?? "dark"]}>
-      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-
       <Tabs
         screenOptions={{
           // tabBarShowLabel: false,
@@ -24,7 +21,6 @@ export default function TabsLayout() {
             fontSize: 14,
             fontWeight: "600",
           },
-          animation: "shift",
         }}
       >
         <Tabs.Screen
