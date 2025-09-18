@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { removeGame } from '@/db/actions/game';
 import { type GameWithRounds, getAllGames } from '@/db/querys/game';
+import { useGame } from '@/stores/use-game';
 import { useFocusEffect } from '@react-navigation/native';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { useCallback, useState } from 'react';
@@ -24,9 +25,11 @@ const ucFirst = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 function GameCard({
   game,
   onDelete,
+  isCurrentGame,
 }: {
   game: GameWithRounds;
   onDelete: (gameId: number) => void;
+  isCurrentGame: boolean;
 }) {
   const handleDelete = () => {
     impactAsync(ImpactFeedbackStyle.Light);
@@ -50,12 +53,25 @@ function GameCard({
     );
   };
   return (
-    <View className="bg-card border border-border rounded-lg p-4 mb-3">
+    <View
+      className={`bg-card border rounded-lg p-4 mb-3 ${
+        isCurrentGame ? 'border-primary border-2' : 'border-border'
+      }`}
+    >
       <View className="flex-row justify-between items-start mb-2">
         <View className="flex-1">
-          <Text variant="h3" className="text-foreground mb-1">
-            {ucFirst(game.type)} Game
-          </Text>
+          <View className="flex-row items-center mb-1">
+            <Text variant="h3" className="text-foreground">
+              {ucFirst(game.type)} Game
+            </Text>
+            {isCurrentGame && (
+              <View className="ml-2 bg-primary px-2 py-1 rounded">
+                <Text className="text-primary-foreground text-xs font-medium">
+                  CURRENT
+                </Text>
+              </View>
+            )}
+          </View>
           <Text variant="muted" className="text-sm">
             {formatDate(game.createdAt)}
           </Text>
@@ -79,9 +95,11 @@ function GameCard({
           <Button variant="outline" size="sm" className="mr-2">
             <Text className="text-xs">View Details</Text>
           </Button>
-          <Button variant="outline" size="sm" onPress={handleDelete}>
-            <Text className="text-xs text-destructive">Delete</Text>
-          </Button>
+          {!isCurrentGame && (
+            <Button variant="outline" size="sm" onPress={handleDelete}>
+              <Text className="text-xs text-destructive">Delete</Text>
+            </Button>
+          )}
         </View>
       </View>
     </View>
@@ -91,6 +109,7 @@ function GameCard({
 export default function HistoryIndex() {
   const [games, setGames] = useState<GameWithRounds[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const currentGameId = useGame((state) => state.currentGameId);
 
   const loadGames = useCallback(async () => {
     setIsLoading(true);
@@ -154,7 +173,11 @@ export default function HistoryIndex() {
             data={games}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
-              <GameCard game={item} onDelete={handleDeleteGame} />
+              <GameCard
+                game={item}
+                onDelete={handleDeleteGame}
+                isCurrentGame={currentGameId === item.id}
+              />
             )}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 20 }}
