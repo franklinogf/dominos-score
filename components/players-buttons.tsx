@@ -24,12 +24,6 @@ export function PlayersButtons() {
 }
 
 function PlayerButton({ player }: { player: Player }) {
-  console.log(
-    "Rendering PlayerButton for:",
-    player.name,
-    player.wins,
-    player.losses
-  );
   const addScoreToPlayer = useGame((state) => state.addScoreToPlayer);
   const gameStatus = useGame((state) => state.gameStatus);
 
