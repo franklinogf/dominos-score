@@ -1,7 +1,7 @@
 import { db } from '@/db/database';
 import { roundsTable } from '@/db/schema';
 
-type NewRound = typeof roundsTable.$inferInsert;
+export type NewRound = typeof roundsTable.$inferInsert;
 
 export async function insertRound(round: NewRound) {
   try {

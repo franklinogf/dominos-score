@@ -13,17 +13,15 @@ export default function TournamentModal() {
   const players = useGame((state) => state.players);
   const gameStatus = useGame((state) => state.gameStatus);
   const updateGameStatus = useGame((state) => state.updateGameStatus);
-  const startNewRound = useGame((state) => state.startNewRound);
 
   const activePlayersCount = players.filter((p) => p.isPlaying).length;
 
   function handleSubmit() {
     if (activePlayersCount < 2 || activePlayersCount > 4) {
       impactAsync(ImpactFeedbackStyle.Heavy);
-      return; // Don't proceed if invalid player count
+      return;
     }
     impactAsync(ImpactFeedbackStyle.Medium);
-    startNewRound();
 
     // Dismiss modal and navigate to game, preventing back navigation
     router.dismissAll();

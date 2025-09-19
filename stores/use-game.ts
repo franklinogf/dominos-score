@@ -22,7 +22,6 @@ type GameState = {
   updateGameStatus: (status: GameStatus) => void;
   endRound: () => void;
   endGame: () => void;
-  startNewRound: () => void;
   updateCurrentGameId: (id: number) => void;
   updateCurrentRoundId: (id: number) => void;
 };
@@ -81,23 +80,39 @@ export const useGame = create<GameState>((set) => ({
   endRound: () =>
     set((state) => {
       const winnerId = state.winnerPlayerId;
-      if (!winnerId) return {}; // No winner, no changes
+
+      if (!winnerId) {
+        return {
+          winnerPlayerId: null,
+          gameStatus: GameStatus.Ready,
+          players: state.players.map((p) => ({ ...p, score: [] })),
+        };
+      }
+
       const playingPlayers = state.players.filter((p) => p.isPlaying);
       const losersIds = playingPlayers
         .filter((p) => p.id !== winnerId)
         .map((p) => p.id);
       const updatedPlayers = state.players.map((p) => {
+        let updatedPlayer = { ...p };
+
+        // Update wins/losses
         if (p.id === winnerId) {
-          return { ...p, wins: p.wins + 1 };
+          updatedPlayer.wins = p.wins + 1;
         }
         if (losersIds.includes(p.id)) {
-          return { ...p, losses: p.losses + 1 };
+          updatedPlayer.losses = p.losses + 1;
         }
-        return p;
+
+        // Reset scores
+        updatedPlayer.score = [];
+
+        return updatedPlayer;
       });
+
       return {
         winnerPlayerId: null,
-        gameStatus: GameStatus.InProgress,
+        gameStatus: GameStatus.Ready,
         players: updatedPlayers,
       };
     }),
@@ -107,16 +122,6 @@ export const useGame = create<GameState>((set) => ({
       winnerPlayerId: null,
       players: [],
     })),
-  startNewRound: () => {
-    // First end the current round to update wins/losses
-    useGame.getState().endRound();
-
-    // Then start new round by clearing scores
-    set((state) => ({
-      gameStatus: GameStatus.Ready,
-      players: state.players.map((p) => ({ ...p, score: [] })),
-    }));
-  },
   updateGameStatus: (status) => set({ gameStatus: status }),
   toggleTournamentMode: () =>
     set((state) => ({

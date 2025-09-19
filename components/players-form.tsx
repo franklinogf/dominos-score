@@ -12,7 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import { useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { FlatList, TextInput, View } from 'react-native';
+import { Alert, FlatList, TextInput, View } from 'react-native';
 import { z } from 'zod';
 
 // Create dynamic schema based on game size
@@ -37,7 +37,7 @@ export function PlayersForm() {
   const inputRef = useRef<TextInput[]>([]);
   const updateGameStatus = useGame((state) => state.updateGameStatus);
   const winningLimit = useGame((state) => state.winningLimit);
-
+  const updateCurrentGameId = useGame((state) => state.updateCurrentGameId);
   const {
     control,
     formState: { errors },
@@ -58,22 +58,33 @@ export function PlayersForm() {
   }));
 
   const onSubmit = async (data: Record<string, string>) => {
-    const players: Player[] = Object.entries(data).map(([key, name]) => ({
-      id: key,
-      name: name.trim(),
+    const playersNames = Object.entries(data).map(([_, name]) => name.trim());
+    const result = await addNewGame(
+      {
+        gameSize,
+        type: tournamentMode ? GameType.TOURNAMENT : GameType.NORMAL,
+        winningLimit,
+      },
+      playersNames,
+    );
+
+    if (result === undefined) {
+      Alert.alert('Error', 'Failed to create a new game. Please try again.');
+      return;
+    }
+    const { game, players } = result;
+
+    const newPlayers: Player[] = players.map((p) => ({
+      id: String(p.id),
+      name: p.name,
+      score: [],
+      isPlaying: tournamentMode ? false : true,
       wins: 0,
       losses: 0,
-      isPlaying: tournamentMode ? false : true,
-      score: [],
     }));
 
-    addPlayers(players);
-
-    await addNewGame({
-      gameSize,
-      type: tournamentMode ? GameType.TOURNAMENT : GameType.NORMAL,
-      winningLimit,
-    });
+    addPlayers(newPlayers);
+    updateCurrentGameId(game.id);
 
     if (tournamentMode) {
       router.push('/modal');

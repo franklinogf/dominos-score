@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { Alert, View } from 'react-native';
 
+import { addNewRound } from '@/db/actions/round';
 import { GameStatus } from '@/lib/enums';
 import { useGame } from '@/stores/use-game';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
@@ -10,8 +11,11 @@ import { router } from 'expo-router';
 export function GameEndingButtons() {
   const updateGameStatus = useGame((state) => state.updateGameStatus);
   const tournamentMode = useGame((state) => state.tournamentMode);
-  const startNewRound = useGame((state) => state.startNewRound);
+  const gameStatus = useGame((state) => state.gameStatus);
+  const winnerPlayerId = useGame((state) => state.winnerPlayerId);
+  const currentGameId = useGame((state) => state.currentGameId);
   const endRound = useGame((state) => state.endRound);
+
   const endRoundLabel = tournamentMode ? 'End Round' : 'Restart';
   const endGameLabel = tournamentMode ? 'End Tournament' : 'End Game';
 
@@ -25,14 +29,24 @@ export function GameEndingButtons() {
       {
         text: endRoundLabel,
         style: 'destructive',
-        onPress: () => {
+        onPress: async () => {
           impactAsync(ImpactFeedbackStyle.Heavy);
-          if (tournamentMode) {
-            endRound();
-            router.push('/modal');
-          } else {
-            startNewRound();
+
+          if (
+            gameStatus === GameStatus.Finished &&
+            currentGameId &&
+            winnerPlayerId
+          ) {
+            addNewRound({
+              gameId: currentGameId,
+              roundWinnerId: Number(winnerPlayerId),
+            });
           }
+
+          if (tournamentMode) {
+            router.push('/modal');
+          }
+          endRound();
         },
       },
     ]);
@@ -60,6 +74,7 @@ export function GameEndingButtons() {
       ],
     );
   };
+
   return (
     <View className="flex-row gap-3">
       <Button

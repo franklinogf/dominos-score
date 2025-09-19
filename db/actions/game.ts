@@ -1,18 +1,25 @@
 import { deleteGame, Game, insertGame, NewGame } from '@/db/querys/game';
-import { useGame } from '@/stores/use-game';
+import { insertPlayers } from '../querys/player';
 
-export async function addNewGame(newGame: NewGame) {
+export async function addNewGame(newGame: NewGame, playersNames: string[]) {
   try {
-    const result = await insertGame(newGame);
-    const gameId = result?.[0].insertedId;
+    const game = await insertGame(newGame);
 
-    if (gameId === undefined) {
-      throw new Error('Failed to retrieve inserted game ID');
+    if (game === undefined) {
+      throw new Error('Failed to create a new game');
     }
 
-    useGame.getState().updateCurrentGameId(gameId);
+    const playerValues = playersNames.map((name) => ({
+      gameId: game.id,
+      name,
+    }));
 
-    return gameId;
+    const players = await insertPlayers(playerValues);
+    if (players === undefined) {
+      throw new Error('Failed to create players');
+    }
+
+    return { game, players };
   } catch (error) {
     console.error('Error adding new game:', error);
   }
