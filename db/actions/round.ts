@@ -19,13 +19,9 @@ export async function newRoundWithResults(
 
     if (isTrioMode) {
       // In trio mode: highest score wins, lowest score loses, others stay unchanged
-      const playingPlayers = players.filter(
-        (player) => player.score.length > 0,
-      );
-
-      if (playingPlayers.length > 1) {
+      if (players.length > 1) {
         // Calculate total scores for each player
-        const playersWithTotals = playingPlayers.map((player) => ({
+        const playersWithTotals = players.map((player) => ({
           ...player,
           totalScore: player.score.reduce((sum, score) => sum + score.value, 0),
         }));
