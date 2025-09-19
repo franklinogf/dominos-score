@@ -17,6 +17,7 @@ export function GameEndingButtons() {
   const endRound = useGame((state) => state.endRound);
   const players = useGame((state) => state.players);
   const playingPlayers = players.filter((p) => p.isPlaying);
+  const endGame = useGame((state) => state.endGame);
 
   const endRoundLabel = tournamentMode ? 'End Round' : 'Restart';
   const endGameLabel = tournamentMode ? 'End Tournament' : 'End Game';
@@ -75,6 +76,7 @@ export function GameEndingButtons() {
             impactAsync(ImpactFeedbackStyle.Heavy);
             updateGameStatus(GameStatus.NotStarted);
             router.replace('/');
+            endGame();
           },
         },
       ],
