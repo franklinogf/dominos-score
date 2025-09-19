@@ -31,9 +31,10 @@ type GameState = {
 
 function checkWinnerWhenUpdatingScore() {
   const { winningLimit, players, trioMode: isTrioMode } = useGame.getState();
+  const playingPlayers = players.filter((p) => p.isPlaying);
 
   // Check if any player has reached the winning limit
-  const playersAtLimit = players.filter((player) => {
+  const playersAtLimit = playingPlayers.filter((player) => {
     const total = player.score.reduce((acc, score) => acc + score.value, 0);
     return total >= winningLimit;
   });
@@ -41,30 +42,26 @@ function checkWinnerWhenUpdatingScore() {
   if (playersAtLimit.length > 0) {
     if (isTrioMode) {
       // In trio mode, find both the highest scorer (winner) and lowest scorer (loser)
-      const playingPlayers = players.filter((p) => p.isPlaying);
-      if (playingPlayers.length > 1) {
-        const playersWithTotals = playingPlayers.map((player) => ({
-          player,
-          total: player.score.reduce((acc, score) => acc + score.value, 0),
-        }));
 
-        // Find highest and lowest scorers
-        const maxTotal = Math.max(...playersWithTotals.map((p) => p.total));
-        const minTotal = Math.min(...playersWithTotals.map((p) => p.total));
+      const playersWithTotals = playingPlayers.map((player) => ({
+        player,
+        total: player.score.reduce((acc, score) => acc + score.value, 0),
+      }));
 
-        const winner = playersWithTotals.find(
-          (p) => p.total === maxTotal,
-        )?.player;
-        const loser = playersWithTotals.find(
-          (p) => p.total === minTotal,
-        )?.player;
+      // Find highest and lowest scorers
+      const maxTotal = Math.max(...playersWithTotals.map((p) => p.total));
+      const minTotal = Math.min(...playersWithTotals.map((p) => p.total));
 
-        useGame.setState(() => ({
-          winnerPlayerId: winner?.id || null,
-          loserPlayerId: loser?.id || null,
-          gameStatus: GameStatus.Finished,
-        }));
-      }
+      const winner = playersWithTotals.find(
+        (p) => p.total === maxTotal,
+      )?.player;
+      const loser = playersWithTotals.find((p) => p.total === minTotal)?.player;
+
+      useGame.setState(() => ({
+        winnerPlayerId: winner?.id || null,
+        loserPlayerId: loser?.id || null,
+        gameStatus: GameStatus.Finished,
+      }));
     } else {
       // Traditional mode: first player to reach the limit wins
       const winner = playersAtLimit[0];
