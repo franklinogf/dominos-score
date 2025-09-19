@@ -49,11 +49,10 @@ export function GameEndingButtons() {
               playingPlayers,
             );
           }
-
+          endRound();
           if (tournamentMode) {
             router.push('/modal');
           }
-          endRound();
         },
       },
     ]);

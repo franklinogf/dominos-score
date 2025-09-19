@@ -9,7 +9,6 @@ export async function insertRound(round: NewRound) {
       .insert(roundsTable)
       .values(round)
       .returning({ insertedId: roundsTable.id });
-    console.log('Inserted new round with ID:', result);
     return result;
   } catch (error) {
     console.error('Database error inserting round:', error);

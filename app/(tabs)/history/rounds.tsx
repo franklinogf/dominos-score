@@ -170,7 +170,7 @@ function SingleRoundDisplay({
                               : 'bg-muted'
                       }`}
                     >
-                      <Text className="text-xs font-bold text-white">
+                      <Text className="font-bold text-white">
                         {player.rank}
                       </Text>
                     </View>
@@ -275,9 +275,7 @@ function MultipleRoundsDisplay({
                           : 'bg-muted'
                   }`}
                 >
-                  <Text className="text-xs font-bold text-white">
-                    {player.rank}
-                  </Text>
+                  <Text className="font-bold text-white">{player.rank}</Text>
                 </View>
                 <Text variant="default" className="font-medium">
                   {player.name}

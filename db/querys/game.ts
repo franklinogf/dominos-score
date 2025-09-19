@@ -8,7 +8,6 @@ export type Game = typeof gamesTable.$inferSelect;
 export async function insertGame(game: NewGame) {
   try {
     const result = await db.insert(gamesTable).values(game).returning();
-    console.log('Inserted new game with ID:', result);
     return result[0];
   } catch (error) {
     console.error('Database error inserting game:', error);
