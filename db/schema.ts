@@ -59,8 +59,12 @@ export const gamesRelations = relations(gamesTable, ({ many }) => ({
   rounds: many(roundsTable),
 }));
 
-export const playersRelations = relations(playersTable, ({ many }) => ({
+export const playersRelations = relations(playersTable, ({ many, one }) => ({
   playerToRounds: many(playersToRoundsTable),
+  game: one(gamesTable, {
+    fields: [playersTable.gameId],
+    references: [gamesTable.id],
+  }),
 }));
 
 export const roundsRelations = relations(roundsTable, ({ one, many }) => ({

@@ -14,6 +14,10 @@ export default function HistoryLayout() {
           headerTitle: 'Game History',
         }}
       />
+      <Stack.Screen
+        name="rounds"
+        options={{ title: 'Rounds', headerShown: true }}
+      />
     </Stack>
   );
 }

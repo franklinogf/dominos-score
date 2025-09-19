@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { Alert, View } from 'react-native';
 
-import { addNewRound } from '@/db/actions/round';
+import { newRoundWithResults } from '@/db/actions/round';
 import { GameStatus } from '@/lib/enums';
 import { useGame } from '@/stores/use-game';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
@@ -15,6 +15,8 @@ export function GameEndingButtons() {
   const winnerPlayerId = useGame((state) => state.winnerPlayerId);
   const currentGameId = useGame((state) => state.currentGameId);
   const endRound = useGame((state) => state.endRound);
+  const players = useGame((state) => state.players);
+  const playingPlayers = players.filter((p) => p.isPlaying);
 
   const endRoundLabel = tournamentMode ? 'End Round' : 'Restart';
   const endGameLabel = tournamentMode ? 'End Tournament' : 'End Game';
@@ -37,10 +39,13 @@ export function GameEndingButtons() {
             currentGameId &&
             winnerPlayerId
           ) {
-            addNewRound({
-              gameId: currentGameId,
-              roundWinnerId: Number(winnerPlayerId),
-            });
+            newRoundWithResults(
+              {
+                gameId: currentGameId,
+                roundWinnerId: Number(winnerPlayerId),
+              },
+              playingPlayers,
+            );
           }
 
           if (tournamentMode) {

@@ -2,17 +2,15 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { removeGame } from '@/db/actions/game';
 import { type GameWithRounds, getAllGames } from '@/db/querys/game';
-import { formatDate, ucFirst } from '@/lib/utils';
+import { GameType } from '@/lib/enums';
+import { formatDate } from '@/lib/utils';
 import { useGame } from '@/stores/use-game';
 import { useFocusEffect } from '@react-navigation/native';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
+import { Link } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Alert, FlatList, View } from 'react-native';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 function GameCard({
@@ -24,23 +22,6 @@ function GameCard({
   onDelete: (gameId: number) => void;
   isCurrentGame: boolean;
 }) {
-  const opacity = useSharedValue(1);
-  const scale = useSharedValue(1);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: opacity.value,
-      transform: [{ scale: scale.value }],
-    };
-  });
-
-  const animateOut = (callback: () => void) => {
-    setIsDeleting(true);
-    opacity.value = withTiming(0, { duration: 300 });
-    scale.value = withTiming(0.8, { duration: 300 });
-  };
-
   const handleDelete = () => {
     impactAsync(ImpactFeedbackStyle.Light);
     Alert.alert(
@@ -56,31 +37,24 @@ function GameCard({
           style: 'destructive',
           onPress: () => {
             impactAsync(ImpactFeedbackStyle.Heavy);
-            animateOut(() => onDelete(game.id));
+            onDelete(game.id);
           },
         },
       ],
     );
   };
   return (
-    <Animated.View
-      style={[
-        animatedStyle,
-        {
-          marginBottom: 12,
-        },
-      ]}
-    >
+    <Animated.View>
       <View
-        className={`bg-card border rounded-lg p-4 ${
+        className={`bg-card border rounded-lg p-4 mb-4 ${
           isCurrentGame ? 'border-primary border-2' : 'border-border'
-        } ${isDeleting ? 'opacity-60' : ''}`}
+        }`}
       >
         <View className="flex-row justify-between items-start mb-2">
           <View className="flex-1">
             <View className="flex-row items-center mb-1">
               <Text variant="h3" className="text-foreground">
-                {ucFirst(game.type)} Game
+                {game.type === GameType.NORMAL ? 'Game' : 'Tournament'}
               </Text>
               {isCurrentGame && (
                 <View className="ml-2 bg-primary px-2 py-1 rounded">
@@ -111,11 +85,25 @@ function GameCard({
           </View>
 
           <View className="flex-row">
-            <Button variant="outline" size="sm" className="mr-2">
-              <Text className="text-xs">View Details</Text>
-            </Button>
+            <Link
+              push
+              asChild
+              href={{
+                pathname: '/history/rounds',
+                params: { gameId: game.id },
+              }}
+            >
+              <Button variant="outline" size="sm">
+                <Text className="text-xs">View Details</Text>
+              </Button>
+            </Link>
             {!isCurrentGame && (
-              <Button variant="outline" size="sm" onPress={handleDelete}>
+              <Button
+                variant="outline"
+                size="sm"
+                className="ml-2"
+                onPress={handleDelete}
+              >
                 <Text className="text-xs text-destructive">Delete</Text>
               </Button>
             )}
@@ -150,6 +138,7 @@ export default function HistoryIndex() {
         // Reload games after deletion
         loadGames();
         impactAsync(ImpactFeedbackStyle.Medium);
+        console.log('Game deleted successfully');
       } catch (error) {
         console.error('Failed to delete game:', error);
         Alert.alert('Error', 'Failed to delete game. Please try again.');
@@ -164,6 +153,7 @@ export default function HistoryIndex() {
       loadGames();
     }, [loadGames]),
   );
+
   return (
     <SafeAreaView className="flex-1 bg-background">
       <View className="px-4 py-6">
