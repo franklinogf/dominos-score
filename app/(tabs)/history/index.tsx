@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
 import { removeGame } from '@/db/actions/game';
 import { type GameWithRounds, getAllGames } from '@/db/querys/game';
@@ -12,6 +13,38 @@ import { useCallback, useState } from 'react';
 import { Alert, FlatList, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+function GameCardSkeleton() {
+  return (
+    <Animated.View>
+      <View className="bg-card border border-border rounded-lg p-4 mb-4">
+        <View className="flex-row justify-between items-start mb-2">
+          <View className="flex-1">
+            <View className="flex-row items-center mb-1">
+              <Skeleton className="h-6 w-24" />
+            </View>
+            <Skeleton className="h-4 w-32 mt-1" />
+          </View>
+          <View className="items-end">
+            <Skeleton className="h-4 w-16" />
+          </View>
+        </View>
+
+        <View className="flex-row justify-between items-center">
+          <View className="flex-row">
+            <Skeleton className="h-4 w-20 mr-2" />
+            <Skeleton className="h-4 w-16" />
+          </View>
+
+          <View className="flex-row">
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-8 w-16 ml-2" />
+          </View>
+        </View>
+      </View>
+    </Animated.View>
+  );
+}
 
 function GameCard({
   game,
@@ -160,10 +193,13 @@ export default function HistoryIndex() {
         <Text variant="h1" className="text-center mb-6">
           Game History
         </Text>
+
         {isLoading && (
-          <Text className="text-center text-muted-foreground">
-            Loading games...
-          </Text>
+          <View>
+            <GameCardSkeleton />
+            <GameCardSkeleton />
+            <GameCardSkeleton />
+          </View>
         )}
 
         {!isLoading && games.length === 0 && (
