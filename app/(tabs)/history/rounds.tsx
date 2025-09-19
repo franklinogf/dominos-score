@@ -322,17 +322,17 @@ function MultipleRoundsDisplay({
 
               {/* Round Scores */}
               <View className="space-y-2">
-                {game.players.map((player) => {
-                  const scores = getPlayerScoresForRound(round, player.id);
+                {round.playersToRounds.map((ptr) => {
+                  const scores = getPlayerScoresForRound(round, ptr.playerId);
                   const totalScore = calculateTotalScore(scores);
 
                   return (
                     <View
-                      key={player.id}
+                      key={ptr.playerId}
                       className="flex-row justify-between items-center py-1"
                     >
                       <Text variant="default" className="font-medium">
-                        {player.name}
+                        {ptr.player.name}
                       </Text>
                       <View className="flex-row items-center">
                         {scores && scores.length > 0 ? (
