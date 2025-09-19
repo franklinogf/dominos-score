@@ -30,10 +30,7 @@ type GameState = {
 };
 
 function checkWinnerWhenUpdatingScore() {
-  const state = useGame.getState();
-  const winningLimit = state.winningLimit;
-  const players = state.players;
-  const isTrioMode = state.trioMode;
+  const { winningLimit, players, trioMode: isTrioMode } = useGame.getState();
 
   // Check if any player has reached the winning limit
   const playersAtLimit = players.filter((player) => {
