@@ -177,16 +177,6 @@ stores/
 - **Score Limit**: Customizable winning threshold
 - **Player Names**: Editable player identification
 
-## 📈 Future Enhancements
-
-- [ ] Cloud sync and backup
-- [ ] Multiplayer over network
-- [ ] Advanced statistics and analytics
-- [ ] Custom game rules and variants
-- [ ] Export game data (CSV, PDF)
-- [ ] Photo integration for player avatars
-- [ ] Sound effects and audio feedback
-
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
