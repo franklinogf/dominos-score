@@ -5,6 +5,7 @@ import { useColorScheme } from 'nativewind';
 
 import { initializeDatabase } from '@/db/database';
 import { useGame } from '@/stores/use-game';
+import { PortalHost } from '@rn-primitives/portal';
 import { useEffect } from 'react';
 
 export default function RootLayout() {
@@ -31,6 +32,7 @@ export default function RootLayout() {
           options={{ presentation: 'containedModal' }}
         />
       </Stack>
+      <PortalHost />
     </>
   );
 }

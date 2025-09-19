@@ -1,7 +1,6 @@
 import { NAV_THEME, THEME } from '@/lib/theme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { ThemeProvider } from '@react-navigation/native';
-import { PortalHost } from '@rn-primitives/portal';
 import { Tabs } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 
@@ -51,7 +50,6 @@ export default function TabsLayout() {
           }}
         />
       </Tabs>
-      <PortalHost />
     </ThemeProvider>
   );
 }
