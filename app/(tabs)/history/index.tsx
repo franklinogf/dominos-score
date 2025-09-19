@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { removeGame } from '@/db/actions/game';
 import { type GameWithRounds, getAllGames } from '@/db/querys/game';
+import { formatDate, ucFirst } from '@/lib/utils';
 import { useGame } from '@/stores/use-game';
 import { useFocusEffect } from '@react-navigation/native';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
@@ -13,19 +14,6 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
-
-const ucFirst = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 function GameCard({
   game,
