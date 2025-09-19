@@ -16,16 +16,25 @@ export function PlayerScoreTotal({ player }: { player: Player }) {
   const total = player.score.reduce((acc, score) => acc + score.value, 0);
   const winningLimit = useGame((state) => state.winningLimit);
   const winnerPlayerId = useGame((state) => state.winnerPlayerId);
+  const loserPlayerId = useGame((state) => state.loserPlayerId);
+  const trioMode = useGame((state) => state.trioMode);
+
   const isWinner = player.id === winnerPlayerId;
+  const isLoser = player.id === loserPlayerId;
+
+  // In traditional mode, only winners get special treatment
+  // In trio mode, both winners and losers get special treatment
+  const shouldShowWinner = isWinner;
+  const shouldShowLoser = trioMode && isLoser;
 
   // Animation values
   const scale = useSharedValue(1);
   const rotation = useSharedValue(0);
 
-  // Trigger celebration animation when this player wins
+  // Trigger celebration animation when this player wins (or different animation for loser in trio mode)
   useEffect(() => {
-    if (isWinner) {
-      // Scale and rotation animation
+    if (shouldShowWinner) {
+      // Scale and rotation animation for winner
       scale.value = withRepeat(
         withSequence(
           withSpring(1.3, { damping: 50, stiffness: 300 }),
@@ -44,12 +53,25 @@ export function PlayerScoreTotal({ player }: { player: Player }) {
         -1,
         true,
       );
+    } else if (shouldShowLoser) {
+      // More noticeable shake animation for loser in trio mode
+      scale.value = withSpring(0.9, { damping: 40, stiffness: 200 }); // Slightly smaller scale
+      rotation.value = withRepeat(
+        withSequence(
+          withSpring(-3, { damping: 80, stiffness: 400 }),
+          withSpring(3, { damping: 80, stiffness: 400 }),
+          withSpring(-3, { damping: 80, stiffness: 400 }),
+          withSpring(0, { damping: 100, stiffness: 300 }),
+        ),
+        -1, // Infinite repeat like winner animation
+        false,
+      );
     } else {
-      // Reset animations when not winner
+      // Reset animations when not winner or loser
       scale.value = withSpring(1, { damping: 40, stiffness: 200 });
       rotation.value = withSpring(0, { damping: 40, stiffness: 200 });
     }
-  }, [isWinner, scale, rotation]);
+  }, [shouldShowWinner, shouldShowLoser, scale, rotation]);
 
   // Animated style
   const animatedStyle = useAnimatedStyle(() => ({
@@ -61,7 +83,8 @@ export function PlayerScoreTotal({ player }: { player: Player }) {
       <Animated.View style={animatedStyle}>
         <Text
           className={cn('text-2xl font-extrabold text-center', {
-            'text-success': isWinner,
+            'text-success': shouldShowWinner,
+            'text-destructive': shouldShowLoser,
           })}
         >
           {total}

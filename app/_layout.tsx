@@ -4,13 +4,22 @@ import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 
 import { initializeDatabase } from '@/db/database';
+import { useGame } from '@/stores/use-game';
 import { useEffect } from 'react';
 
 export default function RootLayout() {
   const { colorScheme } = useColorScheme();
+  const loadSettings = useGame((state) => state.loadSettings);
+
   useEffect(() => {
-    initializeDatabase();
-  }, []);
+    const initialize = async () => {
+      await initializeDatabase();
+      // Load settings after database is initialized
+      await loadSettings();
+    };
+
+    initialize();
+  }, [loadSettings]);
 
   return (
     <>

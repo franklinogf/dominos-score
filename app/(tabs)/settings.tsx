@@ -1,10 +1,15 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { Text } from '@/components/ui/text';
 import { saveSettings } from '@/db/actions/settings';
-import { getLongPressScoreSetting } from '@/db/querys/settings';
-import { DEFAULT_LONG_PRESS_SCORE } from '@/lib/constants';
+import {
+  getLongPressScoreSetting,
+  getTrioModeSetting,
+} from '@/db/querys/settings';
+import { DEFAULT_LONG_PRESS_SCORE, DEFAULT_TRIO_MODE } from '@/lib/constants';
+import { useGame } from '@/stores/use-game';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { useEffect, useState } from 'react';
@@ -48,12 +53,14 @@ const settingsSchema = z.object({
     .refine((val) => !isNaN(Number(val)), 'Must be a valid number')
     .refine((val) => Number(val) > 0, 'Must be greater than 0')
     .refine((val) => Number(val) <= 999, 'Must be 999 or less'),
+  trioMode: z.boolean(),
 });
 
 type SettingsFormData = z.infer<typeof settingsSchema>;
 
 export default function Settings() {
   const [isLoading, setIsLoading] = useState(true);
+  const setTrioMode = useGame((state) => state.setTrioMode);
 
   const {
     control,
@@ -65,6 +72,7 @@ export default function Settings() {
     resolver: zodResolver(settingsSchema),
     defaultValues: {
       longPressScore: DEFAULT_LONG_PRESS_SCORE.toString(),
+      trioMode: DEFAULT_TRIO_MODE,
     },
   });
 
@@ -73,7 +81,9 @@ export default function Settings() {
     const loadSettings = async () => {
       try {
         const longPressScore = await getLongPressScoreSetting();
+        const trioMode = await getTrioModeSetting();
         setValue('longPressScore', longPressScore.toString());
+        setValue('trioMode', trioMode);
       } catch (error) {
         console.error('Failed to load settings:', error);
         Alert.alert('Error', 'Failed to load settings');
@@ -89,7 +99,16 @@ export default function Settings() {
     impactAsync(ImpactFeedbackStyle.Light);
 
     try {
-      await saveSettings(data);
+      // Convert data to string format for storage
+      const settingsData = {
+        longPressScore: data.longPressScore,
+        trioMode: data.trioMode.toString(),
+      };
+      await saveSettings(settingsData);
+
+      // Update game store with new trio mode setting
+      setTrioMode(data.trioMode);
+
       reset(data);
       impactAsync(ImpactFeedbackStyle.Medium);
       Alert.alert('Success', 'Settings saved successfully!');
@@ -144,6 +163,27 @@ export default function Settings() {
                     {errors.longPressScore.message}
                   </Text>
                 )}
+              </FieldGroup>
+
+              <View className="my-6" />
+
+              <FieldGroup
+                id="trioMode"
+                label="Trio Mode"
+                description="Only the player with the lowest score loses (everyone else wins)"
+              >
+                <Controller
+                  control={control}
+                  name="trioMode"
+                  render={({ field: { onChange, value } }) => (
+                    <View className="flex-row items-center space-x-2">
+                      <Switch checked={value} onCheckedChange={onChange} />
+                      <Text variant="default" className="ml-3">
+                        {value ? 'Enabled' : 'Disabled'}
+                      </Text>
+                    </View>
+                  )}
+                />
               </FieldGroup>
 
               <Button

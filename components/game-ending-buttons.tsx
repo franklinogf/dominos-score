@@ -39,6 +39,7 @@ export function GameEndingButtons() {
             currentGameId &&
             winnerPlayerId
           ) {
+            // Pass the actual winner ID (highest scorer) in trio mode
             newRoundWithResults(
               {
                 gameId: currentGameId,

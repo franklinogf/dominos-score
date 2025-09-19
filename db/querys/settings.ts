@@ -1,6 +1,6 @@
 import { db } from '@/db/database';
 import { settingsTable } from '@/db/schema';
-import { DEFAULT_LONG_PRESS_SCORE } from '@/lib/constants';
+import { DEFAULT_LONG_PRESS_SCORE, DEFAULT_TRIO_MODE } from '@/lib/constants';
 import { eq } from 'drizzle-orm';
 
 export async function getSetting(key: string): Promise<string | undefined> {
@@ -22,6 +22,16 @@ export async function getLongPressScoreSetting(): Promise<number> {
   } catch (error) {
     console.error('Database error fetching long press score setting:', error);
     return DEFAULT_LONG_PRESS_SCORE;
+  }
+}
+
+export async function getTrioModeSetting(): Promise<boolean> {
+  try {
+    const value = await getSetting('trioMode');
+    return value ? value === 'true' : DEFAULT_TRIO_MODE;
+  } catch (error) {
+    console.error('Database error fetching trio mode setting:', error);
+    return DEFAULT_TRIO_MODE;
   }
 }
 

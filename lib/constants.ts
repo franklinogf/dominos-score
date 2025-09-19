@@ -13,3 +13,5 @@ export const BIG_PARTY_SIZES = [
 ] as const;
 
 export const DEFAULT_LONG_PRESS_SCORE = 30;
+
+export const DEFAULT_TRIO_MODE = true;
