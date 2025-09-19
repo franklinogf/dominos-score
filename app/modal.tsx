@@ -14,10 +14,18 @@ export default function TournamentModal() {
   const gameStatus = useGame((state) => state.gameStatus);
   const updateGameStatus = useGame((state) => state.updateGameStatus);
 
+  const trioMode = useGame((state) => state.trioMode);
+
+  const maxActivePlayers = trioMode ? 3 : 4;
+  const minActivePlayers = trioMode ? 3 : 2;
+
   const activePlayersCount = players.filter((p) => p.isPlaying).length;
 
   function handleSubmit() {
-    if (activePlayersCount < 2 || activePlayersCount > 4) {
+    if (
+      activePlayersCount < minActivePlayers ||
+      activePlayersCount > maxActivePlayers
+    ) {
       impactAsync(ImpactFeedbackStyle.Heavy);
       return;
     }
@@ -45,6 +53,20 @@ export default function TournamentModal() {
           <Text className="text-center text-muted-foreground mt-2">
             Select players for this round
           </Text>
+
+          {trioMode && (
+            <View className="mt-4 mx-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <Text className="text-center text-amber-800 font-medium text-sm">
+                🎯 Trio Mode Enabled
+              </Text>
+              <Text className="text-center text-amber-700 text-xs mt-1">
+                Exactly 3 players must be selected for this game mode
+              </Text>
+              <Text className="text-center text-amber-600 text-xs mt-1">
+                You can disable this in Settings
+              </Text>
+            </View>
+          )}
         </View>
 
         <PlayersList />
@@ -53,17 +75,21 @@ export default function TournamentModal() {
           <Button
             onPress={handleSubmit}
             variant={
-              activePlayersCount < 2 || activePlayersCount > 4
+              activePlayersCount < minActivePlayers ||
+              activePlayersCount > maxActivePlayers
                 ? 'outline'
                 : 'default'
             }
             className={`shadow-sm`}
-            disabled={activePlayersCount < 2 || activePlayersCount > 4}
+            disabled={
+              activePlayersCount < minActivePlayers ||
+              activePlayersCount > maxActivePlayers
+            }
           >
             <Text>
-              {activePlayersCount < 2
-                ? 'Select at least 2 players'
-                : activePlayersCount > 4
+              {activePlayersCount < minActivePlayers
+                ? `Select at least ${minActivePlayers} players`
+                : activePlayersCount > maxActivePlayers
                   ? 'Too many players selected'
                   : 'Start Game'}
             </Text>
@@ -86,6 +112,8 @@ function PlayersList() {
   const players = useGame((state) => state.players);
   const updatePlayerActivity = useGame((state) => state.changePlayerActivity);
   const activePlayersCount = players.filter((p) => p.isPlaying).length;
+  const trioMode = useGame((state) => state.trioMode);
+  const maxActivePlayers = trioMode ? 3 : 4;
 
   const handlePlayerToggle = (player: Player, isPlaying: boolean) => {
     impactAsync(ImpactFeedbackStyle.Light);
@@ -99,7 +127,7 @@ function PlayersList() {
           {activePlayersCount} selected
         </Text>
         <Text variant="muted" className="text-xs mt-1">
-          2 or 4 players required to start
+          {trioMode ? 'Select 3 players' : 'Select 2 to 4 players'}
         </Text>
       </View>
 
@@ -107,7 +135,7 @@ function PlayersList() {
         {players.map((player, index) => {
           const isDisabled =
             (activePlayersCount === 1 && player.isPlaying) ||
-            (activePlayersCount === 4 && !player.isPlaying);
+            (activePlayersCount === maxActivePlayers && !player.isPlaying);
 
           return (
             <Pressable
