@@ -58,7 +58,10 @@
     "select3Players": "Select 3 players",
     "select2to4Players": "Select 2 to 4 players",
     "wins": "wins",
-    "losses": "losses"
+    "losses": "losses",
+    "firstTo": "First to {{limit}}",
+    "tournamentLeader": "Tournament - {{name}} ({{wins}} wins)",
+    "tournamentTie": "Tournament - {{names}} ({{wins}} wins)"
   },
   "history": {
     "title": "Game History",

@@ -1,3 +1,4 @@
+import { useT } from '@/hooks/use-translation';
 import { useGame } from '@/stores/use-game';
 import { useMemo } from 'react';
 
@@ -5,10 +6,11 @@ export function useTournamentTitle() {
   const players = useGame((state) => state.players);
   const winningLimit = useGame((state) => state.winningLimit);
   const tournamentMode = useGame((state) => state.tournamentMode);
+  const { t } = useT();
 
   const title = useMemo(() => {
     if (!tournamentMode) {
-      return `First to ${winningLimit}`;
+      return t('game.firstTo', { limit: winningLimit });
     }
 
     // Find players with the most wins, handle ties by showing all tied players
@@ -21,16 +23,22 @@ export function useTournamentTitle() {
 
     if (playersWithMostWins.length === 1) {
       // Single leader
-      return `Tournament - ${playersWithMostWins[0].name} (${playersWithMostWins[0].wins} wins)`;
+      return t('game.tournamentLeader', {
+        name: playersWithMostWins[0].name,
+        wins: playersWithMostWins[0].wins,
+      });
     } else if (playersWithMostWins.length > 1) {
       // Multiple leaders tied
       const names = playersWithMostWins.map((p) => p.name).join(', ');
-      return `Tournament - ${names} (${maxWins} wins)`;
+      return t('game.tournamentTie', {
+        names: names,
+        wins: maxWins,
+      });
     }
 
     // No wins yet
-    return 'Tournament';
-  }, [players, winningLimit, tournamentMode]);
+    return t('game.tournament');
+  }, [players, winningLimit, tournamentMode, t]);
 
   return title;
 }
