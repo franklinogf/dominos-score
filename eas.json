@@ -1,0 +1,11 @@
+{
+  "build": {
+    "emulator": {
+      "android": {
+        "developmentClient": true,
+        "distribution": "internal"
+      }
+    },
+    "production": {}
+  }
+}
