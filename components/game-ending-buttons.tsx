@@ -3,12 +3,14 @@ import { Text } from '@/components/ui/text';
 import { Alert, View } from 'react-native';
 
 import { newRoundWithResults } from '@/db/actions/round';
+import { useT } from '@/hooks/use-translation';
 import { GameStatus } from '@/lib/enums';
 import { useGame } from '@/stores/use-game';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { router } from 'expo-router';
 
 export function GameEndingButtons() {
+  const { t } = useT();
   const updateGameStatus = useGame((state) => state.updateGameStatus);
   const tournamentMode = useGame((state) => state.tournamentMode);
   const gameStatus = useGame((state) => state.gameStatus);
@@ -19,14 +21,16 @@ export function GameEndingButtons() {
   const playingPlayers = players.filter((p) => p.isPlaying);
   const endGame = useGame((state) => state.endGame);
 
-  const endRoundLabel = tournamentMode ? 'End Round' : 'Restart';
-  const endGameLabel = tournamentMode ? 'End Tournament' : 'End Game';
+  const endRoundLabel = tournamentMode ? t('game.endRound') : t('game.restart');
+  const endGameLabel = tournamentMode
+    ? t('game.endTournament')
+    : t('game.endGame');
 
   const handleEndRound = () => {
     impactAsync(ImpactFeedbackStyle.Medium);
-    Alert.alert(endRoundLabel, 'Are you sure you want to end this round?', [
+    Alert.alert(endRoundLabel, t('game.endRoundConfirm'), [
       {
-        text: 'Cancel',
+        text: t('common.cancel'),
         style: 'cancel',
       },
       {
@@ -60,26 +64,22 @@ export function GameEndingButtons() {
 
   const handleEndGame = () => {
     impactAsync(ImpactFeedbackStyle.Medium);
-    Alert.alert(
-      endGameLabel,
-      'Are you sure you want to end the entire game? This will reset all scores.',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
+    Alert.alert(endGameLabel, t('game.endGameConfirm'), [
+      {
+        text: t('common.cancel'),
+        style: 'cancel',
+      },
+      {
+        text: endGameLabel,
+        style: 'destructive',
+        onPress: () => {
+          impactAsync(ImpactFeedbackStyle.Heavy);
+          updateGameStatus(GameStatus.NotStarted);
+          endGame();
+          router.replace('/');
         },
-        {
-          text: endGameLabel,
-          style: 'destructive',
-          onPress: () => {
-            impactAsync(ImpactFeedbackStyle.Heavy);
-            updateGameStatus(GameStatus.NotStarted);
-            router.replace('/');
-            endGame();
-          },
-        },
-      ],
-    );
+      },
+    ]);
   };
 
   return (

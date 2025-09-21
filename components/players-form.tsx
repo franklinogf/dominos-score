@@ -4,6 +4,7 @@ import { Text } from '@/components/ui/text';
 
 import { Button } from '@/components/ui/button';
 import { addNewGame } from '@/db/actions/game';
+import { useT } from '@/hooks/use-translation';
 import { GameStatus, GameType } from '@/lib/enums';
 import { Player } from '@/lib/types';
 import { cn } from '@/lib/utils';
@@ -16,23 +17,27 @@ import { Alert, FlatList, TextInput, View } from 'react-native';
 import { z } from 'zod';
 
 // Create dynamic schema based on game size
-const createPlayersSchema = (gameSize: number) => {
+const createPlayersSchema = (
+  gameSize: number,
+  t: (key: string, options?: any) => string,
+) => {
   const playerFields = Array.from({ length: gameSize }, (_, index) => [
     `player${index}`,
     z
       .string()
-      .min(1, `Player ${index + 1} name is required`)
-      .max(10, 'Name must be 10 characters or less'),
+      .min(1, t('players.nameRequired', { number: index + 1 }))
+      .max(10, t('players.nameMaxLength')),
   ]);
 
   return z.object(Object.fromEntries(playerFields));
 };
 
 export function PlayersForm() {
+  const { t } = useT();
   const gameSize = useGame((state) => state.gameSize);
   const players = useGame((state) => state.players);
   const addPlayers = useGame((state) => state.addPlayers);
-  const schema = createPlayersSchema(gameSize);
+  const schema = createPlayersSchema(gameSize, t);
   const tournamentMode = useGame((state) => state.tournamentMode);
   const inputRef = useRef<TextInput[]>([]);
   const updateGameStatus = useGame((state) => state.updateGameStatus);
@@ -69,7 +74,7 @@ export function PlayersForm() {
     );
 
     if (result === undefined) {
-      Alert.alert('Error', 'Failed to create a new game. Please try again.');
+      Alert.alert(t('common.error'), t('errors.gameCreationFailed'));
       return;
     }
     const { game, players } = result;
@@ -111,7 +116,7 @@ export function PlayersForm() {
               htmlFor={`player-name-${item.index}`}
               className="font-bold text-xl mb-2"
             >
-              Player {item.index + 1}
+              {t('players.playerNumber', { number: item.index + 1 })}
             </Label>
             <Controller
               control={control}
@@ -137,7 +142,9 @@ export function PlayersForm() {
                   id={`player-name-${item.index}`}
                   value={value}
                   onChangeText={onChange}
-                  placeholder={`Enter player ${item.index + 1} name`}
+                  placeholder={t('players.enterPlayerName', {
+                    number: item.index + 1,
+                  })}
                 />
               )}
             />
@@ -151,7 +158,9 @@ export function PlayersForm() {
       />
       <View className="px-4 pb-2">
         <Button onPress={handleSubmit(onSubmit)} size="lg">
-          <Text>{tournamentMode ? 'Start Tournament' : 'Start Game'}</Text>
+          <Text>
+            {tournamentMode ? t('game.startTournament') : t('game.startGame')}
+          </Text>
         </Button>
       </View>
     </View>

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Text } from '@/components/ui/text';
+import { useT } from '@/hooks/use-translation';
 import { GameStatus } from '@/lib/enums';
 import { Player } from '@/lib/types';
 import { useGame } from '@/stores/use-game';
@@ -10,6 +11,7 @@ import { Pressable, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function TournamentModal() {
+  const { t } = useT();
   const players = useGame((state) => state.players);
   const gameStatus = useGame((state) => state.gameStatus);
   const updateGameStatus = useGame((state) => state.updateGameStatus);
@@ -48,22 +50,22 @@ export default function TournamentModal() {
       <View className="flex-1 px-6 py-4">
         <View className="mb-6 pt-2">
           <Text variant="h1" className="text-center">
-            Tournament
+            {t('game.tournament')}
           </Text>
           <Text className="text-center text-muted-foreground mt-2">
-            Select players for this round
+            {t('game.selectPlayersForRound')}
           </Text>
 
           {trioMode && (
             <View className="mt-4 mx-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
               <Text className="text-center text-amber-800 font-medium text-sm">
-                🎯 Trio Mode Enabled
+                {t('game.trioModeEnabled')}
               </Text>
               <Text className="text-center text-amber-700 text-xs mt-1">
-                Exactly 3 players must be selected for this game mode
+                {t('game.trioModeExactly3')}
               </Text>
               <Text className="text-center text-amber-600 text-xs mt-1">
-                You can disable this in Settings
+                {t('game.disableInSettings')}
               </Text>
             </View>
           )}
@@ -88,17 +90,17 @@ export default function TournamentModal() {
           >
             <Text>
               {activePlayersCount < minActivePlayers
-                ? `Select at least ${minActivePlayers} players`
+                ? t('game.selectAtLeast', { count: minActivePlayers })
                 : activePlayersCount > maxActivePlayers
-                  ? 'Too many players selected'
-                  : 'Start Game'}
+                  ? t('game.tooManyPlayers')
+                  : t('game.startGame')}
             </Text>
           </Button>
 
           {gameStatus === GameStatus.NotStarted && (
             <View className="mt-4">
               <Button variant="outline" onPress={handleBack}>
-                <Text>Cancel</Text>
+                <Text>{t('common.cancel')}</Text>
               </Button>
             </View>
           )}
@@ -109,6 +111,7 @@ export default function TournamentModal() {
 }
 
 function PlayersList() {
+  const { t } = useT();
   const players = useGame((state) => state.players);
   const updatePlayerActivity = useGame((state) => state.changePlayerActivity);
   const activePlayersCount = players.filter((p) => p.isPlaying).length;
@@ -124,10 +127,10 @@ function PlayersList() {
     <View className="mt-6">
       <View className="mb-4 items-center px-4 py-3 bg-muted/20 rounded-lg">
         <Text variant="muted" className="text-center text-base font-medium">
-          {activePlayersCount} selected
+          {activePlayersCount} {t('game.selected')}
         </Text>
         <Text variant="muted" className="text-xs mt-1">
-          {trioMode ? 'Select 3 players' : 'Select 2 to 4 players'}
+          {trioMode ? t('game.select3Players') : t('game.select2to4Players')}
         </Text>
       </View>
 
@@ -170,7 +173,8 @@ function PlayersList() {
                         ${player.isPlaying ? 'text-muted-foreground' : 'text-muted-foreground/70'}
                       `}
                     >
-                      {player.wins} wins • {player.losses} losses
+                      {player.wins} {t('game.wins')} • {player.losses}{' '}
+                      {t('game.losses')}
                     </Text>
                   )}
                 </View>

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { getLongPressScoreSetting } from '@/db/querys/settings';
+import { useT } from '@/hooks/use-translation';
 import { DEFAULT_LONG_PRESS_SCORE } from '@/lib/constants';
 import { GameStatus } from '@/lib/enums';
 import { Player } from '@/lib/types';
@@ -48,20 +49,21 @@ function PlayerButton({
   player: Player;
   longPressScore: number | null;
 }) {
+  const { t } = useT();
   const addScoreToPlayer = useGame((state) => state.addScoreToPlayer);
   const gameStatus = useGame((state) => state.gameStatus);
   const handleAddCustomScore = () => {
     impactAsync(ImpactFeedbackStyle.Light);
     Alert.prompt(
-      'Add Score',
-      `Enter score for ${player.name}:`,
+      t('game.addScore'),
+      t('game.enterScoreFor', { name: player.name }),
       [
         {
-          text: 'Cancel',
+          text: t('common.cancel'),
           style: 'cancel',
         },
         {
-          text: 'Add',
+          text: t('game.add'),
           onPress: (score: string | undefined) => {
             // Allow empty input to cancel without error
             if (!score || score.trim() === '') {

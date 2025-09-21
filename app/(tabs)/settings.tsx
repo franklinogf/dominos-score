@@ -36,7 +36,7 @@ interface FieldGroupProps {
 
 function FieldGroup({ id, label, description, children }: FieldGroupProps) {
   return (
-    <View>
+    <View className="my-3">
       <View className="mb-3">
         <Label htmlFor={id} className="text-base font-medium">
           {label}
@@ -170,8 +170,6 @@ export default function Settings() {
                   </Text>
                 )}
               </FieldGroup>
-
-              <View className="my-6" />
 
               <FieldGroup
                 id="trioMode"

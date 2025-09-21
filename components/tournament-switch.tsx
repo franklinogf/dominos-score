@@ -1,10 +1,12 @@
 import { Switch } from '@/components/ui/switch';
+import { useT } from '@/hooks/use-translation';
 import { useGame } from '@/stores/use-game';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { View } from 'react-native';
 import { Label } from './ui/label';
 
 export function TournamentSwitch() {
+  const { t } = useT();
   const tournamentMode = useGame((state) => state.tournamentMode);
   const toggleTournamentMode = useGame((state) => state.toggleTournamentMode);
 
@@ -19,7 +21,7 @@ export function TournamentSwitch() {
         nativeID="tournament-mode"
         className="text-lg"
       >
-        Tournament Mode
+        {t('game.tournamentMode')}
       </Label>
       <Switch
         nativeID="tournament-mode"

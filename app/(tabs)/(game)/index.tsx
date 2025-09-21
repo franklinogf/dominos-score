@@ -3,6 +3,7 @@ import { PlayersForm } from '@/components/players-form';
 import { WinningLimit } from '@/components/points-selection';
 import { TournamentSwitch } from '@/components/tournament-switch';
 import { Text } from '@/components/ui/text';
+import { useT } from '@/hooks/use-translation';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -13,6 +14,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Index() {
+  const { t } = useT();
+
   return (
     <SafeAreaView className="flex-1 bg-background">
       <KeyboardAvoidingView
@@ -28,7 +31,7 @@ export default function Index() {
           <View className="flex-1">
             <View className="pt-4">
               <Text variant="h1" className="text-center mb-6">
-                Domino Tracker
+                {t('game.title')}
               </Text>
             </View>
 

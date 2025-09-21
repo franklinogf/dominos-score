@@ -1,6 +1,7 @@
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Text } from '@/components/ui/text';
+import { useT } from '@/hooks/use-translation';
 import { POINTS } from '@/lib/constants';
 import { Point } from '@/lib/types';
 import { useGame } from '@/stores/use-game';
@@ -8,6 +9,7 @@ import * as Haptics from 'expo-haptics';
 import { View } from 'react-native';
 
 export function WinningLimit() {
+  const { t } = useT();
   const winningLimit = useGame((state) => state.winningLimit);
   const updateWinningLimit = useGame((state) => state.updateWinningLimit);
   function onLabelPress(label: Point) {
@@ -24,7 +26,7 @@ export function WinningLimit() {
   return (
     <View className="w-full mt-4">
       <Text className="text-center mb-1" variant="large">
-        Points to win
+        {t('game.pointsToWin')}
       </Text>
       <RadioGroup
         className="text-xl mx-auto flex-row"

@@ -34,17 +34,54 @@
     "tournament": "Torneo",
     "partySize": "Número de Jugadores",
     "selectPoints": "Seleccionar Puntos",
-    "gameEnded": "Juego Terminado"
+    "gameEnded": "Juego Terminado",
+    "startGame": "Iniciar Juego",
+    "startTournament": "Iniciar Torneo",
+    "pointsToWin": "Puntos para ganar",
+    "tournamentMode": "Modo Torneo",
+    "addScore": "Agregar Puntuación",
+    "enterScoreFor": "Ingresa la puntuación para {{name}}:",
+    "add": "Agregar",
+    "endRound": "Terminar Ronda",
+    "restart": "Reiniciar",
+    "endTournament": "Terminar Torneo",
+    "endRoundConfirm": "¿Estás seguro de que quieres terminar esta ronda?",
+    "endGameConfirm": "¿Estás seguro de que quieres terminar todo el juego? Esto reiniciará todas las puntuaciones.",
+    "selectPlayersForRound": "Selecciona jugadores para esta ronda",
+    "trioModeEnabled": "🎯 Modo Trío Habilitado",
+    "trioModeExactly3": "Exactamente 3 jugadores deben ser seleccionados para este modo de juego",
+    "disableInSettings": "Puedes deshabilitarlo en Configuración",
+    "selectAtLeast": "Selecciona al menos {{count}} jugadores",
+    "tooManyPlayers": "Demasiados jugadores seleccionados",
+    "backToSetup": "Volver a Configuración",
+    "selected": "seleccionados",
+    "select3Players": "Selecciona 3 jugadores",
+    "select2to4Players": "Selecciona de 2 a 4 jugadores",
+    "wins": "victorias",
+    "losses": "derrotas"
   },
   "history": {
     "title": "Historial de Juegos",
     "noGames": "No se han jugado partidas aún",
     "rounds": "Rondas",
     "date": "Fecha",
-    "duration": "Duración"
+    "duration": "Duración",
+    "round": "ronda",
+    "playersLabel": "Jugadores",
+    "limitLabel": "Límite",
+    "viewDetails": "Ver Detalles",
+    "current": "ACTUAL",
+    "deleteGame": "Eliminar Juego",
+    "deleteConfirm": "¿Estás seguro de que quieres eliminar este juego de {{type}}? Esta acción no se puede deshacer.",
+    "deleteFailed": "Error al eliminar el juego. Por favor intenta de nuevo.",
+    "startFirstGame": "¡Inicia tu primer juego para verlo aquí!"
   },
   "settings": {
     "title": "Configuración",
+    "language": "Idioma",
+    "theme": "Tema",
+    "notifications": "Notificaciones",
+    "about": "Acerca de",
     "longPressScore": "Puntuación de Pulsación Larga",
     "longPressScoreDescription": "Puntos agregados cuando mantienes presionado un botón de jugador",
     "longPressScorePlaceholder": "Ingresa el valor de puntuación",
@@ -66,11 +103,16 @@
     "addPlayer": "Agregar Jugador",
     "removePlayer": "Quitar Jugador",
     "playerName": "Nombre del Jugador",
-    "enterName": "Ingresa el nombre del jugador"
+    "enterName": "Ingresa el nombre del jugador",
+    "playerNumber": "Jugador {{number}}",
+    "enterPlayerName": "Ingresa el nombre del jugador {{number}}",
+    "nameRequired": "El nombre del jugador {{number}} es requerido",
+    "nameMaxLength": "El nombre debe tener 10 caracteres o menos"
   },
   "errors": {
     "genericError": "Algo salió mal",
     "networkError": "Error de conexión",
-    "invalidInput": "Entrada inválida"
+    "invalidInput": "Entrada inválida",
+    "gameCreationFailed": "Error al crear un nuevo juego. Por favor intenta de nuevo."
   }
 }

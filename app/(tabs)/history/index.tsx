@@ -3,6 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
 import { removeGame } from '@/db/actions/game';
 import { type GameWithRounds, getAllGames } from '@/db/querys/game';
+import { useT } from '@/hooks/use-translation';
 import { GameType } from '@/lib/enums';
 import { formatDate } from '@/lib/utils';
 import { useGame } from '@/stores/use-game';
@@ -55,18 +56,19 @@ function GameCard({
   onDelete: (gameId: number) => void;
   isCurrentGame: boolean;
 }) {
+  const { t } = useT();
   const handleDelete = () => {
     impactAsync(ImpactFeedbackStyle.Light);
     Alert.alert(
-      'Delete Game',
-      `Are you sure you want to delete this ${game.type} game? This action cannot be undone.`,
+      t('history.deleteGame'),
+      t('history.deleteConfirm', { type: game.type.toLowerCase() }),
       [
         {
-          text: 'Cancel',
+          text: t('common.cancel'),
           style: 'cancel',
         },
         {
-          text: 'Delete',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: () => {
             impactAsync(ImpactFeedbackStyle.Heavy);
@@ -87,12 +89,14 @@ function GameCard({
           <View className="flex-1">
             <View className="flex-row items-center mb-1">
               <Text variant="h3" className="text-foreground">
-                {game.type === GameType.NORMAL ? 'Game' : 'Tournament'}
+                {game.type === GameType.NORMAL
+                  ? t('game.newGame')
+                  : t('game.tournament')}
               </Text>
               {isCurrentGame && (
                 <View className="ml-2 bg-primary px-2 py-1 rounded">
                   <Text className="text-primary-foreground text-xs font-medium">
-                    CURRENT
+                    {t('history.current')}
                   </Text>
                 </View>
               )}
@@ -104,7 +108,9 @@ function GameCard({
           <View className="items-end">
             <Text className="text-sm font-medium text-muted-foreground">
               {game.rounds.length}{' '}
-              {game.rounds.length === 1 ? 'round' : 'rounds'}
+              {game.rounds.length === 1
+                ? t('history.round')
+                : t('history.rounds').toLowerCase()}
             </Text>
           </View>
         </View>
@@ -112,9 +118,11 @@ function GameCard({
         <View className="flex-row justify-between items-center">
           <View className="flex-row">
             <Text variant="small" className="mr-2">
-              Players: {game.gameSize}
+              {t('history.playersLabel')}: {game.gameSize}
             </Text>
-            <Text variant="small">Limit: {game.winningLimit}</Text>
+            <Text variant="small">
+              {t('history.limitLabel')}: {game.winningLimit}
+            </Text>
           </View>
 
           <View className="flex-row">
@@ -127,7 +135,7 @@ function GameCard({
               }}
             >
               <Button variant="outline" size="sm">
-                <Text className="text-xs">View Details</Text>
+                <Text className="text-xs">{t('history.viewDetails')}</Text>
               </Button>
             </Link>
             {!isCurrentGame && (
@@ -137,7 +145,9 @@ function GameCard({
                 className="ml-2"
                 onPress={handleDelete}
               >
-                <Text className="text-xs text-destructive">Delete</Text>
+                <Text className="text-xs text-destructive">
+                  {t('common.delete')}
+                </Text>
               </Button>
             )}
           </View>
@@ -148,6 +158,7 @@ function GameCard({
 }
 
 export default function HistoryIndex() {
+  const { t } = useT();
   const [games, setGames] = useState<GameWithRounds[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const currentGameId = useGame((state) => state.currentGameId);
@@ -174,11 +185,11 @@ export default function HistoryIndex() {
         console.log('Game deleted successfully');
       } catch (error) {
         console.error('Failed to delete game:', error);
-        Alert.alert('Error', 'Failed to delete game. Please try again.');
+        Alert.alert(t('common.error'), t('history.deleteFailed'));
         impactAsync(ImpactFeedbackStyle.Heavy);
       }
     },
-    [loadGames],
+    [loadGames, t],
   );
 
   useFocusEffect(
@@ -191,7 +202,7 @@ export default function HistoryIndex() {
     <SafeAreaView className="flex-1 bg-background">
       <View className="px-4 py-6">
         <Text variant="h1" className="text-center mb-6">
-          Game History
+          {t('history.title')}
         </Text>
 
         {isLoading && (
@@ -205,10 +216,10 @@ export default function HistoryIndex() {
         {!isLoading && games.length === 0 && (
           <View className="justify-center items-center">
             <Text className="text-center text-muted-foreground text-lg mb-4">
-              No games played yet
+              {t('history.noGames')}
             </Text>
             <Text className="text-center text-muted-foreground">
-              Start your first game to see it here!
+              {t('history.startFirstGame')}
             </Text>
           </View>
         )}
