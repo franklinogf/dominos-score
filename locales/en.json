@@ -1,0 +1,49 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "reset": "Reset",
+    "ok": "OK",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "navigation": {
+    "game": "Game",
+    "history": "History",
+    "settings": "Settings"
+  },
+  "game": {},
+  "history": {},
+  "settings": {
+    "title": "Settings",
+    "longPressScore": "Long Press Score",
+    "longPressScoreDescription": "Points added when you long press a player button",
+    "longPressScorePlaceholder": "Enter score value",
+    "longPressScoreRequired": "Long press score is required",
+    "longPressScoreInvalid": "Must be a valid number",
+    "longPressScorePositive": "Must be greater than 0",
+    "longPressScoreMax": "Must be 999 or less",
+    "trioMode": "Trio Mode",
+    "trioModeDescription": "Only the player with the lowest score loses (everyone else wins)",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "saving": "Saving...",
+    "success": "Success",
+    "settingsSaved": "Settings saved successfully!",
+    "settingsError": "Failed to save settings. Please try again.",
+    "loadError": "Failed to load settings"
+  },
+  "errors": {
+    "genericError": "Something went wrong",
+    "networkError": "Network error",
+    "invalidInput": "Invalid input"
+  }
+}

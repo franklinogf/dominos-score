@@ -1,0 +1,76 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "confirm": "Confirmar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "finish": "Terminar",
+    "reset": "Reiniciar",
+    "ok": "Aceptar",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "navigation": {
+    "game": "Juego",
+    "history": "Historial",
+    "settings": "Configuración"
+  },
+  "game": {
+    "title": "Juego de Dominó",
+    "newGame": "Nuevo Juego",
+    "endGame": "Terminar Juego",
+    "addRound": "Agregar Ronda",
+    "round": "Ronda",
+    "player": "Jugador",
+    "players": "Jugadores",
+    "score": "Puntuación",
+    "total": "Total",
+    "winner": "Ganador",
+    "tournament": "Torneo",
+    "partySize": "Número de Jugadores",
+    "selectPoints": "Seleccionar Puntos",
+    "gameEnded": "Juego Terminado"
+  },
+  "history": {
+    "title": "Historial de Juegos",
+    "noGames": "No se han jugado partidas aún",
+    "rounds": "Rondas",
+    "date": "Fecha",
+    "duration": "Duración"
+  },
+  "settings": {
+    "title": "Configuración",
+    "longPressScore": "Puntuación de Pulsación Larga",
+    "longPressScoreDescription": "Puntos agregados cuando mantienes presionado un botón de jugador",
+    "longPressScorePlaceholder": "Ingresa el valor de puntuación",
+    "longPressScoreRequired": "La puntuación de pulsación larga es requerida",
+    "longPressScoreInvalid": "Debe ser un número válido",
+    "longPressScorePositive": "Debe ser mayor que 0",
+    "longPressScoreMax": "Debe ser 999 o menos",
+    "trioMode": "Modo Trío",
+    "trioModeDescription": "Solo el jugador con la puntuación más baja pierde (todos los demás ganan)",
+    "enabled": "Habilitado",
+    "disabled": "Deshabilitado",
+    "saving": "Guardando...",
+    "success": "Éxito",
+    "settingsSaved": "¡Configuración guardada exitosamente!",
+    "settingsError": "Error al guardar la configuración. Por favor intenta de nuevo.",
+    "loadError": "Error al cargar la configuración"
+  },
+  "players": {
+    "addPlayer": "Agregar Jugador",
+    "removePlayer": "Quitar Jugador",
+    "playerName": "Nombre del Jugador",
+    "enterName": "Ingresa el nombre del jugador"
+  },
+  "errors": {
+    "genericError": "Algo salió mal",
+    "networkError": "Error de conexión",
+    "invalidInput": "Entrada inválida"
+  }
+}
