@@ -1,3 +1,4 @@
+import useT from '@/hooks/use-translation';
 import { NAV_THEME, THEME } from '@/lib/theme';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { ThemeProvider } from '@react-navigation/native';
@@ -6,6 +7,7 @@ import { useColorScheme } from 'nativewind';
 
 export default function TabsLayout() {
   const { colorScheme } = useColorScheme();
+  const { t } = useT();
   const currentTheme = THEME[colorScheme ?? 'dark'];
   return (
     <ThemeProvider value={NAV_THEME[colorScheme ?? 'dark']}>
@@ -25,7 +27,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="(game)"
           options={{
-            title: 'Game',
+            title: t('navigation.game'),
             tabBarIcon: ({ color, size }) => (
               <FontAwesome name="gamepad" color={color} size={size} />
             ),
@@ -34,7 +36,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="history"
           options={{
-            title: 'History',
+            title: t('navigation.history'),
             tabBarIcon: ({ color, size }) => (
               <FontAwesome name="history" color={color} size={size} />
             ),
@@ -43,7 +45,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="settings"
           options={{
-            title: 'Settings',
+            title: t('navigation.settings'),
             tabBarIcon: ({ color, size }) => (
               <FontAwesome name="cog" color={color} size={size} />
             ),
