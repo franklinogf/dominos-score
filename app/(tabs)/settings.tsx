@@ -12,8 +12,10 @@ import { DEFAULT_LONG_PRESS_SCORE, DEFAULT_TRIO_MODE } from '@/lib/constants';
 import { useGame } from '@/stores/use-game';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
-import { useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import {
   Alert,
   Keyboard,
@@ -46,21 +48,23 @@ function FieldGroup({ id, label, description, children }: FieldGroupProps) {
   );
 }
 
-const settingsSchema = z.object({
-  longPressScore: z
-    .string()
-    .min(1, 'Long press score is required')
-    .refine((val) => !isNaN(Number(val)), 'Must be a valid number')
-    .refine((val) => Number(val) > 0, 'Must be greater than 0')
-    .refine((val) => Number(val) <= 999, 'Must be 999 or less'),
-  trioMode: z.boolean(),
-});
+const settingsSchema = (t: (key: string) => string) =>
+  z.object({
+    longPressScore: z
+      .string()
+      .min(1, t('settings.longPressScoreRequired'))
+      .refine((val) => !isNaN(Number(val)), t('settings.longPressScoreInvalid'))
+      .refine((val) => Number(val) > 0, t('settings.longPressScorePositive'))
+      .refine((val) => Number(val) <= 999, t('settings.longPressScoreMax')),
+    trioMode: z.boolean(),
+  });
 
-type SettingsFormData = z.infer<typeof settingsSchema>;
+type SettingsFormData = z.infer<ReturnType<typeof settingsSchema>>;
 
 export default function Settings() {
   const [isLoading, setIsLoading] = useState(true);
   const setTrioMode = useGame((state) => state.setTrioMode);
+  const { t } = useTranslation();
 
   const {
     control,
@@ -69,7 +73,7 @@ export default function Settings() {
     formState: { errors, isDirty, isSubmitting },
     reset,
   } = useForm<SettingsFormData>({
-    resolver: zodResolver(settingsSchema),
+    resolver: zodResolver(settingsSchema(t)),
     defaultValues: {
       longPressScore: DEFAULT_LONG_PRESS_SCORE.toString(),
       trioMode: DEFAULT_TRIO_MODE,
@@ -77,23 +81,25 @@ export default function Settings() {
   });
 
   // Load current settings
-  useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        const longPressScore = await getLongPressScoreSetting();
-        const trioMode = await getTrioModeSetting();
-        setValue('longPressScore', longPressScore.toString());
-        setValue('trioMode', trioMode);
-      } catch (error) {
-        console.error('Failed to load settings:', error);
-        Alert.alert('Error', 'Failed to load settings');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  useFocusEffect(
+    useCallback(() => {
+      const loadSettings = async () => {
+        try {
+          const longPressScore = await getLongPressScoreSetting();
+          const trioMode = await getTrioModeSetting();
+          setValue('longPressScore', longPressScore.toString());
+          setValue('trioMode', trioMode);
+        } catch (error) {
+          console.error('Failed to load settings:', error);
+          Alert.alert(t('common.error'), t('settings.loadError'));
+        } finally {
+          setIsLoading(false);
+        }
+      };
 
-    loadSettings();
-  }, [setValue]);
+      loadSettings();
+    }, [setValue, t]),
+  );
 
   const onSubmit = async (data: SettingsFormData) => {
     impactAsync(ImpactFeedbackStyle.Light);
@@ -111,11 +117,11 @@ export default function Settings() {
 
       reset(data);
       impactAsync(ImpactFeedbackStyle.Medium);
-      Alert.alert('Success', 'Settings saved successfully!');
+      Alert.alert(t('settings.success'), t('settings.settingsSaved'));
     } catch (error) {
       console.error('Failed to save settings:', error);
       impactAsync(ImpactFeedbackStyle.Heavy);
-      Alert.alert('Error', 'Failed to save settings. Please try again.');
+      Alert.alert(t('common.error'), t('settings.settingsError'));
     } finally {
       Keyboard.dismiss();
     }
@@ -126,12 +132,12 @@ export default function Settings() {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View className="flex-1">
           <Text variant="h1" className="text-center mb-6">
-            Settings
+            {t('settings.title')}
           </Text>
 
           {isLoading ? (
             <Text className="text-center text-muted-foreground">
-              Loading...
+              {t('common.loading')}
             </Text>
           ) : (
             <KeyboardAvoidingView
@@ -140,8 +146,8 @@ export default function Settings() {
             >
               <FieldGroup
                 id="longPressScore"
-                label="Long Press Score"
-                description="Points added when you long press a player button"
+                label={t('settings.longPressScore')}
+                description={t('settings.longPressScoreDescription')}
               >
                 <Controller
                   control={control}
@@ -151,7 +157,7 @@ export default function Settings() {
                       id="longPressScore"
                       value={value}
                       onChangeText={onChange}
-                      placeholder="Enter score value"
+                      placeholder={t('settings.longPressScorePlaceholder')}
                       keyboardType="number-pad"
                       maxLength={3}
                     />
@@ -169,8 +175,8 @@ export default function Settings() {
 
               <FieldGroup
                 id="trioMode"
-                label="Trio Mode"
-                description="Only the player with the lowest score loses (everyone else wins)"
+                label={t('settings.trioMode')}
+                description={t('settings.trioModeDescription')}
               >
                 <Controller
                   control={control}
@@ -179,7 +185,7 @@ export default function Settings() {
                     <View className="flex-row items-center space-x-2">
                       <Switch checked={value} onCheckedChange={onChange} />
                       <Text variant="default" className="ml-3">
-                        {value ? 'Enabled' : 'Disabled'}
+                        {value ? t('settings.enabled') : t('settings.disabled')}
                       </Text>
                     </View>
                   )}
@@ -191,7 +197,9 @@ export default function Settings() {
                 disabled={!isDirty || isSubmitting}
                 className="mt-8"
               >
-                <Text>{isSubmitting ? 'Saving...' : 'Save'}</Text>
+                <Text>
+                  {isSubmitting ? t('settings.saving') : t('common.save')}
+                </Text>
               </Button>
             </KeyboardAvoidingView>
           )}
