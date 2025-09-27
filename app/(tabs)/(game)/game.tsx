@@ -2,13 +2,14 @@ import { GameEndingButtons } from '@/components/game-ending-buttons';
 import { GameScore } from '@/components/game-score';
 import { GameTotal } from '@/components/game-total';
 import { PlayersButtons } from '@/components/players-buttons';
+import { ScoreModal } from '@/components/score-modal';
 import { Separator } from '@/components/ui/separator';
 import { useTournamentTitle } from '@/hooks/use-tournament-title';
 import { useGame } from '@/stores/use-game';
 import { useFocusEffect } from '@react-navigation/native';
 import { router, useNavigation } from 'expo-router';
 import { useCallback } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Game() {
@@ -53,6 +54,8 @@ export default function Game() {
         <View className="h-16">
           <GameTotal />
         </View>
+
+        {Platform.OS === 'android' && <ScoreModal />}
       </SafeAreaView>
     </>
   );

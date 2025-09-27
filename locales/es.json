@@ -112,6 +112,15 @@
     "nameRequired": "El nombre del jugador {{number}} es requerido",
     "nameMaxLength": "El nombre debe tener 10 caracteres o menos"
   },
+  "validation": {
+    "required": "{{field}} es requerido",
+    "minLength": "{{field}} debe tener al menos {{length}} caracteres",
+    "maxLength": "{{field}} debe tener {{length}} caracteres o menos",
+    "min": "{{field}} debe ser al menos {{value}}",
+    "max": "{{field}} debe ser {{value}} o menos",
+    "invalidNumber": "{{field}} debe ser un número válido",
+    "positiveNumber": "{{field}} debe ser un número positivo"
+  },
   "errors": {
     "genericError": "Algo salió mal",
     "networkError": "Error de conexión",
