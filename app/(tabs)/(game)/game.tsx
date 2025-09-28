@@ -51,7 +51,7 @@ export default function Game() {
 
         <Separator className="my-2" />
 
-        <View className="h-16">
+        <View className={Platform.OS === 'ios' ? 'h-36' : 'h-40'}>
           <GameTotal />
         </View>
 

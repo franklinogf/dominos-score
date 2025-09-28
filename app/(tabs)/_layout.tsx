@@ -1,11 +1,8 @@
 import { useT } from '@/hooks/use-translation';
-import { GameStatus } from '@/lib/enums';
 import { NAV_THEME, THEME } from '@/lib/theme';
-import { useGame } from '@/stores/use-game';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import FontAwesome from '@expo/vector-icons/FontAwesome5';
 import { ThemeProvider } from '@react-navigation/native';
 import {
-  Badge,
   Icon,
   Label,
   NativeTabs,
@@ -19,7 +16,7 @@ export default function TabsLayout() {
   const isIos = Platform.OS === 'ios';
   const { colorScheme } = useColorScheme();
   const { t } = useT();
-  const gameStatus = useGame((state) => state.gameStatus);
+
   const currentTheme = THEME[colorScheme ?? 'dark'];
 
   return (
@@ -29,16 +26,20 @@ export default function TabsLayout() {
           backBehavior="none"
           labelStyle={{ color: currentTheme.foreground }}
           labelVisibilityMode="auto"
-          badgeBackgroundColor={currentTheme.accent}
-          iconColor={currentTheme.accentForeground}
-          tintColor={currentTheme.accent}
+          iconColor={
+            isIos
+              ? currentTheme.primaryForeground
+              : currentTheme.accentForeground
+          }
+          tintColor={
+            isIos ? currentTheme.primary : currentTheme.primaryForeground
+          }
           backgroundColor={!isIos ? currentTheme.background : undefined}
           indicatorColor={!isIos ? currentTheme.primary : undefined}
           minimizeBehavior={isIos ? 'never' : undefined}
           rippleColor={!isIos ? currentTheme.primaryForeground : undefined}
         >
           <NativeTabs.Trigger name="(game)">
-            <Badge hidden={gameStatus !== GameStatus.InProgress} />
             <Label selectedStyle={{ color: currentTheme.foreground }}>
               {t('navigation.game')}
             </Label>
