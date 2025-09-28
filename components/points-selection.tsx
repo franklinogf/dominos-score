@@ -24,7 +24,7 @@ export function WinningLimit() {
     updateWinningLimit(Number(value));
   }
   return (
-    <View className="w-full mt-4">
+    <View className="w-full p-4">
       <Text className="text-center mb-1" variant="large">
         {t('game.pointsToWin')}
       </Text>

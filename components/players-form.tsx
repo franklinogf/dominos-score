@@ -13,7 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import { useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Alert, FlatList, TextInput, View } from 'react-native';
+import { Alert, Platform, ScrollView, TextInput, View } from 'react-native';
 import { z } from 'zod';
 
 // Create dynamic schema based on game size
@@ -98,19 +98,28 @@ export function PlayersForm() {
       router.replace('/game');
     }
   };
+
   return (
-    <View className="flex-1 w-full">
-      <FlatList
-        key={gameSize}
-        bounces={false}
-        className="mt-8 w-full flex-1"
-        data={playersData}
-        keyExtractor={(item) => item.fieldName}
-        numColumns={gameSize > 3 ? 2 : 1}
-        renderItem={({ item }) => (
+    <ScrollView
+      className="w-full"
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{
+        paddingBottom: Platform.OS === 'ios' ? 100 : 80,
+      }}
+    >
+      <View
+        className={cn(
+          'mt-8 w-full flex-row flex-wrap',
+          gameSize > 3 ? 'justify-between' : 'justify-center',
+        )}
+      >
+        {playersData.map((item) => (
           <View
             key={item.index}
-            className={cn('w-full px-4 mb-4', { 'w-1/2': gameSize > 3 })}
+            className={cn('px-4 mb-4', {
+              'w-1/2': gameSize > 3,
+              'w-full': gameSize <= 3,
+            })}
           >
             <Label
               htmlFor={`player-name-${item.index}`}
@@ -154,8 +163,8 @@ export function PlayersForm() {
               </Text>
             )}
           </View>
-        )}
-      />
+        ))}
+      </View>
       <View className="px-4 pb-2">
         <Button onPress={handleSubmit(onSubmit)} size="lg">
           <Text>
@@ -163,6 +172,6 @@ export function PlayersForm() {
           </Text>
         </Button>
       </View>
-    </View>
+    </ScrollView>
   );
 }
