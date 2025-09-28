@@ -37,7 +37,7 @@ export default function TabsLayout() {
           backgroundColor={!isIos ? currentTheme.background : undefined}
           indicatorColor={!isIos ? currentTheme.primary : undefined}
           minimizeBehavior={isIos ? 'never' : undefined}
-          rippleColor={!isIos ? currentTheme.primaryForeground : undefined}
+          rippleColor={!isIos ? currentTheme.background : undefined}
         >
           <NativeTabs.Trigger name="(game)">
             <Label selectedStyle={{ color: currentTheme.foreground }}>
