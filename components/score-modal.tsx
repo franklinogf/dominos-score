@@ -1,3 +1,5 @@
+import { InputField } from '@/components/input-field';
+import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Text } from '@/components/ui/text';
 import { useT } from '@/hooks/use-translation';
@@ -7,8 +9,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { View } from 'react-native';
 import { z } from 'zod';
-import { InputField } from './input-field';
-import { Button } from './ui/button';
 
 const createSchema = (t: (key: string, options?: any) => string) => {
   return z.object({

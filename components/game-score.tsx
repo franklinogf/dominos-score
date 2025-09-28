@@ -1,6 +1,6 @@
+import { PlayerScoreList } from '@/components/player-score-list';
 import { useGame } from '@/stores/use-game';
 import { View } from 'react-native';
-import { PlayerScoreList } from './player-score-list';
 
 export function GameScore() {
   const players = useGame((state) => state.players);

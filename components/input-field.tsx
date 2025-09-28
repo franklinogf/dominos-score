@@ -1,8 +1,8 @@
 import { Control, Controller, FieldPath, FieldValues } from 'react-hook-form';
 import { View } from 'react-native';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Text } from './ui/text';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Text } from '@/components/ui/text';
 
 interface InputFieldProps<
   TFieldValues extends FieldValues = FieldValues,

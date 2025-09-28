@@ -1,3 +1,4 @@
+import { Text } from '@/components/ui/text';
 import { Player } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useGame } from '@/stores/use-game';
@@ -10,7 +11,6 @@ import Animated, {
   withSequence,
   withSpring,
 } from 'react-native-reanimated';
-import { Text } from './ui/text';
 
 export function PlayerScoreTotal({ player }: { player: Player }) {
   const total = player.score.reduce((acc, score) => acc + score.value, 0);

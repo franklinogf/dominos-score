@@ -1,9 +1,9 @@
+import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useT } from '@/hooks/use-translation';
 import { useGame } from '@/stores/use-game';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { View } from 'react-native';
-import { Label } from './ui/label';
 
 export function TournamentSwitch() {
   const { t } = useT();
