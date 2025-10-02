@@ -93,7 +93,7 @@
     "longPressScorePositive": "Must be greater than 0",
     "longPressScoreMax": "Must be 999 or less",
     "trioMode": "Trio Mode",
-    "trioModeDescription": "Only the player with the lowest score loses (everyone else wins)",
+    "trioModeDescription": "Only the player with the lowest score loses (player with the most points wins and the other player(s) tie)",
     "enabled": "Enabled",
     "disabled": "Disabled",
     "saving": "Saving...",
