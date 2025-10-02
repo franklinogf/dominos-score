@@ -3,10 +3,13 @@
     "appVersionSource": "remote"
   },
   "build": {
-    "emulator": {
+    "development": {
       "android": {
         "developmentClient": true,
         "distribution": "internal"
+      },
+      "ios": {
+        "simulator": true
       }
     },
     "production": {
