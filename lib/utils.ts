@@ -1,14 +1,17 @@
 import { GameWithRoundsAndPlayers } from '@/db/querys/game';
 import { PlayerSelect } from '@/db/querys/player';
+import i18n from '@/lib/i18n';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
 export const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
+
+  return date.toLocaleDateString(i18n.language, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',

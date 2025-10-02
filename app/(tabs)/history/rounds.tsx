@@ -3,6 +3,7 @@ import { GameWithRoundsAndPlayers, getGameById } from '@/db/querys/game';
 import { GameType } from '@/lib/enums';
 import {
   calculateTotalScore,
+  formatDate,
   getPlayerScoresForRound,
   getRankingByWins,
   getRankingWithTies,
@@ -12,17 +13,6 @@ import { useLocalSearchParams } from 'expo-router/build/hooks';
 import { useCallback, useState } from 'react';
 import { FlatList, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
 
 // Component for displaying game summary
 function GameSummary({
