@@ -7,8 +7,9 @@ import {
   getRankingByWins,
   getRankingWithTies,
 } from '@/lib/utils';
+import { useFocusEffect } from 'expo-router';
 import { useLocalSearchParams } from 'expo-router/build/hooks';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FlatList, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -66,7 +67,7 @@ function NoRoundsDisplay({
   game: NonNullable<GameWithRoundsAndPlayers>;
 }) {
   return (
-    <ScrollView className="flex-1">
+    <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
       <GameSummary game={game} />
 
       <View className="bg-card border border-border rounded-lg p-4 mb-4">
@@ -397,9 +398,11 @@ export default function HistoryRounds() {
     }
   }, [gameId]);
 
-  useEffect(() => {
-    loadGame();
-  }, [loadGame]);
+  useFocusEffect(
+    useCallback(() => {
+      loadGame();
+    }, [loadGame]),
+  );
 
   if (!game) {
     return (
@@ -412,7 +415,7 @@ export default function HistoryRounds() {
   return (
     <SafeAreaView
       edges={['bottom', 'left', 'right']}
-      className="flex-1 bg-background px-4 mt-6"
+      className="flex-1 bg-background px-4 pt-4 pb-20"
     >
       <Text variant="h1" className="text-center mb-6">
         Game Details
