@@ -1,4 +1,7 @@
 {
+  "cli": {
+    "appVersionSource": "remote"
+  },
   "build": {
     "emulator": {
       "android": {
@@ -6,6 +9,9 @@
         "distribution": "internal"
       }
     },
-    "production": {}
+    "production": {
+      "environment": "production",
+      "autoIncrement": true
+    }
   }
 }
