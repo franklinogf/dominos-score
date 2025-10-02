@@ -21,7 +21,7 @@
     "settings": "Configuración"
   },
   "game": {
-    "title": "Juego de Dominó",
+    "title": "Domino Tracker",
     "newGame": "Nuevo Juego",
     "endGame": "Terminar Juego",
     "addRound": "Agregar Ronda",
