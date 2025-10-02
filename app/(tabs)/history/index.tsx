@@ -12,12 +12,12 @@ import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { Link } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Alert, FlatList, View } from 'react-native';
-import Animated from 'react-native-reanimated';
+import Animated, { FadeOut } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 function GameCardSkeleton() {
   return (
-    <Animated.View>
+    <View>
       <View className="bg-card border border-border rounded-lg p-4 mb-4">
         <View className="flex-row justify-between items-start mb-2">
           <View className="flex-1">
@@ -43,7 +43,7 @@ function GameCardSkeleton() {
           </View>
         </View>
       </View>
-    </Animated.View>
+    </View>
   );
 }
 
@@ -79,7 +79,7 @@ function GameCard({
     );
   };
   return (
-    <Animated.View>
+    <Animated.View key={game.id} exiting={FadeOut.duration(200)}>
       <View
         className={`bg-card border rounded-lg p-4 mb-4 ${
           isCurrentGame ? 'border-primary border-2' : 'border-border'
@@ -199,47 +199,47 @@ export default function HistoryIndex() {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-background">
-      <View className="px-4 py-6">
-        <Text variant="h1" className="text-center mb-6">
-          {t('history.title')}
-        </Text>
+    <SafeAreaView className="flex-1 bg-background px-4 py-6">
+      <Text variant="h1" className="text-center mb-6">
+        {t('history.title')}
+      </Text>
 
-        {isLoading && (
-          <View>
-            <GameCardSkeleton />
-            <GameCardSkeleton />
-            <GameCardSkeleton />
-          </View>
-        )}
+      {isLoading && (
+        <View>
+          <GameCardSkeleton />
+          <GameCardSkeleton />
+          <GameCardSkeleton />
+        </View>
+      )}
 
-        {!isLoading && games.length === 0 && (
-          <View className="justify-center items-center">
-            <Text className="text-center text-muted-foreground text-lg mb-4">
-              {t('history.noGames')}
-            </Text>
-            <Text className="text-center text-muted-foreground">
-              {t('history.startFirstGame')}
-            </Text>
-          </View>
-        )}
+      {!isLoading && games.length === 0 && (
+        <View className="justify-center items-center">
+          <Text className="text-center text-muted-foreground text-lg mb-4">
+            {t('history.noGames')}
+          </Text>
+          <Text className="text-center text-muted-foreground">
+            {t('history.startFirstGame')}
+          </Text>
+        </View>
+      )}
 
-        {!isLoading && games.length > 0 && (
-          <FlatList
-            data={games}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <GameCard
-                game={item}
-                onDelete={handleDeleteGame}
-                isCurrentGame={currentGameId === item.id}
-              />
-            )}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 20 }}
-          />
-        )}
-      </View>
+      {!isLoading && games.length > 0 && (
+        <FlatList
+          className="flex-1"
+          bounces={false}
+          data={games}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <GameCard
+              game={item}
+              onDelete={handleDeleteGame}
+              isCurrentGame={currentGameId === item.id}
+            />
+          )}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        />
+      )}
     </SafeAreaView>
   );
 }
