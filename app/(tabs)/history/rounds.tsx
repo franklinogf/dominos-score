@@ -1,5 +1,6 @@
 import { Text } from '@/components/ui/text';
 import { GameWithRoundsAndPlayers, getGameById } from '@/db/querys/game';
+import { useT } from '@/hooks/use-translation';
 import { GameType } from '@/lib/enums';
 import {
   calculateTotalScore,
@@ -20,12 +21,15 @@ function GameSummary({
 }: {
   game: NonNullable<GameWithRoundsAndPlayers>;
 }) {
+  const { t } = useT();
   return (
     <View className="bg-card border border-border rounded-lg p-4 mb-6">
       <View className="flex-row justify-between items-start mb-3">
         <View className="flex-1">
           <Text variant="h3" className="text-foreground mb-1">
-            {game.type === GameType.NORMAL ? 'Game' : 'Tournament'}
+            {game.type === GameType.NORMAL
+              ? t('history.gameType')
+              : t('history.tournamentType')}
           </Text>
           <Text variant="muted" className="text-sm">
             {formatDate(game.createdAt)}
@@ -33,17 +37,20 @@ function GameSummary({
         </View>
         <View className="items-end">
           <Text className="text-sm font-medium text-muted-foreground">
-            {game.rounds.length} {game.rounds.length === 1 ? 'round' : 'rounds'}
+            {game.rounds.length}{' '}
+            {game.rounds.length === 1
+              ? t('history.round')
+              : t('history.rounds')}
           </Text>
         </View>
       </View>
 
       <View className="flex-row justify-between">
         <Text variant="small" className="text-muted-foreground">
-          Players: {game.gameSize}
+          {t('history.playersLabel')}: {game.gameSize}
         </Text>
         <Text variant="small" className="text-muted-foreground">
-          Winning Limit: {game.winningLimit}
+          {t('history.winningLimit')}: {game.winningLimit}
         </Text>
       </View>
     </View>
@@ -56,19 +63,20 @@ function NoRoundsDisplay({
 }: {
   game: NonNullable<GameWithRoundsAndPlayers>;
 }) {
+  const { t } = useT();
   return (
     <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
       <GameSummary game={game} />
 
       <View className="bg-card border border-border rounded-lg p-4 mb-4">
         <Text variant="h3" className="text-center mb-4 text-foreground">
-          Game Setup
+          {t('history.gameSetup')}
         </Text>
 
         {/* Players List - just showing they were registered */}
         <View className="space-y-3">
           <Text variant="default" className="font-medium mb-2">
-            Registered Players:
+            {t('history.registeredPlayers')}:
           </Text>
           {game.players.map((player, index) => (
             <View
@@ -86,7 +94,7 @@ function NoRoundsDisplay({
                 </Text>
               </View>
               <Text className="text-xs text-muted-foreground">
-                Ready to play
+                {t('history.readyToPlay')}
               </Text>
             </View>
           ))}
@@ -99,19 +107,17 @@ function NoRoundsDisplay({
             <Text className="text-white font-bold text-sm">!</Text>
           </View>
           <Text variant="h4" className="text-yellow-800 font-medium">
-            Game Not Started
+            {t('history.gameNotStarted')}
           </Text>
         </View>
         <Text className="text-yellow-700 text-sm leading-5">
-          This game was created but no rounds have been played yet. The players
-          are registered and ready to begin.
+          {t('history.gameNotStartedDesc')}
         </Text>
       </View>
 
       <View className="bg-muted/20 border border-border rounded-lg p-4">
         <Text variant="muted" className="text-center text-sm">
-          When rounds are played, they will appear here with detailed results
-          and standings.
+          {t('history.whenRoundsPlayed')}
         </Text>
       </View>
     </ScrollView>
@@ -124,6 +130,7 @@ function SingleRoundDisplay({
 }: {
   game: NonNullable<GameWithRoundsAndPlayers>;
 }) {
+  const { t } = useT();
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
@@ -134,7 +141,7 @@ function SingleRoundDisplay({
 
       <View className="bg-card border border-border rounded-lg p-4 mb-4">
         <Text variant="h3" className="text-center mb-4 text-foreground">
-          Game Results
+          {t('history.gameResults')}
         </Text>
 
         {/* Players List with Scores */}
@@ -170,7 +177,8 @@ function SingleRoundDisplay({
                         {player.name}
                       </Text>
                       <Text className="text-sm text-muted-foreground">
-                        {player.wins} wins • {player.losses} losses
+                        {player.wins} {t('game.wins')} • {player.losses}{' '}
+                        {t('game.losses')}
                       </Text>
                     </View>
                   </View>
@@ -179,7 +187,7 @@ function SingleRoundDisplay({
                       {totalScore}
                     </Text>
                     <Text className="text-xs text-muted-foreground">
-                      points
+                      {t('history.points')}
                     </Text>
                   </View>
                 </View>
@@ -191,7 +199,7 @@ function SingleRoundDisplay({
                       variant="small"
                       className="text-muted-foreground mb-1"
                     >
-                      Round scores:
+                      {t('history.roundScores')}:
                     </Text>
                     <View className="flex-row flex-wrap">
                       {scores.map((score, scoreIndex) => (
@@ -209,7 +217,7 @@ function SingleRoundDisplay({
                 {(!scores || scores.length === 0) && (
                   <View className="ml-11">
                     <Text variant="small" className="text-muted-foreground">
-                      No scores recorded
+                      {t('history.noScoresRecorded')}
                     </Text>
                   </View>
                 )}
@@ -221,7 +229,7 @@ function SingleRoundDisplay({
 
       <View className="bg-muted/20 border border-border rounded-lg p-4">
         <Text variant="muted" className="text-center">
-          This was a single round game. All results are shown above.
+          {t('history.singleRoundGame')}
         </Text>
       </View>
     </ScrollView>
@@ -234,6 +242,7 @@ function MultipleRoundsDisplay({
 }: {
   game: NonNullable<GameWithRoundsAndPlayers>;
 }) {
+  const { t } = useT();
   return (
     <ScrollView
       showsVerticalScrollIndicator={false}
@@ -245,7 +254,7 @@ function MultipleRoundsDisplay({
       {/* Overall Standings */}
       <View className="bg-card border border-border rounded-lg p-4 mb-4">
         <Text variant="h3" className="text-center mb-4 text-foreground">
-          Final Standings
+          {t('history.finalStandings')}
         </Text>
 
         <View className="space-y-2">
@@ -273,9 +282,11 @@ function MultipleRoundsDisplay({
                 </Text>
               </View>
               <View className="items-end">
-                <Text className="text-sm font-medium">{player.wins} wins</Text>
+                <Text className="text-sm font-medium">
+                  {player.wins} {t('game.wins')}
+                </Text>
                 <Text className="text-xs text-muted-foreground">
-                  {player.losses} losses
+                  {player.losses} {t('game.losses')}
                 </Text>
               </View>
             </View>
@@ -286,7 +297,7 @@ function MultipleRoundsDisplay({
       {/* Rounds Breakdown */}
       <View className="bg-card border border-border rounded-lg p-4 mb-4">
         <Text variant="h3" className="text-center mb-4 text-foreground">
-          Round by Round
+          {t('history.roundByRound')}
         </Text>
 
         <FlatList
@@ -298,11 +309,11 @@ function MultipleRoundsDisplay({
             <View className="border-b border-border py-4 last:border-b-0">
               <View className="flex-row justify-between items-center mb-3">
                 <Text variant="h4" className="font-medium">
-                  Round {index + 1}
+                  {t('history.roundNumber', { number: index + 1 })}
                 </Text>
                 {round.roundWinnerId && (
                   <Text variant="small" className="text-primary font-medium">
-                    Winner:{' '}
+                    {t('game.winner')}:{' '}
                     {game.players.find((p) => p.id === round.roundWinnerId)
                       ?.name || 'Unknown'}
                   </Text>
@@ -345,7 +356,7 @@ function MultipleRoundsDisplay({
                             variant="small"
                             className="text-muted-foreground"
                           >
-                            No scores
+                            {t('history.noScores')}
                           </Text>
                         )}
                       </View>
@@ -356,7 +367,7 @@ function MultipleRoundsDisplay({
 
               {!round.roundWinnerId && !round.playersToRounds.length && (
                 <Text variant="small" className="text-muted-foreground mt-2">
-                  Round not completed
+                  {t('history.roundNotCompleted')}
                 </Text>
               )}
             </View>
@@ -367,8 +378,7 @@ function MultipleRoundsDisplay({
 
       <View className="bg-muted/20 border border-border rounded-lg p-4">
         <Text variant="muted" className="text-center">
-          This game consisted of {game.rounds.length} rounds. Check individual
-          round details above.
+          {t('history.multipleRoundsGame', { count: game.rounds.length })}
         </Text>
       </View>
     </ScrollView>
@@ -378,6 +388,7 @@ function MultipleRoundsDisplay({
 export default function HistoryRounds() {
   const [game, setGame] = useState<GameWithRoundsAndPlayers | null>(null);
   const gameId = useLocalSearchParams<{ gameId: string }>().gameId;
+  const { t } = useT();
 
   const loadGame = useCallback(async () => {
     try {
@@ -397,7 +408,7 @@ export default function HistoryRounds() {
   if (!game) {
     return (
       <SafeAreaView className="flex-1 items-center justify-center">
-        <Text>Loading game data...</Text>
+        <Text>{t('history.loadingGameData')}</Text>
       </SafeAreaView>
     );
   }
@@ -408,7 +419,7 @@ export default function HistoryRounds() {
       className="flex-1 bg-background px-4 pt-4 pb-20"
     >
       <Text variant="h1" className="text-center mb-6">
-        Game Details
+        {t('history.gameDetails')}
       </Text>
 
       {game.rounds.length === 0 ? (
