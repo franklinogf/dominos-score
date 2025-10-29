@@ -7,12 +7,14 @@ import { Separator } from '@/components/ui/separator';
 import { useTournamentTitle } from '@/hooks/use-tournament-title';
 import { useGame } from '@/stores/use-game';
 import { useFocusEffect } from '@react-navigation/native';
+import { useKeepAwake } from 'expo-keep-awake';
 import { router, useNavigation } from 'expo-router';
 import { useCallback } from 'react';
 import { Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Game() {
+  useKeepAwake();
   const players = useGame((state) => state.players);
   const activePlayersCount = players.filter((p) => p.isPlaying).length;
 
