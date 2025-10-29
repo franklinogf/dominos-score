@@ -10,6 +10,7 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "format": "prettier --write ./app/**/*.tsx",
+    "build:android": "eas build -p android --profile production",
     "build:android:local": "eas build -p android --local"
   },
   "dependencies": {
