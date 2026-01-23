@@ -116,6 +116,8 @@
     "longPressScoreMax": "Must be 999 or less",
     "trioMode": "Trio Mode",
     "trioModeDescription": "Only the player with the lowest score loses (player with the most points wins and the other player(s) tie)",
+    "multiLose": "Multi-Lose Mode",
+    "multiLoseDescription": "If enabled, the player with the lowest score loses 2 losses instead of 1",
     "enabled": "Enabled",
     "disabled": "Disabled",
     "saving": "Saving...",

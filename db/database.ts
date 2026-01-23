@@ -1,5 +1,9 @@
 import migrations from '@/drizzle/migrations';
-import { DEFAULT_LONG_PRESS_SCORE, DEFAULT_TRIO_MODE } from '@/lib/constants';
+import {
+  DEFAULT_LONG_PRESS_SCORE,
+  DEFAULT_MULTI_LOSE,
+  DEFAULT_TRIO_MODE,
+} from '@/lib/constants';
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { migrate } from 'drizzle-orm/expo-sqlite/migrator';
@@ -26,6 +30,7 @@ export function deleteDatabase() {
 const defaultSettings = [
   { key: 'longPressScore', value: DEFAULT_LONG_PRESS_SCORE.toString() },
   { key: 'trioMode', value: DEFAULT_TRIO_MODE.toString() },
+  { key: 'multiLose', value: DEFAULT_MULTI_LOSE.toString() },
 ];
 
 export async function initializeDatabase() {

@@ -15,3 +15,5 @@ export const BIG_PARTY_SIZES = [
 export const DEFAULT_LONG_PRESS_SCORE = 30;
 
 export const DEFAULT_TRIO_MODE = true;
+
+export const DEFAULT_MULTI_LOSE = false;

@@ -1,6 +1,10 @@
 import { db } from '@/db/database';
 import { settingsTable } from '@/db/schema';
-import { DEFAULT_LONG_PRESS_SCORE, DEFAULT_TRIO_MODE } from '@/lib/constants';
+import {
+  DEFAULT_LONG_PRESS_SCORE,
+  DEFAULT_MULTI_LOSE,
+  DEFAULT_TRIO_MODE,
+} from '@/lib/constants';
 import { eq } from 'drizzle-orm';
 
 export async function getSetting(key: string): Promise<string | undefined> {
@@ -32,6 +36,16 @@ export async function getTrioModeSetting(): Promise<boolean> {
   } catch (error) {
     console.error('Database error fetching trio mode setting:', error);
     return DEFAULT_TRIO_MODE;
+  }
+}
+
+export async function getMultiLoseSetting(): Promise<boolean> {
+  try {
+    const value = await getSetting('multiLose');
+    return value ? value === 'true' : DEFAULT_MULTI_LOSE;
+  } catch (error) {
+    console.error('Database error fetching multi lose setting:', error);
+    return DEFAULT_MULTI_LOSE;
   }
 }
 

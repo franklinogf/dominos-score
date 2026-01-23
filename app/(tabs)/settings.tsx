@@ -6,9 +6,14 @@ import { Text } from '@/components/ui/text';
 import { saveSettings } from '@/db/actions/settings';
 import {
   getLongPressScoreSetting,
+  getMultiLoseSetting,
   getTrioModeSetting,
 } from '@/db/querys/settings';
-import { DEFAULT_LONG_PRESS_SCORE, DEFAULT_TRIO_MODE } from '@/lib/constants';
+import {
+  DEFAULT_LONG_PRESS_SCORE,
+  DEFAULT_MULTI_LOSE,
+  DEFAULT_TRIO_MODE,
+} from '@/lib/constants';
 import { useGame } from '@/stores/use-game';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
@@ -57,6 +62,7 @@ const settingsSchema = (t: (key: string) => string) =>
       .refine((val) => Number(val) > 0, t('settings.longPressScorePositive'))
       .refine((val) => Number(val) <= 999, t('settings.longPressScoreMax')),
     trioMode: z.boolean(),
+    multiLose: z.boolean(),
   });
 
 type SettingsFormData = z.infer<ReturnType<typeof settingsSchema>>;
@@ -64,6 +70,7 @@ type SettingsFormData = z.infer<ReturnType<typeof settingsSchema>>;
 export default function Settings() {
   const [isLoading, setIsLoading] = useState(true);
   const setTrioMode = useGame((state) => state.setTrioMode);
+  const setMultiLose = useGame((state) => state.setMultiLose);
   const { t } = useTranslation();
 
   const {
@@ -77,6 +84,7 @@ export default function Settings() {
     defaultValues: {
       longPressScore: DEFAULT_LONG_PRESS_SCORE.toString(),
       trioMode: DEFAULT_TRIO_MODE,
+      multiLose: DEFAULT_MULTI_LOSE,
     },
   });
 
@@ -87,8 +95,10 @@ export default function Settings() {
         try {
           const longPressScore = await getLongPressScoreSetting();
           const trioMode = await getTrioModeSetting();
+          const multiLose = await getMultiLoseSetting();
           setValue('longPressScore', longPressScore.toString());
           setValue('trioMode', trioMode);
+          setValue('multiLose', multiLose);
         } catch (error) {
           console.error('Failed to load settings:', error);
           Alert.alert(t('common.error'), t('settings.loadError'));
@@ -109,12 +119,13 @@ export default function Settings() {
       const settingsData = {
         longPressScore: data.longPressScore,
         trioMode: data.trioMode.toString(),
+        multiLose: data.multiLose.toString(),
       };
       await saveSettings(settingsData);
 
       // Update game store with new trio mode setting
       setTrioMode(data.trioMode);
-
+      setMultiLose(data.multiLose);
       reset(data);
       impactAsync(ImpactFeedbackStyle.Medium);
       Alert.alert(t('settings.success'), t('settings.settingsSaved'));
@@ -179,6 +190,24 @@ export default function Settings() {
                 <Controller
                   control={control}
                   name="trioMode"
+                  render={({ field: { onChange, value } }) => (
+                    <View className="flex-row items-center space-x-2">
+                      <Switch checked={value} onCheckedChange={onChange} />
+                      <Text variant="default" className="ml-3">
+                        {value ? t('settings.enabled') : t('settings.disabled')}
+                      </Text>
+                    </View>
+                  )}
+                />
+              </FieldGroup>
+              <FieldGroup
+                id="multiLose"
+                label={t('settings.multiLose')}
+                description={t('settings.multiLoseDescription')}
+              >
+                <Controller
+                  control={control}
+                  name="multiLose"
                   render={({ field: { onChange, value } }) => (
                     <View className="flex-row items-center space-x-2">
                       <Switch checked={value} onCheckedChange={onChange} />

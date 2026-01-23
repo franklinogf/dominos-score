@@ -8,6 +8,7 @@ type GameState = {
   gameStatus: GameStatus;
   tournamentMode: boolean;
   trioMode: boolean;
+  multiLose: boolean;
   players: Player[];
   gameSize: number;
   winningLimit: number;
@@ -16,6 +17,7 @@ type GameState = {
   currentGameId?: number;
   toggleTournamentMode: () => void;
   setTrioMode: (enabled: boolean) => void;
+  setMultiLose: (enabled: boolean) => void;
   loadSettings: () => Promise<void>;
   updateGameSize: (size: number) => void;
   updateWinningLimit: (limit: number) => void;
@@ -87,6 +89,7 @@ export const useGame = create<GameState>((set) => ({
   gameStatus: GameStatus.NotStarted,
   tournamentMode: false,
   trioMode: false,
+  multiLose: false,
   currentGameId: undefined,
   players: [],
   gameSize: 2,
@@ -96,6 +99,7 @@ export const useGame = create<GameState>((set) => ({
       const winnerId = state.winnerPlayerId;
       const loserId = state.loserPlayerId;
       const isTrioMode = state.trioMode;
+      const isMultiLoseEnabled = state.multiLose;
 
       if (!winnerId) {
         return {
@@ -118,7 +122,7 @@ export const useGame = create<GameState>((set) => ({
           if (p.id === winnerId) {
             updatedPlayer.wins = p.wins + 1;
           } else if (p.id === loserId) {
-            updatedPlayer.losses = p.losses + 1;
+            updatedPlayer.losses = p.losses + (isMultiLoseEnabled ? 2 : 1);
           }
           // Other players stay unchanged
 
@@ -140,7 +144,7 @@ export const useGame = create<GameState>((set) => ({
             updatedPlayer.wins = p.wins + 1;
           }
           if (losersIds.includes(p.id)) {
-            updatedPlayer.losses = p.losses + 1;
+            updatedPlayer.losses = p.losses + (isMultiLoseEnabled ? 2 : 1);
           }
 
           // Reset scores
@@ -176,6 +180,7 @@ export const useGame = create<GameState>((set) => ({
             : state.gameSize,
     })),
   setTrioMode: (enabled) => set({ trioMode: enabled }),
+  setMultiLose: (enabled) => set({ multiLose: enabled }),
   loadSettings: async () => {
     try {
       const trioMode = await getTrioModeSetting();

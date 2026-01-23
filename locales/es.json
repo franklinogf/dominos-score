@@ -116,6 +116,8 @@
     "longPressScoreMax": "Debe ser 999 o menos",
     "trioMode": "Modo Trío",
     "trioModeDescription": "Solo el jugador con la puntuación más baja pierde (todos los demás ganan)",
+    "multiLose": "Modo Multi-Derrota",
+    "multiLoseDescription": "Si está habilitado, el jugador con la puntuación más baja pierde 2 derrotas en lugar de 1",
     "enabled": "Habilitado",
     "disabled": "Deshabilitado",
     "saving": "Guardando...",
