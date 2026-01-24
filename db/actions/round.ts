@@ -1,5 +1,5 @@
 import { insertPlayerToRound, insertRound, NewRound } from '@/db/querys/round';
-import { getTrioModeSetting } from '@/db/querys/settings';
+import { getMultiLoseSetting, getTrioModeSetting } from '@/db/querys/settings';
 import { Player } from '@/lib/types';
 import { incrementPlayerLosses, incrementPlayerWins } from '../querys/player';
 
@@ -14,8 +14,9 @@ export async function newRoundWithResults(
     }
     await addResultsToRound(roundId, players);
 
-    // Get trio mode setting to determine win/loss logic
+    // Get settings to determine win/loss logic
     const isTrioMode = await getTrioModeSetting();
+    const isMultiLoseEnabled = await getMultiLoseSetting();
 
     if (isTrioMode) {
       // In trio mode: highest score wins, lowest score loses, others stay unchanged
@@ -34,12 +35,26 @@ export async function newRoundWithResults(
           ...playersWithTotals.map((p) => p.totalScore),
         );
 
+        // Check for players with no score (tied losers)
+        const playersWithNoScore = playersWithTotals.filter(
+          (p) => p.score.length === 0,
+        );
+
         // Award wins and losses
         for (const player of playersWithTotals) {
           if (player.totalScore === maxScore) {
             await incrementPlayerWins(Number(player.id));
+          } else if (playersWithNoScore.length > 1) {
+            // Multiple players with no score - they all lose
+            if (player.score.length === 0) {
+              const lossIncrement = isMultiLoseEnabled ? 2 : 1;
+              await incrementPlayerLosses(Number(player.id), lossIncrement);
+            }
           } else if (player.totalScore === minScore) {
-            await incrementPlayerLosses(Number(player.id));
+            // Single loser with lowest score
+            const lossIncrement =
+              player.score.length === 0 && isMultiLoseEnabled ? 2 : 1;
+            await incrementPlayerLosses(Number(player.id), lossIncrement);
           }
           // Players in between don't get wins or losses
         }
@@ -50,7 +65,9 @@ export async function newRoundWithResults(
         if (player.id === newRound.roundWinnerId?.toString()) {
           await incrementPlayerWins(Number(player.id));
         } else {
-          await incrementPlayerLosses(Number(player.id));
+          const lossIncrement =
+            player.score.length === 0 && isMultiLoseEnabled ? 2 : 1;
+          await incrementPlayerLosses(Number(player.id), lossIncrement);
         }
       }
     }

@@ -34,11 +34,14 @@ export async function incrementPlayerWins(playerId: PlayerSelect['id']) {
   }
 }
 
-export async function incrementPlayerLosses(playerId: PlayerSelect['id']) {
+export async function incrementPlayerLosses(
+  playerId: PlayerSelect['id'],
+  incrementBy: number = 1,
+) {
   try {
     await db
       .update(playersTable)
-      .set({ losses: sql`${playersTable.losses} + 1` })
+      .set({ losses: sql`${playersTable.losses} + ${incrementBy}` })
       .where(eq(playersTable.id, playerId));
   } catch (error) {
     console.error('Database error incrementing player losses:', error);

@@ -1,4 +1,4 @@
-import { getTrioModeSetting } from '@/db/querys/settings';
+import { getMultiLoseSetting, getTrioModeSetting } from '@/db/querys/settings';
 import { GameStatus } from '@/lib/enums';
 import type { Player, Score } from '@/lib/types';
 import { randomUUID } from 'expo-crypto';
@@ -99,7 +99,6 @@ export const useGame = create<GameState>((set) => ({
   endRound: () =>
     set((state) => {
       const winnerId = state.winnerPlayerId;
-      const loserId = state.loserPlayerId;
       const isTrioMode = state.trioMode;
       const isMultiLoseEnabled = state.multiLose;
 
@@ -116,6 +115,15 @@ export const useGame = create<GameState>((set) => ({
 
       let updatedPlayers;
       if (isTrioMode) {
+        const playersIdWithNoScore = playingPlayers
+          .filter((p) => p.id !== winnerId)
+          .filter((p) => p.score.length === 0)
+          .map((p) => p.id);
+
+        const losersId =
+          playersIdWithNoScore.length > 1
+            ? playersIdWithNoScore
+            : [state.loserPlayerId];
         // In trio mode: highest scorer wins, lowest scorer loses, others unchanged
         updatedPlayers = state.players.map((p) => {
           let updatedPlayer = { ...p };
@@ -123,8 +131,9 @@ export const useGame = create<GameState>((set) => ({
           // Update wins/losses - only winner and loser change
           if (p.id === winnerId) {
             updatedPlayer.wins = p.wins + 1;
-          } else if (p.id === loserId) {
-            updatedPlayer.losses = p.losses + (isMultiLoseEnabled ? 2 : 1);
+          } else if (losersId.includes(p.id)) {
+            updatedPlayer.losses =
+              p.losses + (p.score.length === 0 && isMultiLoseEnabled ? 2 : 1);
           }
           // Other players stay unchanged
 
@@ -146,7 +155,8 @@ export const useGame = create<GameState>((set) => ({
             updatedPlayer.wins = p.wins + 1;
           }
           if (losersIds.includes(p.id)) {
-            updatedPlayer.losses = p.losses + (isMultiLoseEnabled ? 2 : 1);
+            updatedPlayer.losses =
+              p.losses + (p.score.length === 0 && isMultiLoseEnabled ? 2 : 1);
           }
 
           // Reset scores
@@ -186,9 +196,10 @@ export const useGame = create<GameState>((set) => ({
   loadSettings: async () => {
     try {
       const trioMode = await getTrioModeSetting();
-      useGame.setState({ trioMode });
+      const multiLose = await getMultiLoseSetting();
+      useGame.setState({ trioMode, multiLose });
     } catch (error) {
-      console.error('Failed to load trio mode setting:', error);
+      console.error('Failed to load settings:', error);
     }
   },
   updateWinningLimit: (limit) => set({ winningLimit: limit }),
