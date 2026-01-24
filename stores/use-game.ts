@@ -22,6 +22,7 @@ type GameState = {
   updateGameSize: (size: number) => void;
   updateWinningLimit: (limit: number) => void;
   addPlayers: (players: Player[]) => void;
+  addPlayer: (player: Player) => void;
   addScoreToPlayer: (player: Player, score: number) => void;
   removeScoreFromPlayer: (player: Player, scoreId: string) => void;
   changePlayerActivity: (player: Player, isPlaying: boolean) => void;
@@ -192,6 +193,8 @@ export const useGame = create<GameState>((set) => ({
   updateWinningLimit: (limit) => set({ winningLimit: limit }),
   updateGameSize: (size) => set({ gameSize: size }),
   addPlayers: (players) => set({ players }),
+  addPlayer: (player) =>
+    set((state) => ({ players: [...state.players, player] })),
   addScoreToPlayer: (player, scoreValue) => {
     set((state) => {
       if (state.gameStatus === GameStatus.Finished) return {};

@@ -134,7 +134,11 @@
     "playerNumber": "Player {{number}}",
     "enterPlayerName": "Enter player {{number}} name",
     "nameRequired": "Player {{number}} name is required",
-    "nameMaxLength": "Name must be 10 characters or less"
+    "nameMaxLength": "Name must be 10 characters or less",
+    "addPlayerTitle": "Add New Player",
+    "addPlayerPlaceholder": "Enter player name",
+    "playerNameExists": "A player with this name already exists",
+    "maxPlayersReached": "Maximum of {{count}} players reached"
   },
   "validation": {
     "required": "{{field}} is required",

@@ -1,5 +1,5 @@
 import { deleteGame, Game, insertGame, NewGame } from '@/db/querys/game';
-import { insertPlayers } from '../querys/player';
+import { insertPlayer, insertPlayers } from '../querys/player';
 
 export async function addNewGame(newGame: NewGame, playersNames: string[]) {
   try {
@@ -30,5 +30,22 @@ export async function removeGame(gameId: Game['id']) {
     await deleteGame(gameId);
   } catch (error) {
     console.error('Error removing game:', error);
+  }
+}
+
+export async function addPlayerToGame(gameId: number, playerName: string) {
+  try {
+    const player = await insertPlayer({
+      gameId,
+      name: playerName,
+    });
+
+    if (player === undefined) {
+      throw new Error('Failed to create player');
+    }
+
+    return player;
+  } catch (error) {
+    console.error('Error adding player to game:', error);
   }
 }

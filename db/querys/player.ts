@@ -14,6 +14,15 @@ export async function insertPlayers(players: NewPlayer[]) {
   }
 }
 
+export async function insertPlayer(player: NewPlayer) {
+  try {
+    const result = await db.insert(playersTable).values(player).returning();
+    return result[0];
+  } catch (error) {
+    console.error('Database error inserting player:', error);
+  }
+}
+
 export async function incrementPlayerWins(playerId: PlayerSelect['id']) {
   try {
     await db
