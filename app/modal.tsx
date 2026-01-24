@@ -13,8 +13,9 @@ import { useGame } from '@/stores/use-game';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { router } from 'expo-router';
+import { Trash2Icon } from 'lucide-react-native';
 import { useForm } from 'react-hook-form';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Alert, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
 
@@ -126,16 +127,41 @@ function PlayersList() {
   const { t } = useT();
   const players = useGame((state) => state.players);
   const updatePlayerActivity = useGame((state) => state.changePlayerActivity);
+  const removePlayer = useGame((state) => state.removePlayer);
   const activePlayersCount = players.filter((p) => p.isPlaying).length;
   const trioMode = useGame((state) => state.trioMode);
   const maxActivePlayers = trioMode ? 3 : 4;
   const openAddPlayerDialog = useAddPlayerDialog((state) => state.open);
 
   const canAddMorePlayers = players.length < MAX_PLAYERS;
+  const minPlayers = trioMode ? 3 : 2;
+  const canRemovePlayers = players.length > minPlayers;
 
   const handlePlayerToggle = (player: Player, isPlaying: boolean) => {
     impactAsync(ImpactFeedbackStyle.Light);
     updatePlayerActivity(player, isPlaying);
+  };
+
+  const handleRemovePlayer = (player: Player) => {
+    Alert.alert(
+      t('players.removePlayer'),
+      t('players.removePlayerConfirm', { name: player.name }),
+      [
+        {
+          text: t('common.cancel'),
+          style: 'cancel',
+          onPress: () => impactAsync(ImpactFeedbackStyle.Light),
+        },
+        {
+          text: t('common.delete'),
+          style: 'destructive',
+          onPress: () => {
+            impactAsync(ImpactFeedbackStyle.Medium);
+            removePlayer(player.id);
+          },
+        },
+      ],
+    );
   };
 
   const handleAddPlayerPress = () => {
@@ -201,13 +227,26 @@ function PlayersList() {
                   </View>
                 </View>
 
-                <Switch
-                  disabled={isDisabled}
-                  checked={player.isPlaying}
-                  onCheckedChange={(checked) =>
-                    handlePlayerToggle(player, checked)
-                  }
-                />
+                <View className="flex-row items-center gap-3">
+                  {canRemovePlayers && !player.isPlaying && (
+                    <Pressable
+                      onPress={(e) => {
+                        e.stopPropagation();
+                        handleRemovePlayer(player);
+                      }}
+                      className="p-2 active:opacity-50"
+                    >
+                      <Trash2Icon size={16} color="red" />
+                    </Pressable>
+                  )}
+                  <Switch
+                    disabled={isDisabled}
+                    checked={player.isPlaying}
+                    onCheckedChange={(checked) =>
+                      handlePlayerToggle(player, checked)
+                    }
+                  />
+                </View>
               </Pressable>
             );
           })}

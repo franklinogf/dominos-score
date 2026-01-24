@@ -129,6 +129,7 @@
   "players": {
     "addPlayer": "Add Player",
     "removePlayer": "Remove Player",
+    "removePlayerConfirm": "Are you sure you want to remove {{name}} from this game?",
     "playerName": "Player Name",
     "enterName": "Enter player name",
     "playerNumber": "Player {{number}}",
@@ -138,7 +139,8 @@
     "addPlayerTitle": "Add New Player",
     "addPlayerPlaceholder": "Enter player name",
     "playerNameExists": "A player with this name already exists",
-    "maxPlayersReached": "Maximum of {{count}} players reached"
+    "maxPlayersReached": "Maximum of {{count}} players reached",
+    "minPlayersRequired": "Minimum of {{count}} players required"
   },
   "validation": {
     "required": "{{field}} is required",

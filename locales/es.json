@@ -129,6 +129,7 @@
   "players": {
     "addPlayer": "Agregar Jugador",
     "removePlayer": "Quitar Jugador",
+    "removePlayerConfirm": "¿Estás seguro de que quieres quitar a {{name}} de este juego?",
     "playerName": "Nombre del Jugador",
     "enterName": "Ingresa el nombre del jugador",
     "playerNumber": "Jugador {{number}}",
@@ -138,7 +139,8 @@
     "addPlayerTitle": "Agregar Nuevo Jugador",
     "addPlayerPlaceholder": "Ingresa el nombre del jugador",
     "playerNameExists": "Ya existe un jugador con este nombre",
-    "maxPlayersReached": "Máximo de {{count}} jugadores alcanzado"
+    "maxPlayersReached": "Máximo de {{count}} jugadores alcanzado",
+    "minPlayersRequired": "Mínimo de {{count}} jugadores requerido"
   },
   "validation": {
     "required": "{{field}} es requerido",
