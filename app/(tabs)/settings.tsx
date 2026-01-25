@@ -3,21 +3,28 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Text } from '@/components/ui/text';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { saveSettings } from '@/db/actions/settings';
 import {
   getLongPressScoreSetting,
   getMultiLoseSetting,
+  getThemeSetting,
   getTrioModeSetting,
 } from '@/db/querys/settings';
 import {
   DEFAULT_LONG_PRESS_SCORE,
   DEFAULT_MULTI_LOSE,
+  DEFAULT_THEME,
   DEFAULT_TRIO_MODE,
+  THEME_OPTIONS,
+  ThemeOption,
 } from '@/lib/constants';
 import { useGame } from '@/stores/use-game';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { useFocusEffect } from 'expo-router';
+import { Moon, Smartphone, Sun } from 'lucide-react-native';
+import { useColorScheme } from 'nativewind';
 import { useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +34,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,
+  useColorScheme as useSystemColorScheme,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -63,6 +71,7 @@ const settingsSchema = (t: (key: string) => string) =>
       .refine((val) => Number(val) <= 999, t('settings.longPressScoreMax')),
     trioMode: z.boolean(),
     multiLose: z.boolean(),
+    theme: z.enum(THEME_OPTIONS),
   });
 
 type SettingsFormData = z.infer<ReturnType<typeof settingsSchema>>;
@@ -72,6 +81,8 @@ export default function Settings() {
   const setTrioMode = useGame((state) => state.setTrioMode);
   const setMultiLose = useGame((state) => state.setMultiLose);
   const { t } = useTranslation();
+  const { setColorScheme } = useColorScheme();
+  const systemColorScheme = useSystemColorScheme();
 
   const {
     control,
@@ -85,31 +96,45 @@ export default function Settings() {
       longPressScore: DEFAULT_LONG_PRESS_SCORE.toString(),
       trioMode: DEFAULT_TRIO_MODE,
       multiLose: DEFAULT_MULTI_LOSE,
+      theme: DEFAULT_THEME,
     },
   });
 
-  // Load current settings
-  useFocusEffect(
-    useCallback(() => {
-      const loadSettings = async () => {
-        try {
-          const longPressScore = await getLongPressScoreSetting();
-          const trioMode = await getTrioModeSetting();
-          const multiLose = await getMultiLoseSetting();
-          setValue('longPressScore', longPressScore.toString());
-          setValue('trioMode', trioMode);
-          setValue('multiLose', multiLose);
-        } catch (error) {
-          console.error('Failed to load settings:', error);
-          Alert.alert(t('common.error'), t('settings.loadError'));
-        } finally {
-          setIsLoading(false);
-        }
-      };
-
-      loadSettings();
-    }, [setValue, t]),
+  const applyTheme = useCallback(
+    (theme: ThemeOption) => {
+      if (theme === 'system') {
+        setColorScheme(systemColorScheme ?? 'light');
+      } else {
+        setColorScheme(theme);
+      }
+    },
+    [setColorScheme, systemColorScheme],
   );
+
+  // Load current settings
+  useFocusEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const longPressScore = await getLongPressScoreSetting();
+        const trioMode = await getTrioModeSetting();
+        const multiLose = await getMultiLoseSetting();
+        const theme = await getThemeSetting();
+        setValue('longPressScore', longPressScore.toString());
+        setValue('trioMode', trioMode);
+        setValue('multiLose', multiLose);
+        setValue('theme', theme);
+        // Apply saved theme immediately
+        applyTheme(theme);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Failed to load settings:', error);
+        Alert.alert(t('common.error'), t('settings.loadError'));
+        setIsLoading(false);
+      }
+    };
+    console.log({ systemColorScheme });
+    loadSettings();
+  });
 
   const onSubmit = async (data: SettingsFormData) => {
     impactAsync(ImpactFeedbackStyle.Light);
@@ -120,20 +145,23 @@ export default function Settings() {
         longPressScore: data.longPressScore,
         trioMode: data.trioMode.toString(),
         multiLose: data.multiLose.toString(),
+        theme: data.theme,
       };
       await saveSettings(settingsData);
 
       // Update game store with new trio mode setting
       setTrioMode(data.trioMode);
       setMultiLose(data.multiLose);
+      // Apply theme
+      applyTheme(data.theme);
       reset(data);
       impactAsync(ImpactFeedbackStyle.Medium);
       Alert.alert(t('settings.success'), t('settings.settingsSaved'));
+      Keyboard.dismiss();
     } catch (error) {
       console.error('Failed to save settings:', error);
       impactAsync(ImpactFeedbackStyle.Heavy);
       Alert.alert(t('common.error'), t('settings.settingsError'));
-    } finally {
       Keyboard.dismiss();
     }
   };
@@ -215,6 +243,55 @@ export default function Settings() {
                         {value ? t('settings.enabled') : t('settings.disabled')}
                       </Text>
                     </View>
+                  )}
+                />
+              </FieldGroup>
+
+              <FieldGroup
+                id="theme"
+                label={t('settings.theme')}
+                description={t('settings.themeDescription')}
+              >
+                <Controller
+                  control={control}
+                  name="theme"
+                  render={({ field: { onChange, value } }) => (
+                    <ToggleGroup
+                      type="single"
+                      value={value}
+                      onValueChange={(val) => {
+                        if (val) {
+                          impactAsync(ImpactFeedbackStyle.Light);
+                          onChange(val as ThemeOption);
+                        }
+                      }}
+                      className="justify-start"
+                    >
+                      <ToggleGroupItem
+                        value="light"
+                        aria-label={t('settings.themeLight')}
+                        className="flex-row items-center gap-2 px-4"
+                      >
+                        <Sun size={18} className="text-foreground" />
+                        <Text>{t('settings.themeLight')}</Text>
+                      </ToggleGroupItem>
+                      <ToggleGroupItem
+                        value="dark"
+                        aria-label={t('settings.themeDark')}
+                        className="flex-row items-center gap-2 px-4"
+                      >
+                        <Moon size={18} className="text-foreground" />
+                        <Text>{t('settings.themeDark')}</Text>
+                      </ToggleGroupItem>
+                      <ToggleGroupItem
+                        value="system"
+                        aria-label={t('settings.themeSystem')}
+                        className="flex-row items-center gap-2 px-4"
+                      >
+                        <Smartphone size={18} className="text-foreground" />
+                        <Text>{t('settings.themeSystem')}</Text>
+                      </ToggleGroupItem>
+                    </ToggleGroup>
                   )}
                 />
               </FieldGroup>

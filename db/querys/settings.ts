@@ -3,9 +3,10 @@ import { settingsTable } from '@/db/schema';
 import {
   DEFAULT_LONG_PRESS_SCORE,
   DEFAULT_MULTI_LOSE,
+  DEFAULT_THEME,
   DEFAULT_TRIO_MODE,
+  ThemeOption,
 } from '@/lib/constants';
-import { eq } from 'drizzle-orm';
 
 export async function getSetting(key: string): Promise<string | undefined> {
   try {
@@ -49,12 +50,26 @@ export async function getMultiLoseSetting(): Promise<boolean> {
   }
 }
 
+export async function getThemeSetting(): Promise<ThemeOption> {
+  try {
+    const value = await getSetting('theme');
+    if (value && ['light', 'dark', 'system'].includes(value)) {
+      return value as ThemeOption;
+    }
+    return DEFAULT_THEME;
+  } catch (error) {
+    console.error('Database error fetching theme setting:', error);
+    return DEFAULT_THEME;
+  }
+}
+
 export async function updateSetting(key: string, value: string) {
   try {
-    await db
-      .update(settingsTable)
-      .set({ value })
-      .where(eq(settingsTable.key, key));
+    // Use upsert to insert or update the setting
+    await db.insert(settingsTable).values({ key, value }).onConflictDoUpdate({
+      target: settingsTable.key,
+      set: { value },
+    });
   } catch (error) {
     console.error('Database error updating setting ' + key + ':', error);
   }

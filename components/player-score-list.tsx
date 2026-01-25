@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
+import { useT } from '@/hooks/use-translation';
 import { Player } from '@/lib/types';
 import { useGame } from '@/stores/use-game';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
@@ -12,6 +13,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 export function PlayerScoreList({ player }: { player: Player }) {
+  const { t } = useT();
   const removeScoreFromPlayer = useGame((state) => state.removeScoreFromPlayer);
   const winnerPlayerId = useGame((state) => state.winnerPlayerId);
   const flatListRef = useRef<any>(null);
@@ -62,15 +64,18 @@ export function PlayerScoreList({ player }: { player: Player }) {
               onLongPress={() => {
                 impactAsync(ImpactFeedbackStyle.Heavy);
                 Alert.alert(
-                  'Remove Score',
-                  `Remove ${item.value} points from ${player.name}?`,
+                  t('game.removeScore'),
+                  t('game.removeScoreConfirm', {
+                    value: item.value,
+                    name: player.name,
+                  }),
                   [
                     {
-                      text: 'Cancel',
+                      text: t('common.cancel'),
                       style: 'cancel',
                     },
                     {
-                      text: 'OK',
+                      text: t('common.ok'),
                       style: 'destructive',
                       onPress: () => removeScoreFromPlayer(player, item.id),
                     },

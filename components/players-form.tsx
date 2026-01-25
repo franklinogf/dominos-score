@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { useGame } from '@/stores/use-game';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Alert, Platform, ScrollView, TextInput, View } from 'react-native';
 import { z } from 'zod';
@@ -37,7 +37,7 @@ export function PlayersForm() {
   const gameSize = useGame((state) => state.gameSize);
   const players = useGame((state) => state.players);
   const addPlayers = useGame((state) => state.addPlayers);
-  const schema = createPlayersSchema(gameSize, t);
+  const schema = useMemo(() => createPlayersSchema(gameSize, t), [gameSize, t]);
   const tournamentMode = useGame((state) => state.tournamentMode);
   const inputRef = useRef<TextInput[]>([]);
   const updateGameStatus = useGame((state) => state.updateGameStatus);

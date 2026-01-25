@@ -12,6 +12,7 @@ export function WinningLimit() {
   const { t } = useT();
   const winningLimit = useGame((state) => state.winningLimit);
   const updateWinningLimit = useGame((state) => state.updateWinningLimit);
+
   function onLabelPress(label: Point) {
     return () => {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -23,6 +24,7 @@ export function WinningLimit() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     updateWinningLimit(Number(value));
   }
+
   return (
     <View className="w-full p-4">
       <Text className="text-center mb-1" variant="large">

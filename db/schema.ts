@@ -15,6 +15,7 @@ export const gamesTable = sqliteTable('games', {
   createdAt: text('created_at')
     .default(sql`(CURRENT_TIMESTAMP)`)
     .notNull(),
+  endedAt: text('ended_at'),
 });
 
 export const roundsTable = sqliteTable('rounds', {
@@ -23,6 +24,7 @@ export const roundsTable = sqliteTable('rounds', {
     .references(() => gamesTable.id, { onDelete: 'cascade' })
     .notNull(),
   roundWinnerId: integer('round_winner_id', { mode: 'number' }),
+  createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
 });
 
 export const playersTable = sqliteTable('players', {

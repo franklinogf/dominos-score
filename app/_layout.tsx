@@ -1,16 +1,19 @@
-import '@/global.css';
-import '@/lib/i18n';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useColorScheme } from 'nativewind';
+import '@/global.css'
+import '@/lib/i18n'
+import { Stack } from 'expo-router'
+import { StatusBar } from 'expo-status-bar'
+import { useColorScheme } from 'nativewind'
 
-import { initializeDatabase } from '@/db/database';
-import { useGame } from '@/stores/use-game';
-import { PortalHost } from '@rn-primitives/portal';
-import { useEffect } from 'react';
+import { initializeDatabase } from '@/db/database'
+import { getThemeSetting } from '@/db/querys/settings'
+import { useGame } from '@/stores/use-game'
+import { PortalHost } from '@rn-primitives/portal'
+import { useEffect } from 'react'
+import { useColorScheme as useSystemColorScheme } from 'react-native'
 
 export default function RootLayout() {
-  const { colorScheme } = useColorScheme();
+  const { colorScheme, setColorScheme } = useColorScheme();
+  const systemColorScheme = useSystemColorScheme();
   const loadSettings = useGame((state) => state.loadSettings);
 
   useEffect(() => {
@@ -18,10 +21,17 @@ export default function RootLayout() {
       await initializeDatabase();
       // Load settings after database is initialized
       await loadSettings();
+      // Load and apply theme
+      const theme = await getThemeSetting();
+      if (theme === 'system') {
+        setColorScheme(systemColorScheme ?? 'light');
+      } else {
+        setColorScheme(theme);
+      }
     };
 
     initialize();
-  }, [loadSettings]);
+  }, [loadSettings, setColorScheme, systemColorScheme]);
 
   return (
     <>

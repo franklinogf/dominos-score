@@ -17,3 +17,9 @@ export const DEFAULT_LONG_PRESS_SCORE = 30;
 export const DEFAULT_TRIO_MODE = true;
 
 export const DEFAULT_MULTI_LOSE = false;
+
+export const DEFAULT_THEME = 'system' as const;
+
+export const THEME_OPTIONS = ['light', 'dark', 'system'] as const;
+
+export type ThemeOption = (typeof THEME_OPTIONS)[number];

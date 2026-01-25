@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { getLongPressScoreSetting } from '@/db/querys/settings';
+import { saveSettings } from '@/db/actions/settings';
+import { getLongPressScoreSetting, getSetting } from '@/db/querys/settings';
 import { useT } from '@/hooks/use-translation';
 import { DEFAULT_LONG_PRESS_SCORE } from '@/lib/constants';
 import { GameStatus } from '@/lib/enums';
@@ -9,26 +10,41 @@ import { useGame } from '@/stores/use-game';
 import { useScoreModal } from '@/stores/use-score-modal';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { useFocusEffect } from 'expo-router';
+import { Info } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
-import { Alert, Platform, View } from 'react-native';
+import { Alert, Platform, Pressable, View } from 'react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 export function PlayersButtons() {
+  const { t } = useT();
   const players = useGame((state) => state.players);
   const activePlayers = players.filter((p) => p.isPlaying);
   const [longPressScore, setLongPressScore] = useState<number>(
     DEFAULT_LONG_PRESS_SCORE,
   );
+  const [showHint, setShowHint] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
-      const fetchLongPressScore = async () => {
+      const fetchSettings = async () => {
         const score = await getLongPressScoreSetting();
         setLongPressScore(score);
+
+        // Check if hint has been shown before
+        const hintShown = await getSetting('hintShown');
+        if (!hintShown) {
+          setShowHint(true);
+        }
       };
 
-      fetchLongPressScore();
+      fetchSettings();
     }, []),
   );
+
+  const dismissHint = async () => {
+    setShowHint(false);
+    await saveSettings({ hintShown: 'true' });
+  };
 
   return (
     <>
@@ -41,6 +57,22 @@ export function PlayersButtons() {
           />
         ))}
       </View>
+      {showHint && (
+        <Animated.View entering={FadeIn.delay(500)} exiting={FadeOut}>
+          <Pressable
+            onPress={dismissHint}
+            className="flex-row items-center justify-center gap-2 mt-2 px-4 py-2 bg-muted/50 rounded-lg mx-2"
+          >
+            <Info size={16} className="text-muted-foreground" />
+            <Text
+              variant="small"
+              className="text-muted-foreground text-center flex-1"
+            >
+              {t('game.longPressHint', { points: longPressScore })}
+            </Text>
+          </Pressable>
+        </Animated.View>
+      )}
     </>
   );
 }

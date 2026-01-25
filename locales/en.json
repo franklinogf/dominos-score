@@ -61,7 +61,10 @@
     "losses": "losses",
     "firstTo": "First to {{limit}}",
     "tournamentLeader": "Tournament - {{name}} ({{wins}} wins)",
-    "tournamentTie": "Tournament - {{names}} ({{wins}} wins)"
+    "tournamentTie": "Tournament - {{names}} ({{wins}} wins)",
+    "removeScore": "Remove Score",
+    "removeScoreConfirm": "Remove {{value}} points from {{name}}?",
+    "longPressHint": "Tip: Long-press a player name to quickly add {{points}} points. Long-press a score to remove it. Tap to dismiss."
   },
   "history": {
     "title": "Game History",
@@ -99,12 +102,19 @@
     "noScores": "No scores",
     "roundNotCompleted": "Round not completed",
     "multipleRoundsGame": "This game consisted of {{count}} rounds. Check individual round details above.",
-    "loadingGameData": "Loading game data..."
+    "loadingGameData": "Loading game data...",
+    "shareGameResults": "Share Game Results",
+    "sharingNotAvailable": "Sharing is not available on this device",
+    "screenshotFailed": "Failed to capture screenshot. Please try again."
   },
   "settings": {
     "title": "Settings",
     "language": "Language",
     "theme": "Theme",
+    "themeDescription": "Choose your preferred color scheme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
     "notifications": "Notifications",
     "about": "About",
     "longPressScore": "Long Press Score",

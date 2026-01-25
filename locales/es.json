@@ -61,7 +61,10 @@
     "losses": "derrotas",
     "firstTo": "Primero a {{limit}}",
     "tournamentLeader": "Torneo - {{name}} ({{wins}} victorias)",
-    "tournamentTie": "Torneo - {{names}} ({{wins}} victorias)"
+    "tournamentTie": "Torneo - {{names}} ({{wins}} victorias)",
+    "removeScore": "Eliminar Puntuación",
+    "removeScoreConfirm": "¿Eliminar {{value}} puntos de {{name}}?",
+    "longPressHint": "Consejo: Mantén presionado el nombre de un jugador para agregar rápidamente {{points}} puntos. Mantén presionada una puntuación para eliminarla. Toca para cerrar."
   },
   "history": {
     "title": "Historial de Juegos",
@@ -99,12 +102,19 @@
     "noScores": "Sin puntuaciones",
     "roundNotCompleted": "Ronda no completada",
     "multipleRoundsGame": "Este juego consistió en {{count}} rondas. Consulta los detalles de cada ronda arriba.",
-    "loadingGameData": "Cargando datos del juego..."
+    "loadingGameData": "Cargando datos del juego...",
+    "shareGameResults": "Compartir Resultados del Juego",
+    "sharingNotAvailable": "Compartir no está disponible en este dispositivo",
+    "screenshotFailed": "Error al capturar la pantalla. Por favor inténtalo de nuevo."
   },
   "settings": {
     "title": "Configuración",
     "language": "Idioma",
     "theme": "Tema",
+    "themeDescription": "Elige tu esquema de colores preferido",
+    "themeLight": "Claro",
+    "themeDark": "Oscuro",
+    "themeSystem": "Sistema",
     "notifications": "Notificaciones",
     "about": "Acerca de",
     "longPressScore": "Puntuación de Pulsación Larga",
