@@ -22,6 +22,14 @@ export async function deleteGame(gameId: Game['id']) {
   }
 }
 
+export async function deleteAllGames() {
+  try {
+    await db.delete(gamesTable);
+  } catch (error) {
+    console.error('Database error deleting all games:', error);
+  }
+}
+
 export async function getAllGames() {
   try {
     const games = await db.query.gamesTable.findMany({

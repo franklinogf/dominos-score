@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
-import { removeGame } from '@/db/actions/game';
+import { removeAllGames, removeGame } from '@/db/actions/game';
 import { type GameWithRounds, getAllGames } from '@/db/querys/game';
 import { useT } from '@/hooks/use-translation';
 import { GameType } from '@/lib/enums';
@@ -192,6 +192,32 @@ export default function HistoryIndex() {
     [loadGames, t],
   );
 
+  const handleDeleteAllGames = useCallback(() => {
+    impactAsync(ImpactFeedbackStyle.Light);
+    Alert.alert(t('history.deleteAll'), t('history.deleteAllConfirm'), [
+      {
+        text: t('common.cancel'),
+        style: 'cancel',
+      },
+      {
+        text: t('common.delete'),
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await removeAllGames();
+            setGames([]);
+            impactAsync(ImpactFeedbackStyle.Heavy);
+            console.log('All games deleted successfully');
+          } catch (error) {
+            console.error('Failed to delete all games:', error);
+            Alert.alert(t('common.error'), t('history.deleteAllFailed'));
+            impactAsync(ImpactFeedbackStyle.Heavy);
+          }
+        },
+      },
+    ]);
+  }, [t]);
+
   useFocusEffect(
     useCallback(() => {
       loadGames();
@@ -200,9 +226,23 @@ export default function HistoryIndex() {
 
   return (
     <SafeAreaView className="flex-1 bg-background px-4 py-6">
-      <Text variant="h1" className="text-center mb-6">
+      <Text variant="h1" className="text-center mb-4">
         {t('history.title')}
       </Text>
+
+      {games.length > 0 && !isLoading && (
+        <View className="items-center mb-4">
+          <Button
+            variant="destructive"
+            size="sm"
+            onPress={handleDeleteAllGames}
+          >
+            <Text className="text-xs text-destructive-foreground">
+              {t('history.deleteAll')}
+            </Text>
+          </Button>
+        </View>
+      )}
 
       {isLoading && (
         <View>

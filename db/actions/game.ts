@@ -1,4 +1,10 @@
-import { deleteGame, Game, insertGame, NewGame } from '@/db/querys/game';
+import {
+  deleteAllGames,
+  deleteGame,
+  Game,
+  insertGame,
+  NewGame,
+} from '@/db/querys/game';
 import {
   getPlayerByNameAndGame,
   insertPlayer,
@@ -34,6 +40,14 @@ export async function removeGame(gameId: Game['id']) {
     await deleteGame(gameId);
   } catch (error) {
     console.error('Error removing game:', error);
+  }
+}
+
+export async function removeAllGames() {
+  try {
+    await deleteAllGames();
+  } catch (error) {
+    console.error('Error removing all games:', error);
   }
 }
 
