@@ -9,7 +9,7 @@ import { useGame } from '@/stores/use-game';
 import { useFocusEffect } from '@react-navigation/native';
 import { useKeepAwake } from 'expo-keep-awake';
 import { router, useNavigation } from 'expo-router';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Platform, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -28,8 +28,14 @@ export default function Game() {
     }, [navigation, title]),
   );
 
+  // Redirect to home if no active players
+  useEffect(() => {
+    if (activePlayersCount === 0) {
+      router.replace('/');
+    }
+  }, [activePlayersCount]);
+
   if (activePlayersCount === 0) {
-    router.replace('/');
     return null;
   }
 
