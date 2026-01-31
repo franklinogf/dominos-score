@@ -42,7 +42,10 @@ export default function RootLayout() {
           name="modal"
           options={{ presentation: 'containedModal' }}
         />
-        <Stack.Screen name="info-modal" options={{ presentation: 'modal' }} />
+        <Stack.Screen
+          name="info-modal"
+          options={{ presentation: 'formSheet' }}
+        />
       </Stack>
       <PortalHost />
     </>

@@ -1,6 +1,11 @@
 import { InputField } from '@/components/input-field';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Text } from '@/components/ui/text';
 import { useT } from '@/hooks/use-translation';
 import { useGame } from '@/stores/use-game';
@@ -53,9 +58,11 @@ export function ScoreModal() {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="min-w-full">
-        <DialogTitle>
-          <Text variant="large">{t('game.addScore')}</Text>
-        </DialogTitle>
+        <DialogHeader>
+          <DialogTitle>
+            <Text variant="large">{t('game.addScore')}</Text>
+          </DialogTitle>
+        </DialogHeader>
         <InputField
           autoFocus
           name="score"
