@@ -1,15 +1,15 @@
-import '@/global.css'
-import '@/lib/i18n'
-import { Stack } from 'expo-router'
-import { StatusBar } from 'expo-status-bar'
-import { useColorScheme } from 'nativewind'
+import '@/global.css';
+import '@/lib/i18n';
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useColorScheme } from 'nativewind';
 
-import { initializeDatabase } from '@/db/database'
-import { getThemeSetting } from '@/db/querys/settings'
-import { useGame } from '@/stores/use-game'
-import { PortalHost } from '@rn-primitives/portal'
-import { useEffect } from 'react'
-import { useColorScheme as useSystemColorScheme } from 'react-native'
+import { initializeDatabase } from '@/db/database';
+import { getThemeSetting } from '@/db/querys/settings';
+import { useGame } from '@/stores/use-game';
+import { PortalHost } from '@rn-primitives/portal';
+import { useEffect } from 'react';
+import { useColorScheme as useSystemColorScheme } from 'react-native';
 
 export default function RootLayout() {
   const { colorScheme, setColorScheme } = useColorScheme();
@@ -42,6 +42,7 @@ export default function RootLayout() {
           name="modal"
           options={{ presentation: 'containedModal' }}
         />
+        <Stack.Screen name="info-modal" options={{ presentation: 'modal' }} />
       </Stack>
       <PortalHost />
     </>

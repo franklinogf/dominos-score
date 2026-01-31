@@ -1,9 +1,11 @@
-import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { saveSettings } from '@/db/actions/settings';
 import { getLongPressScoreSetting, getSetting } from '@/db/querys/settings';
 import { useT } from '@/hooks/use-translation';
-import { DEFAULT_LONG_PRESS_SCORE } from '@/lib/constants';
+import {
+  DEFAULT_DOUBLE_PRESS_SCORE,
+  DEFAULT_LONG_PRESS_SCORE,
+} from '@/lib/constants';
 import { GameStatus } from '@/lib/enums';
 import { Player } from '@/lib/types';
 import { useGame } from '@/stores/use-game';
@@ -14,6 +16,7 @@ import { Info } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
 import { Alert, Platform, Pressable, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { DoubleTapButton } from './ui/double-tap-button';
 
 export function PlayersButtons() {
   const { t } = useT();
@@ -130,7 +133,11 @@ function PlayerButton({
   return (
     <>
       <View className="flex-1 px-1">
-        <Button
+        <DoubleTapButton
+          onDoublePress={() => {
+            impactAsync(ImpactFeedbackStyle.Heavy);
+            addScoreToPlayer(player, DEFAULT_DOUBLE_PRESS_SCORE);
+          }}
           disabled={gameStatus === GameStatus.Finished}
           className="px-0 relative overflow-hidden"
           size="lg"
@@ -152,7 +159,7 @@ function PlayerButton({
             </Text>
           )}
           <Text className="line-clamp-1 uppercase">{player.name}</Text>
-        </Button>
+        </DoubleTapButton>
       </View>
     </>
   );

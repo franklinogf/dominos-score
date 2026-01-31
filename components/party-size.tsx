@@ -4,7 +4,7 @@ import { useT } from '@/hooks/use-translation';
 import { BIG_PARTY_SIZES, PARTY_SIZES } from '@/lib/constants';
 import { useGame } from '@/stores/use-game';
 import * as Haptics from 'expo-haptics';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 
 export function PartySize() {
   const { t } = useT();
@@ -24,26 +24,36 @@ export function PartySize() {
       <Text className="text-center mb-1" variant="large">
         {t('game.partySize')}
       </Text>
-      <ToggleGroup
-        type="single"
+      <ScrollView
         className="mx-auto"
-        variant="outline"
-        size="lg"
-        value={gameSize.toString()}
-        onValueChange={(value) => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          updateGameSize(value !== undefined ? Number(value) : 2);
+        horizontal
+        bounces={false}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
-        {currentMaxPartySizes.map((size, index) => (
-          <PartySizeButton
-            isFirst={index === 0}
-            isLast={index === currentMaxPartySizes.length - 1}
-            key={size}
-            label={size}
-          />
-        ))}
-      </ToggleGroup>
+        <ToggleGroup
+          type="single"
+          variant="outline"
+          size="lg"
+          value={gameSize.toString()}
+          onValueChange={(value) => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            updateGameSize(value !== undefined ? Number(value) : 2);
+          }}
+        >
+          {currentMaxPartySizes.map((size, index) => (
+            <PartySizeButton
+              isFirst={index === 0}
+              isLast={index === currentMaxPartySizes.length - 1}
+              key={size}
+              label={size}
+            />
+          ))}
+        </ToggleGroup>
+      </ScrollView>
     </View>
   );
 }

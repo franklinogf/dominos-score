@@ -166,5 +166,31 @@
     "networkError": "Network error",
     "invalidInput": "Invalid input",
     "gameCreationFailed": "Failed to create a new game. Please try again."
+  },
+  "info": {
+    "title": "How to Play",
+    "controlsTitle": "Controls",
+    "tapTitle": "Tap",
+    "tapDescription": "Tap a player button to open the score modal where you can enter a custom score.",
+    "longPressTitle": "Long Press",
+    "longPressDescription": "Hold down a player button to quickly add configurable points (current: {{amount}}). You can change this value in Settings.",
+    "doubleTapTitle": "Double Tap",
+    "doubleTapDescription": "Double tap a player button to add {{amount}} points quickly to their score.",
+    "removeScoreTitle": "Remove Score",
+    "removeScoreDescription": "Long press on any score item in the player's score list to remove it.",
+    "gameModesTitle": "Game Modes",
+    "normalModeTitle": "Normal Mode",
+    "normalModeDescription": "Standard game where the first player to reach the winning score limit wins the game.",
+    "tournamentModeTitle": "Tournament Mode",
+    "tournamentModeDescription": "Multi-round competition that tracks wins and losses across rounds. Perfect for longer play sessions with friends.",
+    "tournamentOptionsTitle": "Tournament Options",
+    "trioModeTitle": "Trio Mode",
+    "trioModeDescription": "When enabled with 3 players: the player with the highest score wins, the player with the lowest score loses, and the middle player's record remains unchanged.",
+    "multiLoseTitle": "Multi-Lose Mode",
+    "multiLoseDescription": "When enabled, the player with the lowest score at the end of a round loses 2 losses instead of just 1. Makes tournaments more intense!",
+    "tipsTitle": "Tips",
+    "tip1": "You can configure the long press score value in Settings.",
+    "tip2": "Trio Mode and Multi-Lose can be enabled/disabled in Settings.",
+    "tip3": "Check your game history to see past results and statistics."
   }
 }

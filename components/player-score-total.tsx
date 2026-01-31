@@ -91,7 +91,7 @@ export function PlayerScoreTotal({ player }: { player: Player }) {
         </Text>
       </Animated.View>
       <Text variant="muted" className="text-center text-lg font-medium">
-        {winningLimit}
+        {winningLimit - total}
       </Text>
     </View>
   );
