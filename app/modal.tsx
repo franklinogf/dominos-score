@@ -318,19 +318,20 @@ function AddPlayerDialog() {
     }
 
     try {
-      const newPlayer = await addPlayerToGame(
+      const player = await addPlayerToGame(
         currentGameId,
         data.playerName.trim(),
       );
 
-      if (newPlayer) {
-        // Update store with new player
+      if (player) {
+        // Update store with player (existing or new)
+        // Use wins/losses from DB in case this is a re-added player
         addPlayer({
-          id: newPlayer.id.toString(),
-          name: newPlayer.name,
-          wins: 0,
-          losses: 0,
-          isPlaying: false, // New players start as inactive in tournament mode
+          id: player.id.toString(),
+          name: player.name,
+          wins: player.wins,
+          losses: player.losses,
+          isPlaying: false, // New/re-added players start as inactive in tournament mode
           score: [],
         });
 

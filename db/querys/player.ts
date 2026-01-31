@@ -1,9 +1,28 @@
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { db } from '../database';
 import { playersTable } from '../schema';
 
 export type NewPlayer = typeof playersTable.$inferInsert;
 export type PlayerSelect = typeof playersTable.$inferSelect;
+
+export async function getPlayerByNameAndGame(gameId: number, name: string) {
+  try {
+    const normalizedName = name.trim().toLowerCase();
+    const result = await db
+      .select()
+      .from(playersTable)
+      .where(
+        and(
+          eq(playersTable.gameId, gameId),
+          sql`LOWER(TRIM(${playersTable.name})) = ${normalizedName}`,
+        ),
+      )
+      .limit(1);
+    return result[0];
+  } catch (error) {
+    console.error('Database error finding player:', error);
+  }
+}
 
 export async function insertPlayers(players: NewPlayer[]) {
   try {

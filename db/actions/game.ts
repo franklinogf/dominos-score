@@ -1,5 +1,9 @@
 import { deleteGame, Game, insertGame, NewGame } from '@/db/querys/game';
-import { insertPlayer, insertPlayers } from '../querys/player';
+import {
+  getPlayerByNameAndGame,
+  insertPlayer,
+  insertPlayers,
+} from '../querys/player';
 
 export async function addNewGame(newGame: NewGame, playersNames: string[]) {
   try {
@@ -35,6 +39,15 @@ export async function removeGame(gameId: Game['id']) {
 
 export async function addPlayerToGame(gameId: number, playerName: string) {
   try {
+    // Check if a player with the same name already exists in this game
+    const existingPlayer = await getPlayerByNameAndGame(gameId, playerName);
+
+    if (existingPlayer) {
+      // Return the existing player instead of creating a new one
+      return existingPlayer;
+    }
+
+    // Create a new player if no existing player found
     const player = await insertPlayer({
       gameId,
       name: playerName,
