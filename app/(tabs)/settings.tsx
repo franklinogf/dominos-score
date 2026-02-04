@@ -132,7 +132,6 @@ export default function Settings() {
         setIsLoading(false);
       }
     };
-    console.log({ systemColorScheme });
     loadSettings();
   });
 
