@@ -63,39 +63,47 @@ export function PlayersForm() {
   }));
 
   const onSubmit = async (data: Record<string, string>) => {
-    const playersNames = Object.entries(data).map(([_, name]) => name.trim());
-    const result = await addNewGame(
-      {
-        gameSize,
-        type: tournamentMode ? GameType.TOURNAMENT : GameType.NORMAL,
-        winningLimit,
-      },
-      playersNames,
-    );
+    try {
+      const playersNames = Object.entries(data).map(([_, name]) => name.trim());
+      const result = await addNewGame(
+        {
+          gameSize,
+          type: tournamentMode ? GameType.TOURNAMENT : GameType.NORMAL,
+          winningLimit,
+        },
+        playersNames,
+      );
 
-    if (result === undefined) {
-      Alert.alert(t('common.error'), t('errors.gameCreationFailed'));
-      return;
-    }
-    const { game, players } = result;
+      if (result === undefined) {
+        Alert.alert(t('common.error'), t('errors.gameCreationFailed'));
+        return;
+      }
+      const { game, players } = result;
 
-    const newPlayers: Player[] = players.map((p) => ({
-      id: String(p.id),
-      name: p.name,
-      score: [],
-      isPlaying: tournamentMode ? false : true,
-      wins: 0,
-      losses: 0,
-    }));
+      const newPlayers: Player[] = players.map((p) => ({
+        id: String(p.id),
+        name: p.name,
+        score: [],
+        isPlaying: tournamentMode ? false : true,
+        wins: 0,
+        losses: 0,
+      }));
 
-    addPlayers(newPlayers);
-    updateCurrentGameId(game.id);
+      addPlayers(newPlayers);
+      updateCurrentGameId(game.id);
 
-    if (tournamentMode) {
-      router.push('/modal');
-    } else {
-      updateGameStatus(GameStatus.Ready);
-      router.replace('/game');
+      if (tournamentMode) {
+        router.push('/modal');
+      } else {
+        updateGameStatus(GameStatus.Ready);
+        router.replace('/game');
+      }
+    } catch (error) {
+      console.error('Error creating game:', error);
+      Alert.alert(
+        t('common.error'),
+        t('errors.gameCreationFailed') + '| ' + error,
+      );
     }
   };
 

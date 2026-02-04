@@ -9,7 +9,7 @@ import { getThemeSetting } from '@/db/querys/settings';
 import { useGame } from '@/stores/use-game';
 import { PortalHost } from '@rn-primitives/portal';
 import { useEffect } from 'react';
-import { useColorScheme as useSystemColorScheme } from 'react-native';
+import { Platform, useColorScheme as useSystemColorScheme } from 'react-native';
 
 export default function RootLayout() {
   const { colorScheme, setColorScheme } = useColorScheme();
@@ -44,7 +44,9 @@ export default function RootLayout() {
         />
         <Stack.Screen
           name="info-modal"
-          options={{ presentation: 'formSheet' }}
+          options={{
+            presentation: Platform.OS === 'ios' ? 'modal' : 'formSheet',
+          }}
         />
       </Stack>
       <PortalHost />
