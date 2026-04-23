@@ -3,10 +3,9 @@
     "appVersionSource": "remote"
   },
   "build": {
-    "development": {
+    "preview": {
       "android": {
-        "developmentClient": true,
-        "distribution": "internal"
+        "buildType": "apk"
       },
       "ios": {
         "simulator": true
