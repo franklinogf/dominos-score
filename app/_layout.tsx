@@ -24,7 +24,9 @@ export default function RootLayout() {
       // Load and apply theme
       const theme = await getThemeSetting();
       if (theme === 'system') {
-        setColorScheme(systemColorScheme ?? 'light');
+        setColorScheme(
+          systemColorScheme === 'unspecified' ? 'system' : systemColorScheme,
+        );
       } else {
         setColorScheme(theme);
       }
