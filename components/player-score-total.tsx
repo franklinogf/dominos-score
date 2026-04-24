@@ -7,10 +7,16 @@ import { View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
   withRepeat,
   withSequence,
   withSpring,
 } from 'react-native-reanimated';
+
 
 export function PlayerScoreTotal({ player }: { player: Player }) {
   const total = player.score.reduce((acc, score) => acc + score.value, 0);
@@ -27,9 +33,13 @@ export function PlayerScoreTotal({ player }: { player: Player }) {
   const shouldShowWinner = isWinner;
   const shouldShowLoser = trioMode && isLoser;
 
+  const progress = Math.min(total / winningLimit, 1);
+  const isNearLimit = progress >= 0.75 && !shouldShowWinner;
+
   // Animation values
   const scale = useSharedValue(1);
   const rotation = useSharedValue(0);
+  const progressWidth = useSharedValue(0);
 
   // Trigger celebration animation when this player wins (or different animation for loser in trio mode)
   useEffect(() => {
@@ -73,9 +83,20 @@ export function PlayerScoreTotal({ player }: { player: Player }) {
     }
   }, [shouldShowWinner, shouldShowLoser, scale, rotation]);
 
+  useEffect(() => {
+    progressWidth.value = withSpring(progress * 100, {
+      damping: 20,
+      stiffness: 120,
+    });
+  }, [progress, progressWidth]);
+
   // Animated style
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }, { rotate: `${rotation.value}deg` }],
+  }));
+
+  const progressBarStyle = useAnimatedStyle(() => ({
+    width: `${progressWidth.value}%` as any,
   }));
 
   return (
@@ -93,6 +114,17 @@ export function PlayerScoreTotal({ player }: { player: Player }) {
       <Text variant="muted" className="text-center text-lg font-medium">
         {winningLimit - total}
       </Text>
+      <View className="mt-1 h-1.5 rounded-full bg-muted overflow-hidden">
+        <Animated.View
+          style={progressBarStyle}
+          className={cn('h-full rounded-full', {
+            'bg-success': shouldShowWinner,
+            'bg-destructive': shouldShowLoser,
+            'bg-warning': isNearLimit,
+            'bg-primary': !shouldShowWinner && !shouldShowLoser && !isNearLimit,
+          })}
+        />
+      </View>
     </View>
   );
 }
