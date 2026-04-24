@@ -54,7 +54,7 @@ export default function RootLayout() {
     };
 
     initialize();
-  }, [loadSettings, setColorScheme, systemColorScheme]);
+  }, [loadSettings, setColorScheme, systemColorScheme, restoreGame]);
 
   return (
     <>

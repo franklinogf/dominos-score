@@ -16,7 +16,7 @@ export type RoundOutcomeOptions = {
 };
 
 export function calculateRoundOutcomes(
-  players: Array<{ id: string; score: { value: number }[] }>,
+  players: { id: string; score: { value: number }[] }[],
   winnerId: string,
   options: RoundOutcomeOptions,
 ): PlayerDelta[] {

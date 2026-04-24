@@ -63,7 +63,12 @@ function FieldGroup({ id, label, description, children }: FieldGroupProps) {
   );
 }
 
-const numericScoreField = (required: string, invalid: string, positive: string, max: string) =>
+const numericScoreField = (
+  required: string,
+  invalid: string,
+  positive: string,
+  max: string,
+) =>
   z
     .string()
     .min(1, required)
