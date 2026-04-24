@@ -226,8 +226,7 @@ export const useGame = create<GameState>((set) => ({
       };
     });
 
-    // Check winner after state update
-    setTimeout(() => checkWinnerWhenUpdatingScore(), 0);
+    checkWinnerWhenUpdatingScore();
   },
   removeScoreFromPlayer: (player, scoreId) => {
     set((state) => {
@@ -247,8 +246,7 @@ export const useGame = create<GameState>((set) => ({
       };
     });
 
-    // Check winner after state update
-    setTimeout(() => checkWinnerWhenUpdatingScore(), 0);
+    checkWinnerWhenUpdatingScore();
   },
   changePlayerActivity: (player, isPlaying) =>
     set((state) => {
