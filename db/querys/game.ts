@@ -45,6 +45,20 @@ export async function deleteAllGames(excludeGameId?: number) {
   }
 }
 
+export async function getUnfinishedGame() {
+  try {
+    const game = await db.query.gamesTable.findFirst({
+      where: (t, { isNull }) => isNull(t.endedAt),
+      orderBy: (t, { desc }) => [desc(t.createdAt)],
+      with: { players: true },
+    });
+    return game ?? null;
+  } catch (error) {
+    console.error('Database error fetching unfinished game:', error);
+    return null;
+  }
+}
+
 export async function getAllGames() {
   try {
     const games = await db.query.gamesTable.findMany({

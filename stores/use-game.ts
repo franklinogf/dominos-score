@@ -33,6 +33,7 @@ type GameState = {
   endRound: () => void;
   endGame: () => void;
   updateCurrentGameId: (id: number) => void;
+  restoreGame: (gameId: number, players: Player[], tournamentMode: boolean) => void;
 };
 
 function checkWinnerWhenUpdatingScore() {
@@ -221,4 +222,12 @@ export const useGame = create<GameState>((set) => ({
       return { players: updatedPlayers };
     }),
   updateCurrentGameId: (id: number) => set({ currentGameId: id }),
+  restoreGame: (gameId, players, tournamentMode) =>
+    set({
+      currentGameId: gameId,
+      tournamentMode,
+      players,
+      gameStatus: GameStatus.Ready,
+      currentRoundNumber: Math.max(...players.map((p) => p.wins + p.losses), 0) + 1,
+    }),
 }));
