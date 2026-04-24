@@ -204,10 +204,11 @@ export default function HistoryIndex() {
         style: 'destructive',
         onPress: async () => {
           try {
-            await removeAllGames();
-            setGames([]);
+            await removeAllGames(currentGameId);
+            setGames((prev) =>
+              currentGameId ? prev.filter((g) => g.id === currentGameId) : [],
+            );
             impactAsync(ImpactFeedbackStyle.Heavy);
-            console.log('All games deleted successfully');
           } catch (error) {
             console.error('Failed to delete all games:', error);
             Alert.alert(t('common.error'), t('history.deleteAllFailed'));
@@ -216,7 +217,7 @@ export default function HistoryIndex() {
         },
       },
     ]);
-  }, [t]);
+  }, [t, currentGameId]);
 
   useFocusEffect(
     useCallback(() => {

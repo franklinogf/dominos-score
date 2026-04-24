@@ -43,9 +43,9 @@ export async function removeGame(gameId: Game['id']) {
   }
 }
 
-export async function removeAllGames() {
+export async function removeAllGames(excludeGameId?: number) {
   try {
-    await deleteAllGames();
+    await deleteAllGames(excludeGameId);
   } catch (error) {
     console.error('Error removing all games:', error);
   }

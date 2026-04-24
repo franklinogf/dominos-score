@@ -1,6 +1,6 @@
 import { db } from '@/db/database';
 import { gamesTable } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, ne } from 'drizzle-orm';
 
 export type NewGame = typeof gamesTable.$inferInsert;
 export type Game = typeof gamesTable.$inferSelect;
@@ -22,9 +22,13 @@ export async function deleteGame(gameId: Game['id']) {
   }
 }
 
-export async function deleteAllGames() {
+export async function deleteAllGames(excludeGameId?: number) {
   try {
-    await db.delete(gamesTable);
+    if (excludeGameId !== undefined) {
+      await db.delete(gamesTable).where(ne(gamesTable.id, excludeGameId));
+    } else {
+      await db.delete(gamesTable);
+    }
   } catch (error) {
     console.error('Database error deleting all games:', error);
   }
