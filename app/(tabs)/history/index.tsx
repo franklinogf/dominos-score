@@ -10,7 +10,7 @@ import { useGame } from '@/stores/use-game';
 import { useFocusEffect } from '@react-navigation/native';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { Link } from 'expo-router';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, View } from 'react-native';
 import Animated, { FadeOut } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -174,6 +174,13 @@ export default function HistoryIndex() {
       setIsLoading(false);
     }
   }, []);
+
+  // Reload when a game ends (currentGameId transitions to undefined)
+  useEffect(() => {
+    if (currentGameId === undefined) {
+      loadGames();
+    }
+  }, [currentGameId, loadGames]);
 
   const handleDeleteGame = useCallback(
     async (gameId: number) => {
