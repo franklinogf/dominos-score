@@ -7,7 +7,6 @@ import { useT } from '@/hooks/use-translation';
 import { GameStatus } from '@/lib/enums';
 import { useGame } from '@/stores/use-game';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
-import { router } from 'expo-router';
 
 export function GameEndingButtons() {
   const { t } = useT();
@@ -76,7 +75,6 @@ export function GameEndingButtons() {
           impactAsync(ImpactFeedbackStyle.Heavy);
           updateGameStatus(GameStatus.NotStarted);
           endGame();
-          router.replace('/');
         },
       },
     ]);
