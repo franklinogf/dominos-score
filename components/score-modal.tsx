@@ -40,7 +40,7 @@ export function ScoreModal() {
     },
   });
 
-  const { players } = useGame();
+  const players = useGame((state) => state.players);
   const player = players.find((p) => p.id === playerId);
   if (!player) return null;
 
