@@ -1,11 +1,12 @@
 import { Text } from '@/components/ui/text';
 import { saveSettings } from '@/db/actions/settings';
-import { getLongPressScoreSetting, getSetting } from '@/db/querys/settings';
-import { useT } from '@/hooks/use-translation';
 import {
-  DEFAULT_DOUBLE_PRESS_SCORE,
-  DEFAULT_LONG_PRESS_SCORE,
-} from '@/lib/constants';
+  getDoublePressScoreSetting,
+  getLongPressScoreSetting,
+  getSetting,
+} from '@/db/querys/settings';
+import { useT } from '@/hooks/use-translation';
+import { DEFAULT_LONG_PRESS_SCORE, DEFAULT_DOUBLE_PRESS_SCORE } from '@/lib/constants';
 import { GameStatus } from '@/lib/enums';
 import { Player } from '@/lib/types';
 import { useGame } from '@/stores/use-game';
@@ -25,6 +26,9 @@ export function PlayersButtons() {
   const [longPressScore, setLongPressScore] = useState<number>(
     DEFAULT_LONG_PRESS_SCORE,
   );
+  const [doublePressScore, setDoublePressScore] = useState<number>(
+    DEFAULT_DOUBLE_PRESS_SCORE,
+  );
   const [showHint, setShowHint] = useState(false);
 
   useFocusEffect(
@@ -32,6 +36,8 @@ export function PlayersButtons() {
       const fetchSettings = async () => {
         const score = await getLongPressScoreSetting();
         setLongPressScore(score);
+        const doubleScore = await getDoublePressScoreSetting();
+        setDoublePressScore(doubleScore);
 
         // Check if hint has been shown before
         const hintShown = await getSetting('hintShown');
@@ -57,6 +63,7 @@ export function PlayersButtons() {
             key={player.id}
             player={player}
             longPressScore={longPressScore}
+            doublePressScore={doublePressScore}
           />
         ))}
       </View>
@@ -83,9 +90,11 @@ export function PlayersButtons() {
 function PlayerButton({
   player,
   longPressScore,
+  doublePressScore,
 }: {
   player: Player;
   longPressScore: number | null;
+  doublePressScore: number;
 }) {
   const { t } = useT();
   const addScoreToPlayer = useGame((state) => state.addScoreToPlayer);
@@ -136,7 +145,7 @@ function PlayerButton({
         <DoubleTapButton
           onDoublePress={() => {
             impactAsync(ImpactFeedbackStyle.Heavy);
-            addScoreToPlayer(player, DEFAULT_DOUBLE_PRESS_SCORE);
+            addScoreToPlayer(player, doublePressScore);
           }}
           disabled={gameStatus === GameStatus.Finished}
           className="px-0 relative overflow-hidden"

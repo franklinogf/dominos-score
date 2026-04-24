@@ -1,5 +1,6 @@
 import migrations from '@/drizzle/migrations';
 import {
+  DEFAULT_DOUBLE_PRESS_SCORE,
   DEFAULT_LONG_PRESS_SCORE,
   DEFAULT_MULTI_LOSE,
   DEFAULT_TRIO_MODE,
@@ -29,6 +30,7 @@ export function deleteDatabase() {
 
 const defaultSettings = [
   { key: 'longPressScore', value: DEFAULT_LONG_PRESS_SCORE.toString() },
+  { key: 'doublePressScore', value: DEFAULT_DOUBLE_PRESS_SCORE.toString() },
   { key: 'trioMode', value: DEFAULT_TRIO_MODE.toString() },
   { key: 'multiLose', value: DEFAULT_MULTI_LOSE.toString() },
 ];

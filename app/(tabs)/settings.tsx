@@ -6,12 +6,14 @@ import { Text } from '@/components/ui/text';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { saveSettings } from '@/db/actions/settings';
 import {
+  getDoublePressScoreSetting,
   getLongPressScoreSetting,
   getMultiLoseSetting,
   getThemeSetting,
   getTrioModeSetting,
 } from '@/db/querys/settings';
 import {
+  DEFAULT_DOUBLE_PRESS_SCORE,
   DEFAULT_LONG_PRESS_SCORE,
   DEFAULT_MULTI_LOSE,
   DEFAULT_THEME,
@@ -61,14 +63,28 @@ function FieldGroup({ id, label, description, children }: FieldGroupProps) {
   );
 }
 
+const numericScoreField = (required: string, invalid: string, positive: string, max: string) =>
+  z
+    .string()
+    .min(1, required)
+    .refine((val) => !isNaN(Number(val)), invalid)
+    .refine((val) => Number(val) > 0, positive)
+    .refine((val) => Number(val) <= 999, max);
+
 const settingsSchema = (t: (key: string) => string) =>
   z.object({
-    longPressScore: z
-      .string()
-      .min(1, t('settings.longPressScoreRequired'))
-      .refine((val) => !isNaN(Number(val)), t('settings.longPressScoreInvalid'))
-      .refine((val) => Number(val) > 0, t('settings.longPressScorePositive'))
-      .refine((val) => Number(val) <= 999, t('settings.longPressScoreMax')),
+    longPressScore: numericScoreField(
+      t('settings.longPressScoreRequired'),
+      t('settings.longPressScoreInvalid'),
+      t('settings.longPressScorePositive'),
+      t('settings.longPressScoreMax'),
+    ),
+    doublePressScore: numericScoreField(
+      t('settings.doublePressScoreRequired'),
+      t('settings.longPressScoreInvalid'),
+      t('settings.longPressScorePositive'),
+      t('settings.longPressScoreMax'),
+    ),
     trioMode: z.boolean(),
     multiLose: z.boolean(),
     theme: z.enum(THEME_OPTIONS),
@@ -94,6 +110,7 @@ export default function Settings() {
     resolver: zodResolver(settingsSchema(t)),
     defaultValues: {
       longPressScore: DEFAULT_LONG_PRESS_SCORE.toString(),
+      doublePressScore: DEFAULT_DOUBLE_PRESS_SCORE.toString(),
       trioMode: DEFAULT_TRIO_MODE,
       multiLose: DEFAULT_MULTI_LOSE,
       theme: DEFAULT_THEME,
@@ -116,10 +133,12 @@ export default function Settings() {
     const loadSettings = async () => {
       try {
         const longPressScore = await getLongPressScoreSetting();
+        const doublePressScore = await getDoublePressScoreSetting();
         const trioMode = await getTrioModeSetting();
         const multiLose = await getMultiLoseSetting();
         const theme = await getThemeSetting();
         setValue('longPressScore', longPressScore.toString());
+        setValue('doublePressScore', doublePressScore.toString());
         setValue('trioMode', trioMode);
         setValue('multiLose', multiLose);
         setValue('theme', theme);
@@ -142,6 +161,7 @@ export default function Settings() {
       // Convert data to string format for storage
       const settingsData = {
         longPressScore: data.longPressScore,
+        doublePressScore: data.doublePressScore,
         trioMode: data.trioMode.toString(),
         multiLose: data.multiLose.toString(),
         theme: data.theme,
@@ -205,6 +225,32 @@ export default function Settings() {
                 {errors.longPressScore && (
                   <Text className="text-destructive text-sm mt-2">
                     {errors.longPressScore.message}
+                  </Text>
+                )}
+              </FieldGroup>
+
+              <FieldGroup
+                id="doublePressScore"
+                label={t('settings.doublePressScore')}
+                description={t('settings.doublePressScoreDescription')}
+              >
+                <Controller
+                  control={control}
+                  name="doublePressScore"
+                  render={({ field: { onChange, value } }) => (
+                    <Input
+                      id="doublePressScore"
+                      value={value}
+                      onChangeText={onChange}
+                      placeholder={t('settings.longPressScorePlaceholder')}
+                      keyboardType="number-pad"
+                      maxLength={3}
+                    />
+                  )}
+                />
+                {errors.doublePressScore && (
+                  <Text className="text-destructive text-sm mt-2">
+                    {errors.doublePressScore.message}
                   </Text>
                 )}
               </FieldGroup>

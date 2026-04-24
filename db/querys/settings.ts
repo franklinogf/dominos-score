@@ -1,6 +1,7 @@
 import { db } from '@/db/database';
 import { settingsTable } from '@/db/schema';
 import {
+  DEFAULT_DOUBLE_PRESS_SCORE,
   DEFAULT_LONG_PRESS_SCORE,
   DEFAULT_MULTI_LOSE,
   DEFAULT_THEME,
@@ -27,6 +28,16 @@ export async function getLongPressScoreSetting(): Promise<number> {
   } catch (error) {
     console.error('Database error fetching long press score setting:', error);
     return DEFAULT_LONG_PRESS_SCORE;
+  }
+}
+
+export async function getDoublePressScoreSetting(): Promise<number> {
+  try {
+    const value = await getSetting('doublePressScore');
+    return value ? Number(value) : DEFAULT_DOUBLE_PRESS_SCORE;
+  } catch (error) {
+    console.error('Database error fetching double press score setting:', error);
+    return DEFAULT_DOUBLE_PRESS_SCORE;
   }
 }
 
