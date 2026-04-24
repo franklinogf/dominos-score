@@ -1,7 +1,12 @@
 import {
   calculateRoundOutcomes,
   calculateTotalScore,
+  cn,
+  formatDate,
+  getPlayerScoresForRound,
   getRankingByWins,
+  getRankingWithTies,
+  ucFirst,
 } from '@/lib/utils';
 
 const mkPlayer = (id: string, scores: number[]) => ({
@@ -173,6 +178,20 @@ describe('calculateRoundOutcomes', () => {
       expect(result.find((d) => d.id === 'b')?.lossesIncrement).toBe(0);
     });
 
+    it('player with scores gets 0 losses when multiple others have no scores (4-player game)', () => {
+      // winner=a, middle=b(has scores), losers=c,d(no scores) → b gets 0 losses
+      const players = [
+        mkPlayer('a', [150]),
+        mkPlayer('b', [80]),
+        mkPlayer('c', []),
+        mkPlayer('d', []),
+      ];
+      const result = calculateRoundOutcomes(players, 'a', opts);
+      expect(result.find((d) => d.id === 'b')?.lossesIncrement).toBe(0);
+      expect(result.find((d) => d.id === 'c')?.lossesIncrement).toBe(2);
+      expect(result.find((d) => d.id === 'd')?.lossesIncrement).toBe(2);
+    });
+
     it('winner still gets 1 win and 0 losses', () => {
       const players = [
         mkPlayer('a', [100]),
@@ -247,5 +266,101 @@ describe('getRankingByWins', () => {
     const players = [mkDbPlayer(1, 'A', 5)];
     const ranked = getRankingByWins(players);
     expect(ranked[0].rank).toBe(1);
+  });
+});
+
+describe('getPlayerScoresForRound', () => {
+  const mockRound = {
+    playersToRounds: [
+      { playerId: 1, scores: [30, 60] },
+      { playerId: 2, scores: [] },
+    ],
+  } as any;
+
+  it('returns the scores for a matching player', () => {
+    expect(getPlayerScoresForRound(mockRound, 1)).toEqual([30, 60]);
+  });
+
+  it('returns undefined when player is not in the round', () => {
+    expect(getPlayerScoresForRound(mockRound, 99)).toBeUndefined();
+  });
+});
+
+describe('getRankingWithTies', () => {
+  const mockGame = {
+    rounds: [{
+      playersToRounds: [
+        { playerId: 1, scores: [100] },
+        { playerId: 2, scores: [30, 60] },
+        { playerId: 3, scores: [50] },
+      ],
+    }],
+  } as any;
+
+  const players = [{ id: 1, name: 'A' }, { id: 2, name: 'B' }, { id: 3, name: 'C' }];
+
+  it('sorts players by descending total score', () => {
+    const ranked = getRankingWithTies(players, mockGame);
+    // A=100, B=90, C=50
+    expect(ranked[0].name).toBe('A');
+    expect(ranked[1].name).toBe('B');
+    expect(ranked[2].name).toBe('C');
+  });
+
+  it('assigns rank 1 to the highest scorer', () => {
+    const ranked = getRankingWithTies(players, mockGame);
+    expect(ranked[0].rank).toBe(1);
+  });
+
+  it('assigns same rank when two players have the same total', () => {
+    const tiedGame = {
+      rounds: [{
+        playersToRounds: [
+          { playerId: 1, scores: [100] },
+          { playerId: 2, scores: [100] },
+          { playerId: 3, scores: [50] },
+        ],
+      }],
+    } as any;
+    const ranked = getRankingWithTies(players, tiedGame);
+    expect(ranked[0].rank).toBe(1);
+    expect(ranked[1].rank).toBe(1);
+    expect(ranked[2].rank).toBe(3);
+  });
+});
+
+describe('ucFirst', () => {
+  it('capitalizes the first letter', () => {
+    expect(ucFirst('hello')).toBe('Hello');
+  });
+
+  it('handles a single character', () => {
+    expect(ucFirst('a')).toBe('A');
+  });
+
+  it('returns an empty string unchanged', () => {
+    expect(ucFirst('')).toBe('');
+  });
+});
+
+describe('formatDate', () => {
+  it('returns a formatted date string', () => {
+    const result = formatDate('2024-01-15T10:30:00.000Z');
+    expect(typeof result).toBe('string');
+    expect(result.length).toBeGreaterThan(0);
+  });
+});
+
+describe('cn', () => {
+  it('merges class names', () => {
+    expect(cn('foo', 'bar')).toBe('foo bar');
+  });
+
+  it('deduplicates conflicting tailwind classes', () => {
+    expect(cn('p-2', 'p-4')).toBe('p-4');
+  });
+
+  it('filters out falsy values', () => {
+    expect(cn('foo', false && 'bar', undefined, 'baz')).toBe('foo baz');
   });
 });

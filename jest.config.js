@@ -15,5 +15,13 @@ module.exports = {
     'stores/use-game.ts',
     'stores/use-score-modal.ts',
     'stores/use-add-player-dialog.ts',
+    'db/actions/game.ts',
+    'db/actions/round.ts',
+    'db/actions/settings.ts',
+    'db/querys/settings.ts',
+    'db/querys/game.ts',
+    'db/querys/player.ts',
+    'db/querys/round.ts',
+    'hooks/use-tournament-title.ts',
   ],
 };

@@ -109,6 +109,13 @@ describe('winner detection — trio mode', () => {
 });
 
 describe('removeScoreFromPlayer', () => {
+  it('is a no-op when the player is not in the state (covers the fallback || [] branch)', () => {
+    const ghost = mkPlayer('ghost');
+    useGame.setState({ players: [mkPlayer('a', [50])] });
+    useGame.getState().removeScoreFromPlayer(ghost, 'nonexistent-score');
+    expect(useGame.getState().players[0].id).toBe('a');
+  });
+
   it('pulls total below limit and clears winner', () => {
     const player = mkPlayer('a', [100, 50]);
     useGame.setState({
@@ -211,6 +218,12 @@ describe('toggleTournamentMode', () => {
     useGame.getState().toggleTournamentMode();
     expect(useGame.getState().gameSize).toBe(4);
   });
+
+  it('turning ON when gameSize is already 3 keeps gameSize as 3', () => {
+    useGame.setState({ tournamentMode: false, gameSize: 3 });
+    useGame.getState().toggleTournamentMode();
+    expect(useGame.getState().gameSize).toBe(3);
+  });
 });
 
 describe('restoreGame', () => {
@@ -243,5 +256,99 @@ describe('loadSettings', () => {
     await useGame.getState().loadSettings();
     expect(useGame.getState().trioMode).toBe(true);
     expect(useGame.getState().multiLose).toBe(true);
+  });
+
+  it('does not throw when settings query fails', async () => {
+    const { getTrioModeSetting } = require('@/db/querys/settings');
+    (getTrioModeSetting as jest.Mock).mockRejectedValueOnce(new Error('DB error'));
+    await expect(useGame.getState().loadSettings()).resolves.not.toThrow();
+  });
+});
+
+describe('simple setters', () => {
+  it('setTrioMode sets trioMode', () => {
+    useGame.getState().setTrioMode(true);
+    expect(useGame.getState().trioMode).toBe(true);
+    useGame.getState().setTrioMode(false);
+    expect(useGame.getState().trioMode).toBe(false);
+  });
+
+  it('setMultiLose sets multiLose', () => {
+    useGame.getState().setMultiLose(true);
+    expect(useGame.getState().multiLose).toBe(true);
+  });
+
+  it('updateGameSize sets gameSize', () => {
+    useGame.getState().updateGameSize(4);
+    expect(useGame.getState().gameSize).toBe(4);
+  });
+
+  it('updateWinningLimit sets winningLimit', () => {
+    useGame.getState().updateWinningLimit(200);
+    expect(useGame.getState().winningLimit).toBe(200);
+  });
+
+  it('updateCurrentGameId sets currentGameId', () => {
+    useGame.getState().updateCurrentGameId(99);
+    expect(useGame.getState().currentGameId).toBe(99);
+  });
+
+  it('addPlayers replaces the players list and resets currentRoundNumber', () => {
+    const players = [mkPlayer('a'), mkPlayer('b')];
+    useGame.setState({ currentRoundNumber: 5 });
+    useGame.getState().addPlayers(players);
+    expect(useGame.getState().players).toHaveLength(2);
+    expect(useGame.getState().currentRoundNumber).toBe(1);
+  });
+
+  it('addPlayer appends a player to the list', () => {
+    useGame.setState({ players: [mkPlayer('a')] });
+    useGame.getState().addPlayer(mkPlayer('b'));
+    expect(useGame.getState().players).toHaveLength(2);
+    expect(useGame.getState().players[1].id).toBe('b');
+  });
+
+  it('removePlayer removes the player with the given id', () => {
+    useGame.setState({ players: [mkPlayer('a'), mkPlayer('b')] });
+    useGame.getState().removePlayer('a');
+    expect(useGame.getState().players).toHaveLength(1);
+    expect(useGame.getState().players[0].id).toBe('b');
+  });
+
+  it('changePlayerActivity updates the isPlaying flag and leaves other players unchanged', () => {
+    const playerA = mkPlayer('a');
+    const playerB = mkPlayer('b');
+    useGame.setState({ players: [playerA, playerB] });
+    useGame.getState().changePlayerActivity(playerA, false);
+    expect(useGame.getState().players[0].isPlaying).toBe(false);
+    expect(useGame.getState().players[1].isPlaying).toBe(true); // b untouched (false branch of ternary)
+  });
+});
+
+describe('endRound edge cases', () => {
+  it('multiLose=true: player with no scores receives 2 losses', () => {
+    const players = [mkPlayer('a', [150]), mkPlayer('b', [])];
+    useGame.setState({ players, winnerPlayerId: 'a', multiLose: true });
+    useGame.getState().endRound();
+    const loser = useGame.getState().players.find((p) => p.id === 'b')!;
+    expect(loser.losses).toBe(2);
+  });
+
+  it('clears winnerPlayerId and loserPlayerId after endRound', () => {
+    const players = [mkPlayer('a', [150]), mkPlayer('b', [50])];
+    useGame.setState({ players, winnerPlayerId: 'a', loserPlayerId: 'b' });
+    useGame.getState().endRound();
+    expect(useGame.getState().winnerPlayerId).toBeNull();
+    expect(useGame.getState().loserPlayerId).toBeNull();
+  });
+
+  it('non-playing players get 0 delta (delta ?? 0 path)', () => {
+    const bench = { ...mkPlayer('z', [30]), isPlaying: false };
+    const players = [mkPlayer('a', [150]), mkPlayer('b', [50]), bench];
+    useGame.setState({ players, winnerPlayerId: 'a' });
+    useGame.getState().endRound();
+    const benchAfter = useGame.getState().players.find((p) => p.id === 'z')!;
+    expect(benchAfter.wins).toBe(0);
+    expect(benchAfter.losses).toBe(0);
   });
 });
