@@ -4,6 +4,7 @@ import {
   Game,
   insertGame,
   NewGame,
+  updateGameEndedAt,
 } from '@/db/querys/game';
 import {
   getPlayerByNameAndGame,
@@ -40,6 +41,14 @@ export async function removeGame(gameId: Game['id']) {
     await deleteGame(gameId);
   } catch (error) {
     console.error('Error removing game:', error);
+  }
+}
+
+export async function endGame(gameId: Game['id']) {
+  try {
+    await updateGameEndedAt(gameId);
+  } catch (error) {
+    console.error('Error ending game:', error);
   }
 }
 

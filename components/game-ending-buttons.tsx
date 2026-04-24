@@ -2,11 +2,13 @@ import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { Alert, View } from 'react-native';
 
+import { endGame as endGameInDb } from '@/db/actions/game';
 import { newRoundWithResults } from '@/db/actions/round';
 import { useT } from '@/hooks/use-translation';
 import { GameStatus } from '@/lib/enums';
 import { useGame } from '@/stores/use-game';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
+import { router } from 'expo-router';
 
 export function GameEndingButtons() {
   const { t } = useT();
@@ -73,6 +75,9 @@ export function GameEndingButtons() {
         style: 'destructive',
         onPress: () => {
           impactAsync(ImpactFeedbackStyle.Heavy);
+          if (currentGameId) {
+            endGameInDb(currentGameId);
+          }
           updateGameStatus(GameStatus.NotStarted);
           endGame();
         },

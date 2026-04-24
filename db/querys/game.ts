@@ -14,6 +14,17 @@ export async function insertGame(game: NewGame) {
   }
 }
 
+export async function updateGameEndedAt(gameId: Game['id']) {
+  try {
+    await db
+      .update(gamesTable)
+      .set({ endedAt: new Date().toISOString() })
+      .where(eq(gamesTable.id, gameId));
+  } catch (error) {
+    console.error('Database error updating game endedAt:', error);
+  }
+}
+
 export async function deleteGame(gameId: Game['id']) {
   try {
     await db.delete(gamesTable).where(eq(gamesTable.id, gameId));
