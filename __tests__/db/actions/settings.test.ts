@@ -1,9 +1,9 @@
+import { saveSettings } from '@/db/actions/settings';
+import { updateSetting } from '@/db/querys/settings';
+
 jest.mock('@/db/querys/settings', () => ({
   updateSetting: jest.fn().mockResolvedValue(undefined),
 }));
-
-import { saveSettings } from '@/db/actions/settings';
-import { updateSetting } from '@/db/querys/settings';
 
 beforeEach(() => jest.clearAllMocks());
 beforeAll(() => jest.spyOn(console, 'error').mockImplementation(() => {}));

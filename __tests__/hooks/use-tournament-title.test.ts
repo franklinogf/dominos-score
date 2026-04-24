@@ -1,6 +1,11 @@
 import React, { act } from 'react';
 import TestRenderer from 'react-test-renderer';
 
+import { useTournamentTitle } from '@/hooks/use-tournament-title';
+import { useGame } from '@/stores/use-game';
+import { GameStatus } from '@/lib/enums';
+import type { Player } from '@/lib/types';
+
 jest.mock('@/hooks/use-translation', () => ({
   useT: () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
@@ -17,11 +22,6 @@ jest.mock('@/db/querys/settings', () => ({
   getTrioModeSetting: jest.fn().mockResolvedValue(false),
   getMultiLoseSetting: jest.fn().mockResolvedValue(false),
 }));
-
-import { useTournamentTitle } from '@/hooks/use-tournament-title';
-import { useGame } from '@/stores/use-game';
-import { GameStatus } from '@/lib/enums';
-import type { Player } from '@/lib/types';
 
 const INITIAL_STATE = {
   gameStatus: GameStatus.NotStarted,

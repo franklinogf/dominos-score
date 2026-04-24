@@ -1,3 +1,12 @@
+import {
+  addNewRound,
+  addResultsToRound,
+  newRoundWithResults,
+} from '@/db/actions/round';
+import { incrementPlayerLosses, incrementPlayerWins } from '@/db/querys/player';
+import { insertPlayerToRound, insertRound } from '@/db/querys/round';
+import type { Player } from '@/lib/types';
+
 jest.mock('@/db/querys/round', () => ({
   insertRound: jest.fn(),
   insertPlayerToRound: jest.fn().mockResolvedValue(undefined),
@@ -8,12 +17,12 @@ jest.mock('@/db/querys/player', () => ({
   incrementPlayerLosses: jest.fn().mockResolvedValue(undefined),
 }));
 
-import { addNewRound, addResultsToRound, newRoundWithResults } from '@/db/actions/round';
-import { insertPlayerToRound, insertRound } from '@/db/querys/round';
-import { incrementPlayerLosses, incrementPlayerWins } from '@/db/querys/player';
-import type { Player } from '@/lib/types';
-
-const mkPlayer = (id: string, scores: number[], wins = 0, losses = 0): Player => ({
+const mkPlayer = (
+  id: string,
+  scores: number[],
+  wins = 0,
+  losses = 0,
+): Player => ({
   id,
   name: `P${id}`,
   wins,
@@ -53,7 +62,9 @@ describe('addResultsToRound', () => {
 
   it('does not throw on error', async () => {
     (insertPlayerToRound as jest.Mock).mockRejectedValueOnce(new Error('fail'));
-    await expect(addResultsToRound(5, [mkPlayer('1', [30])])).resolves.not.toThrow();
+    await expect(
+      addResultsToRound(5, [mkPlayer('1', [30])]),
+    ).resolves.not.toThrow();
   });
 });
 
@@ -62,11 +73,10 @@ describe('newRoundWithResults', () => {
     (insertRound as jest.Mock).mockResolvedValue([{ insertedId: 10 }]);
     const players = [mkPlayer('1', [150]), mkPlayer('2', [50])];
 
-    await newRoundWithResults(
-      { gameId: 1, roundWinnerId: 1 },
-      players,
-      { trioMode: false, multiLose: false },
-    );
+    await newRoundWithResults({ gameId: 1, roundWinnerId: 1 }, players, {
+      trioMode: false,
+      multiLose: false,
+    });
 
     expect(insertRound).toHaveBeenCalledTimes(1);
     expect(insertPlayerToRound).toHaveBeenCalledTimes(2);
@@ -78,11 +88,10 @@ describe('newRoundWithResults', () => {
     (insertRound as jest.Mock).mockResolvedValue([{ insertedId: 10 }]);
     const players = [mkPlayer('1', [50]), mkPlayer('2', [40])];
 
-    await newRoundWithResults(
-      { gameId: 1 },
-      players,
-      { trioMode: false, multiLose: false },
-    );
+    await newRoundWithResults({ gameId: 1 }, players, {
+      trioMode: false,
+      multiLose: false,
+    });
 
     expect(incrementPlayerWins).not.toHaveBeenCalled();
     expect(incrementPlayerLosses).not.toHaveBeenCalled();
@@ -92,11 +101,10 @@ describe('newRoundWithResults', () => {
     (insertRound as jest.Mock).mockResolvedValue([{ insertedId: 10 }]);
     const players = [mkPlayer('1', [150]), mkPlayer('2', [])];
 
-    await newRoundWithResults(
-      { gameId: 1, roundWinnerId: 1 },
-      players,
-      { trioMode: false, multiLose: true },
-    );
+    await newRoundWithResults({ gameId: 1, roundWinnerId: 1 }, players, {
+      trioMode: false,
+      multiLose: true,
+    });
 
     expect(incrementPlayerLosses).toHaveBeenCalledWith(2, 2);
   });
@@ -104,14 +112,20 @@ describe('newRoundWithResults', () => {
   it('does not throw when insertRound returns no id', async () => {
     (insertRound as jest.Mock).mockResolvedValue(undefined);
     await expect(
-      newRoundWithResults({ gameId: 1, roundWinnerId: 1 }, [], { trioMode: false, multiLose: false }),
+      newRoundWithResults({ gameId: 1, roundWinnerId: 1 }, [], {
+        trioMode: false,
+        multiLose: false,
+      }),
     ).resolves.not.toThrow();
   });
 
   it('does not throw on error', async () => {
     (insertRound as jest.Mock).mockRejectedValue(new Error('fail'));
     await expect(
-      newRoundWithResults({ gameId: 1, roundWinnerId: 1 }, [], { trioMode: false, multiLose: false }),
+      newRoundWithResults({ gameId: 1, roundWinnerId: 1 }, [], {
+        trioMode: false,
+        multiLose: false,
+      }),
     ).resolves.not.toThrow();
   });
 });

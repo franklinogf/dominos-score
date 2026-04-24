@@ -8,10 +8,11 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "eslint . --fix",
-    "format": "prettier --write ./app/**/*.tsx",
+    "format": "prettier --write ./app",
     "build:android": "eas build -p android --profile production",
     "build:android:preview": "eas build -p android --profile preview",
     "test:lint": "eslint .",
+    "test:types": "tsc",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage"
@@ -75,6 +76,7 @@
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/react": "~19.2.10",
+    "@types/react-test-renderer": "^19.1.0",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9.39.4",
     "eslint-config-expo": "~55.0.0",

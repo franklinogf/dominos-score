@@ -1,3 +1,6 @@
+import { db } from '@/db/database';
+import { insertPlayerToRound, insertRound } from '@/db/querys/round';
+
 jest.mock('@/db/schema', () => ({
   roundsTable: { id: 'id' },
   playersToRoundsTable: {},
@@ -9,9 +12,7 @@ jest.mock('@/db/database', () => ({
   },
 }));
 
-import { insertPlayerToRound, insertRound } from '@/db/querys/round';
-
-const getDb = () => require('@/db/database').db;
+const getDb = () => db;
 
 beforeEach(() => {
   jest.clearAllMocks();

@@ -1,3 +1,15 @@
+import { db } from '@/db/database';
+import {
+  deleteAllGames,
+  deleteGame,
+  getAllGames,
+  getGameById,
+  getUnfinishedGame,
+  insertGame,
+  updateGameEndedAt,
+} from '@/db/querys/game';
+import { GameType } from '@/lib/enums';
+
 jest.mock('@/db/schema', () => ({
   gamesTable: { id: 'id', endedAt: 'endedAt', createdAt: 'createdAt' },
 }));
@@ -21,17 +33,7 @@ jest.mock('@/db/database', () => ({
   },
 }));
 
-import {
-  deleteAllGames,
-  deleteGame,
-  getAllGames,
-  getGameById,
-  getUnfinishedGame,
-  insertGame,
-  updateGameEndedAt,
-} from '@/db/querys/game';
-
-const getDb = () => require('@/db/database').db;
+const getDb = () => db;
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -66,7 +68,13 @@ describe('insertGame', () => {
         returning: jest.fn().mockResolvedValue([mockGame]),
       }),
     });
-    expect(await insertGame({ gameSize: 2, winningLimit: 150, type: 'normal' })).toEqual(mockGame);
+    expect(
+      await insertGame({
+        gameSize: 2,
+        winningLimit: 150,
+        type: GameType.NORMAL,
+      }),
+    ).toEqual(mockGame);
   });
 
   it('returns undefined on error', async () => {
@@ -76,7 +84,13 @@ describe('insertGame', () => {
         returning: jest.fn().mockRejectedValue(new Error('fail')),
       }),
     });
-    expect(await insertGame({ gameSize: 2, winningLimit: 150, type: 'normal' })).toBeUndefined();
+    expect(
+      await insertGame({
+        gameSize: 2,
+        winningLimit: 150,
+        type: GameType.NORMAL,
+      }),
+    ).toBeUndefined();
   });
 });
 
@@ -145,11 +159,14 @@ describe('getUnfinishedGame — query callbacks', () => {
   it('executes where and orderBy callbacks when findFirst invokes them', async () => {
     const db = getDb();
     type Opts = { where?: Function; orderBy?: Function };
-    (db.query.gamesTable.findFirst as jest.Mock).mockImplementationOnce(async (opts: Opts) => {
-      if (opts?.where) opts.where({ endedAt: null }, { isNull: () => true });
-      if (opts?.orderBy) opts.orderBy({ createdAt: '' }, { desc: (x: unknown) => x });
-      return null;
-    });
+    (db.query.gamesTable.findFirst as jest.Mock).mockImplementationOnce(
+      async (opts: Opts) => {
+        if (opts?.where) opts.where({ endedAt: null }, { isNull: () => true });
+        if (opts?.orderBy)
+          opts.orderBy({ createdAt: '' }, { desc: (x: unknown) => x });
+        return null;
+      },
+    );
     expect(await getUnfinishedGame()).toBeNull();
   });
 });
@@ -158,10 +175,13 @@ describe('getAllGames — query callbacks', () => {
   it('executes orderBy callback when findMany invokes it', async () => {
     const db = getDb();
     type Opts = { orderBy?: Function };
-    (db.query.gamesTable.findMany as jest.Mock).mockImplementationOnce(async (opts: Opts) => {
-      if (opts?.orderBy) opts.orderBy({ createdAt: '' }, { desc: (x: unknown) => x });
-      return [];
-    });
+    (db.query.gamesTable.findMany as jest.Mock).mockImplementationOnce(
+      async (opts: Opts) => {
+        if (opts?.orderBy)
+          opts.orderBy({ createdAt: '' }, { desc: (x: unknown) => x });
+        return [];
+      },
+    );
     expect(await getAllGames()).toEqual([]);
   });
 });
@@ -169,17 +189,23 @@ describe('getAllGames — query callbacks', () => {
 describe('getUnfinishedGame', () => {
   it('returns the game found', async () => {
     const mockGame = { id: 1, endedAt: null };
-    (getDb().query.gamesTable.findFirst as jest.Mock).mockResolvedValue(mockGame);
+    (getDb().query.gamesTable.findFirst as jest.Mock).mockResolvedValue(
+      mockGame,
+    );
     expect(await getUnfinishedGame()).toEqual(mockGame);
   });
 
   it('returns null when no game found', async () => {
-    (getDb().query.gamesTable.findFirst as jest.Mock).mockResolvedValue(undefined);
+    (getDb().query.gamesTable.findFirst as jest.Mock).mockResolvedValue(
+      undefined,
+    );
     expect(await getUnfinishedGame()).toBeNull();
   });
 
   it('returns null on error', async () => {
-    (getDb().query.gamesTable.findFirst as jest.Mock).mockRejectedValue(new Error('fail'));
+    (getDb().query.gamesTable.findFirst as jest.Mock).mockRejectedValue(
+      new Error('fail'),
+    );
     expect(await getUnfinishedGame()).toBeNull();
   });
 });
@@ -187,12 +213,16 @@ describe('getUnfinishedGame', () => {
 describe('getAllGames', () => {
   it('returns games array', async () => {
     const mockGames = [{ id: 1 }, { id: 2 }];
-    (getDb().query.gamesTable.findMany as jest.Mock).mockResolvedValue(mockGames);
+    (getDb().query.gamesTable.findMany as jest.Mock).mockResolvedValue(
+      mockGames,
+    );
     expect(await getAllGames()).toEqual(mockGames);
   });
 
   it('returns empty array on error', async () => {
-    (getDb().query.gamesTable.findMany as jest.Mock).mockRejectedValue(new Error('fail'));
+    (getDb().query.gamesTable.findMany as jest.Mock).mockRejectedValue(
+      new Error('fail'),
+    );
     expect(await getAllGames()).toEqual([]);
   });
 });
@@ -200,17 +230,23 @@ describe('getAllGames', () => {
 describe('getGameById', () => {
   it('returns the game when found', async () => {
     const mockGame = { id: 1, rounds: [] };
-    (getDb().query.gamesTable.findFirst as jest.Mock).mockResolvedValue(mockGame);
+    (getDb().query.gamesTable.findFirst as jest.Mock).mockResolvedValue(
+      mockGame,
+    );
     expect(await getGameById(1)).toEqual(mockGame);
   });
 
   it('returns null when not found', async () => {
-    (getDb().query.gamesTable.findFirst as jest.Mock).mockResolvedValue(undefined);
+    (getDb().query.gamesTable.findFirst as jest.Mock).mockResolvedValue(
+      undefined,
+    );
     expect(await getGameById(1)).toBeNull();
   });
 
   it('returns null on error', async () => {
-    (getDb().query.gamesTable.findFirst as jest.Mock).mockRejectedValue(new Error('fail'));
+    (getDb().query.gamesTable.findFirst as jest.Mock).mockRejectedValue(
+      new Error('fail'),
+    );
     expect(await getGameById(1)).toBeNull();
   });
 });

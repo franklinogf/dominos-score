@@ -1,12 +1,4 @@
-jest.mock('@/db/schema', () => ({ settingsTable: { key: 'key', value: 'value' } }));
-
-jest.mock('@/db/database', () => ({
-  db: {
-    query: { settingsTable: { findFirst: jest.fn() } },
-    insert: jest.fn(),
-  },
-}));
-
+import { db } from '@/db/database';
 import {
   getDoublePressScoreSetting,
   getLongPressScoreSetting,
@@ -24,7 +16,18 @@ import {
   DEFAULT_TRIO_MODE,
 } from '@/lib/constants';
 
-const getDb = () => require('@/db/database').db;
+jest.mock('@/db/schema', () => ({
+  settingsTable: { key: 'key', value: 'value' },
+}));
+
+jest.mock('@/db/database', () => ({
+  db: {
+    query: { settingsTable: { findFirst: jest.fn() } },
+    insert: jest.fn(),
+  },
+}));
+
+const getDb = () => db;
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -41,102 +44,138 @@ afterAll(() => jest.restoreAllMocks());
 
 describe('getSetting', () => {
   it('returns the value when the setting exists', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({ value: 'hello' });
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({
+      value: 'hello',
+    });
     expect(await getSetting('someKey')).toBe('hello');
   });
 
   it('returns undefined when the setting does not exist', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue(undefined);
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue(
+      undefined,
+    );
     expect(await getSetting('missing')).toBeUndefined();
   });
 
   it('returns undefined on error', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockRejectedValue(new Error('DB error'));
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockRejectedValue(
+      new Error('DB error'),
+    );
     expect(await getSetting('key')).toBeUndefined();
   });
 });
 
 describe('getLongPressScoreSetting', () => {
   it('returns the parsed number when value is set', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({ value: '45' });
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({
+      value: '45',
+    });
     expect(await getLongPressScoreSetting()).toBe(45);
   });
 
   it('returns DEFAULT_LONG_PRESS_SCORE when not set', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue(undefined);
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue(
+      undefined,
+    );
     expect(await getLongPressScoreSetting()).toBe(DEFAULT_LONG_PRESS_SCORE);
   });
 });
 
 describe('getDoublePressScoreSetting', () => {
   it('returns the parsed number when value is set', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({ value: '90' });
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({
+      value: '90',
+    });
     expect(await getDoublePressScoreSetting()).toBe(90);
   });
 
   it('returns DEFAULT_DOUBLE_PRESS_SCORE when not set', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue(undefined);
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue(
+      undefined,
+    );
     expect(await getDoublePressScoreSetting()).toBe(DEFAULT_DOUBLE_PRESS_SCORE);
   });
 });
 
 describe('getTrioModeSetting', () => {
   it('returns true when value is "true"', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({ value: 'true' });
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({
+      value: 'true',
+    });
     expect(await getTrioModeSetting()).toBe(true);
   });
 
   it('returns false when value is "false"', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({ value: 'false' });
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({
+      value: 'false',
+    });
     expect(await getTrioModeSetting()).toBe(false);
   });
 
   it('returns DEFAULT_TRIO_MODE when not set', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue(undefined);
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue(
+      undefined,
+    );
     expect(await getTrioModeSetting()).toBe(DEFAULT_TRIO_MODE);
   });
 });
 
 describe('getMultiLoseSetting', () => {
   it('returns true when value is "true"', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({ value: 'true' });
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({
+      value: 'true',
+    });
     expect(await getMultiLoseSetting()).toBe(true);
   });
 
   it('returns false when value is "false"', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({ value: 'false' });
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({
+      value: 'false',
+    });
     expect(await getMultiLoseSetting()).toBe(false);
   });
 
   it('returns DEFAULT_MULTI_LOSE when not set', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue(undefined);
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue(
+      undefined,
+    );
     expect(await getMultiLoseSetting()).toBe(DEFAULT_MULTI_LOSE);
   });
 });
 
 describe('getThemeSetting', () => {
   it('returns "light" when value is "light"', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({ value: 'light' });
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({
+      value: 'light',
+    });
     expect(await getThemeSetting()).toBe('light');
   });
 
   it('returns "dark" when value is "dark"', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({ value: 'dark' });
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({
+      value: 'dark',
+    });
     expect(await getThemeSetting()).toBe('dark');
   });
 
   it('returns "system" when value is "system"', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({ value: 'system' });
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({
+      value: 'system',
+    });
     expect(await getThemeSetting()).toBe('system');
   });
 
   it('returns DEFAULT_THEME when value is an invalid string', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({ value: 'invalid' });
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue({
+      value: 'invalid',
+    });
     expect(await getThemeSetting()).toBe(DEFAULT_THEME);
   });
 
   it('returns DEFAULT_THEME when not set', async () => {
-    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue(undefined);
+    (getDb().query.settingsTable.findFirst as jest.Mock).mockResolvedValue(
+      undefined,
+    );
     expect(await getThemeSetting()).toBe(DEFAULT_THEME);
   });
 });

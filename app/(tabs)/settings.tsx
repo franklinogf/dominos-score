@@ -125,7 +125,9 @@ export default function Settings() {
   const applyTheme = useCallback(
     (theme: ThemeOption) => {
       if (theme === 'system') {
-        setColorScheme(systemColorScheme ?? 'light');
+        setColorScheme(
+          systemColorScheme === 'unspecified' ? 'light' : systemColorScheme,
+        );
       } else {
         setColorScheme(theme);
       }

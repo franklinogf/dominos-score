@@ -1,16 +1,3 @@
-jest.mock('@/db/querys/game', () => ({
-  insertGame: jest.fn(),
-  deleteGame: jest.fn().mockResolvedValue(undefined),
-  deleteAllGames: jest.fn().mockResolvedValue(undefined),
-  updateGameEndedAt: jest.fn().mockResolvedValue(undefined),
-}));
-
-jest.mock('@/db/querys/player', () => ({
-  insertPlayers: jest.fn(),
-  insertPlayer: jest.fn(),
-  getPlayerByNameAndGame: jest.fn(),
-}));
-
 import {
   addNewGame,
   addPlayerToGame,
@@ -29,8 +16,27 @@ import {
   insertPlayer,
   insertPlayers,
 } from '@/db/querys/player';
+import { GameType } from '@/lib/enums';
 
-const mockGame = { id: 1, gameSize: 2, winningLimit: 150, type: 'normal' as const };
+jest.mock('@/db/querys/game', () => ({
+  insertGame: jest.fn(),
+  deleteGame: jest.fn().mockResolvedValue(undefined),
+  deleteAllGames: jest.fn().mockResolvedValue(undefined),
+  updateGameEndedAt: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@/db/querys/player', () => ({
+  insertPlayers: jest.fn(),
+  insertPlayer: jest.fn(),
+  getPlayerByNameAndGame: jest.fn(),
+}));
+
+const mockGame = {
+  id: 1,
+  gameSize: 2,
+  winningLimit: 150,
+  type: GameType.NORMAL,
+};
 const mockPlayer = { id: 10, gameId: 1, name: 'Alice', wins: 0, losses: 0 };
 
 beforeEach(() => jest.clearAllMocks());
@@ -43,7 +49,7 @@ describe('addNewGame', () => {
     (insertPlayers as jest.Mock).mockResolvedValue([mockPlayer]);
 
     const result = await addNewGame(
-      { gameSize: 2, winningLimit: 150, type: 'normal' },
+      { gameSize: 2, winningLimit: 150, type: GameType.NORMAL },
       ['Alice'],
     );
 
@@ -54,14 +60,20 @@ describe('addNewGame', () => {
 
   it('returns undefined and logs error when insertGame returns undefined', async () => {
     (insertGame as jest.Mock).mockResolvedValue(undefined);
-    const result = await addNewGame({ gameSize: 2, winningLimit: 150, type: 'normal' }, ['Alice']);
+    const result = await addNewGame(
+      { gameSize: 2, winningLimit: 150, type: GameType.NORMAL },
+      ['Alice'],
+    );
     expect(result).toBeUndefined();
   });
 
   it('returns undefined and logs error when insertPlayers returns undefined', async () => {
     (insertGame as jest.Mock).mockResolvedValue(mockGame);
     (insertPlayers as jest.Mock).mockResolvedValue(undefined);
-    const result = await addNewGame({ gameSize: 2, winningLimit: 150, type: 'normal' }, ['Alice']);
+    const result = await addNewGame(
+      { gameSize: 2, winningLimit: 150, type: GameType.NORMAL },
+      ['Alice'],
+    );
     expect(result).toBeUndefined();
   });
 });
@@ -131,7 +143,9 @@ describe('addPlayerToGame', () => {
   });
 
   it('does not throw on error', async () => {
-    (getPlayerByNameAndGame as jest.Mock).mockRejectedValueOnce(new Error('fail'));
+    (getPlayerByNameAndGame as jest.Mock).mockRejectedValueOnce(
+      new Error('fail'),
+    );
     await expect(addPlayerToGame(1, 'Bob')).resolves.not.toThrow();
   });
 });

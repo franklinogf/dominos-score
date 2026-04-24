@@ -1,5 +1,20 @@
+import { db } from '@/db/database';
+import {
+  getPlayerByNameAndGame,
+  incrementPlayerLosses,
+  incrementPlayerWins,
+  insertPlayer,
+  insertPlayers,
+} from '@/db/querys/player';
+
 jest.mock('@/db/schema', () => ({
-  playersTable: { id: 'id', gameId: 'gameId', name: 'name', wins: 'wins', losses: 'losses' },
+  playersTable: {
+    id: 'id',
+    gameId: 'gameId',
+    name: 'name',
+    wins: 'wins',
+    losses: 'losses',
+  },
 }));
 
 jest.mock('drizzle-orm', () => ({
@@ -16,15 +31,7 @@ jest.mock('@/db/database', () => ({
   },
 }));
 
-import {
-  getPlayerByNameAndGame,
-  incrementPlayerLosses,
-  incrementPlayerWins,
-  insertPlayer,
-  insertPlayers,
-} from '@/db/querys/player';
-
-const getDb = () => require('@/db/database').db;
+const getDb = () => db;
 
 const mockPlayer = { id: 1, gameId: 1, name: 'Alice', wins: 0, losses: 0 };
 
@@ -94,7 +101,9 @@ describe('insertPlayers', () => {
         returning: jest.fn().mockResolvedValue([mockPlayer]),
       }),
     });
-    expect(await insertPlayers([{ gameId: 1, name: 'Alice' }])).toEqual([mockPlayer]);
+    expect(await insertPlayers([{ gameId: 1, name: 'Alice' }])).toEqual([
+      mockPlayer,
+    ]);
   });
 
   it('returns undefined on error', async () => {
@@ -116,7 +125,9 @@ describe('insertPlayer', () => {
         returning: jest.fn().mockResolvedValue([mockPlayer]),
       }),
     });
-    expect(await insertPlayer({ gameId: 1, name: 'Alice' })).toEqual(mockPlayer);
+    expect(await insertPlayer({ gameId: 1, name: 'Alice' })).toEqual(
+      mockPlayer,
+    );
   });
 
   it('returns undefined on error', async () => {
