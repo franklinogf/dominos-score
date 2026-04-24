@@ -16,6 +16,7 @@ type GameState = {
   winnerPlayerId: string | null;
   loserPlayerId: string | null;
   currentGameId?: number;
+  currentRoundNumber: number;
   toggleTournamentMode: () => void;
   setTrioMode: (enabled: boolean) => void;
   setMultiLose: (enabled: boolean) => void;
@@ -94,6 +95,7 @@ export const useGame = create<GameState>((set) => ({
   trioMode: false,
   multiLose: false,
   currentGameId: undefined,
+  currentRoundNumber: 1,
   players: [],
   gameSize: 2,
   winningLimit: 150,
@@ -121,6 +123,7 @@ export const useGame = create<GameState>((set) => ({
         winnerPlayerId: null,
         loserPlayerId: null,
         gameStatus: GameStatus.Ready,
+        currentRoundNumber: state.currentRoundNumber + 1,
         players: state.players.map((p) => {
           const delta = deltaMap.get(p.id);
           return {
@@ -135,6 +138,7 @@ export const useGame = create<GameState>((set) => ({
   endGame: () =>
     set(() => ({
       currentGameId: undefined,
+      currentRoundNumber: 1,
       gameStatus: GameStatus.NotStarted,
       winnerPlayerId: null,
       loserPlayerId: null,
@@ -164,7 +168,7 @@ export const useGame = create<GameState>((set) => ({
   },
   updateWinningLimit: (limit) => set({ winningLimit: limit }),
   updateGameSize: (size) => set({ gameSize: size }),
-  addPlayers: (players) => set({ players }),
+  addPlayers: (players) => set({ players, currentRoundNumber: 1 }),
   addPlayer: (player) =>
     set((state) => ({ players: [...state.players, player] })),
   removePlayer: (playerId) =>
