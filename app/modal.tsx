@@ -69,14 +69,14 @@ export default function TournamentModal() {
           </Text>
 
           {trioMode && (
-            <View className="mt-4 mx-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <Text className="text-center text-amber-800 font-medium text-sm">
+            <View className="mt-4 mx-4 p-3 bg-warning/10 border border-warning/30 rounded-lg">
+              <Text className="text-center text-foreground font-medium text-sm">
                 {t('game.trioModeEnabled')}
               </Text>
-              <Text className="text-center text-amber-700 text-xs mt-1">
+              <Text className="text-center text-muted-foreground text-xs mt-1">
                 {t('game.trioModeExactly3')}
               </Text>
-              <Text className="text-center text-amber-600 text-xs mt-1">
+              <Text className="text-center text-muted-foreground text-xs mt-1">
                 {t('game.disableInSettings')}
               </Text>
             </View>

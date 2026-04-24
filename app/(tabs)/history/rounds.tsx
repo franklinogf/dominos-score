@@ -101,16 +101,16 @@ function NoRoundsDisplay({
         </View>
       </View>
 
-      <View className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+      <View className="bg-warning/10 border border-warning/30 rounded-lg p-4 mb-4">
         <View className="flex-row items-center mb-2">
-          <View className="w-8 h-8 rounded-full bg-yellow-500 items-center justify-center mr-3">
-            <Text className="text-white font-bold text-sm">!</Text>
+          <View className="w-8 h-8 rounded-full bg-warning items-center justify-center mr-3">
+            <Text className="text-warning-foreground font-bold text-sm">!</Text>
           </View>
-          <Text variant="h4" className="text-yellow-800 font-medium">
+          <Text variant="h4" className="text-foreground font-medium">
             {t('history.gameNotStarted')}
           </Text>
         </View>
-        <Text className="text-yellow-700 text-sm leading-5">
+        <Text className="text-muted-foreground text-sm leading-5">
           {t('history.gameNotStartedDesc')}
         </Text>
       </View>
@@ -160,7 +160,7 @@ function SingleRoundDisplay({
                     <View
                       className={`w-8 h-8 rounded-full mr-3 items-center justify-center ${
                         player.rank === 1
-                          ? 'bg-yellow-500'
+                          ? 'bg-warning'
                           : player.rank === 2
                             ? 'bg-gray-400'
                             : player.rank === 3
@@ -267,7 +267,7 @@ function MultipleRoundsDisplay({
                 <View
                   className={`w-8 h-8 rounded-full mr-3 items-center justify-center ${
                     player.rank === 1
-                      ? 'bg-yellow-500'
+                      ? 'bg-warning'
                       : player.rank === 2
                         ? 'bg-gray-400'
                         : player.rank === 3
