@@ -15,6 +15,7 @@ import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { router } from 'expo-router';
 import { Trash2Icon } from 'lucide-react-native';
 import { useForm } from 'react-hook-form';
+import { useMemo } from 'react';
 import { Alert, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
@@ -278,24 +279,25 @@ function AddPlayerDialog() {
   const players = useGame((state) => state.players);
   const currentGameId = useGame((state) => state.currentGameId);
 
-  // Create schema with dynamic validation
-  const createSchema = () => {
-    return z.object({
-      playerName: z
-        .string()
-        .min(1, t('validation.required', { field: t('players.playerName') }))
-        .max(10, t('players.nameMaxLength'))
-        .refine(
-          (name) => {
-            const normalizedName = name.trim().toLowerCase();
-            return !players.some(
-              (p) => p.name.trim().toLowerCase() === normalizedName,
-            );
-          },
-          { message: t('players.playerNameExists') },
-        ),
-    });
-  };
+  const schema = useMemo(
+    () =>
+      z.object({
+        playerName: z
+          .string()
+          .min(1, t('validation.required', { field: t('players.playerName') }))
+          .max(10, t('players.nameMaxLength'))
+          .refine(
+            (name) => {
+              const normalizedName = name.trim().toLowerCase();
+              return !players.some(
+                (p) => p.name.trim().toLowerCase() === normalizedName,
+              );
+            },
+            { message: t('players.playerNameExists') },
+          ),
+      }),
+    [players, t],
+  );
 
   const {
     control,
@@ -303,7 +305,7 @@ function AddPlayerDialog() {
     reset,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(createSchema()),
+    resolver: zodResolver(schema),
     defaultValues: {
       playerName: '',
     },
