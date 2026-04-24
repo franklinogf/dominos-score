@@ -7,16 +7,10 @@ import { View } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
   withRepeat,
   withSequence,
   withSpring,
 } from 'react-native-reanimated';
-
 
 export function PlayerScoreTotal({ player }: { player: Player }) {
   const total = player.score.reduce((acc, score) => acc + score.value, 0);
