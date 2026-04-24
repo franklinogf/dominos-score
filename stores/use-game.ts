@@ -1,6 +1,7 @@
 import { getMultiLoseSetting, getTrioModeSetting } from '@/db/querys/settings';
 import { GameStatus } from '@/lib/enums';
 import type { Player, Score } from '@/lib/types';
+import { calculateRoundOutcomes } from '@/lib/utils';
 import { randomUUID } from 'expo-crypto';
 import { create } from 'zustand';
 
@@ -99,8 +100,6 @@ export const useGame = create<GameState>((set) => ({
   endRound: () =>
     set((state) => {
       const winnerId = state.winnerPlayerId;
-      const isTrioMode = state.trioMode;
-      const isMultiLoseEnabled = state.multiLose;
 
       if (!winnerId) {
         return {
@@ -112,64 +111,25 @@ export const useGame = create<GameState>((set) => ({
       }
 
       const playingPlayers = state.players.filter((p) => p.isPlaying);
-
-      let updatedPlayers;
-      if (isTrioMode) {
-        const playersIdWithNoScore = playingPlayers
-          .filter((p) => p.id !== winnerId)
-          .filter((p) => p.score.length === 0)
-          .map((p) => p.id);
-
-        const losersId =
-          playersIdWithNoScore.length > 1
-            ? playersIdWithNoScore
-            : [state.loserPlayerId];
-        // In trio mode: highest scorer wins, lowest scorer loses, others unchanged
-        updatedPlayers = state.players.map((p) => {
-          let updatedPlayer = { ...p };
-
-          // Update wins/losses - only winner and loser change
-          if (p.id === winnerId) {
-            updatedPlayer.wins = p.wins + 1;
-          } else if (losersId.includes(p.id)) {
-            updatedPlayer.losses =
-              p.losses + (p.score.length === 0 && isMultiLoseEnabled ? 2 : 1);
-          }
-          // Other players stay unchanged
-
-          // Reset scores for all players
-          updatedPlayer.score = [];
-          return updatedPlayer;
-        });
-      } else {
-        // Traditional mode: winner gets a win, everyone else gets a loss
-        const losersIds = playingPlayers
-          .filter((p) => p.id !== winnerId)
-          .map((p) => p.id);
-
-        updatedPlayers = state.players.map((p) => {
-          let updatedPlayer = { ...p };
-
-          // Update wins/losses
-          if (p.id === winnerId) {
-            updatedPlayer.wins = p.wins + 1;
-          }
-          if (losersIds.includes(p.id)) {
-            updatedPlayer.losses =
-              p.losses + (p.score.length === 0 && isMultiLoseEnabled ? 2 : 1);
-          }
-
-          // Reset scores
-          updatedPlayer.score = [];
-          return updatedPlayer;
-        });
-      }
+      const deltas = calculateRoundOutcomes(playingPlayers, winnerId, {
+        trioMode: state.trioMode,
+        multiLose: state.multiLose,
+      });
+      const deltaMap = new Map(deltas.map((d) => [d.id, d]));
 
       return {
         winnerPlayerId: null,
         loserPlayerId: null,
         gameStatus: GameStatus.Ready,
-        players: updatedPlayers,
+        players: state.players.map((p) => {
+          const delta = deltaMap.get(p.id);
+          return {
+            ...p,
+            score: [],
+            wins: p.wins + (delta?.winsIncrement ?? 0),
+            losses: p.losses + (delta?.lossesIncrement ?? 0),
+          };
+        }),
       };
     }),
   endGame: () =>

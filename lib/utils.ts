@@ -4,6 +4,60 @@ import i18n from '@/lib/i18n';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
+export type PlayerDelta = {
+  id: string;
+  winsIncrement: number;
+  lossesIncrement: number;
+};
+
+export type RoundOutcomeOptions = {
+  trioMode: boolean;
+  multiLose: boolean;
+};
+
+export function calculateRoundOutcomes(
+  players: Array<{ id: string; score: { value: number }[] }>,
+  winnerId: string,
+  options: RoundOutcomeOptions,
+): PlayerDelta[] {
+  const { trioMode, multiLose } = options;
+
+  if (trioMode) {
+    const withTotals = players.map((p) => ({
+      id: p.id,
+      total: p.score.reduce((sum, s) => sum + s.value, 0),
+      hasNoScore: p.score.length === 0,
+    }));
+
+    const playersWithNoScore = withTotals.filter((p) => p.hasNoScore);
+    const minTotal = Math.min(...withTotals.map((p) => p.total));
+
+    return withTotals.map((p) => {
+      if (p.id === winnerId) {
+        return { id: p.id, winsIncrement: 1, lossesIncrement: 0 };
+      }
+      let lossesIncrement = 0;
+      if (playersWithNoScore.length > 1) {
+        if (p.hasNoScore) lossesIncrement = multiLose ? 2 : 1;
+      } else if (p.total === minTotal) {
+        lossesIncrement = p.hasNoScore && multiLose ? 2 : 1;
+      }
+      return { id: p.id, winsIncrement: 0, lossesIncrement };
+    });
+  }
+
+  return players.map((p) => {
+    if (p.id === winnerId) {
+      return { id: p.id, winsIncrement: 1, lossesIncrement: 0 };
+    }
+    return {
+      id: p.id,
+      winsIncrement: 0,
+      lossesIncrement: p.score.length === 0 && multiLose ? 2 : 1,
+    };
+  });
+}
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }

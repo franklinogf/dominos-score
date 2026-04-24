@@ -14,6 +14,8 @@ export function GameEndingButtons() {
   const { t } = useT();
   const updateGameStatus = useGame((state) => state.updateGameStatus);
   const tournamentMode = useGame((state) => state.tournamentMode);
+  const trioMode = useGame((state) => state.trioMode);
+  const multiLose = useGame((state) => state.multiLose);
   const gameStatus = useGame((state) => state.gameStatus);
   const winnerPlayerId = useGame((state) => state.winnerPlayerId);
   const currentGameId = useGame((state) => state.currentGameId);
@@ -52,6 +54,7 @@ export function GameEndingButtons() {
                 roundWinnerId: Number(winnerPlayerId),
               },
               playingPlayers,
+              { trioMode, multiLose },
             );
           }
           endRound();
