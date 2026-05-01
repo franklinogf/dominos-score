@@ -29,7 +29,33 @@ const createPlayersSchema = (
       .max(10, t('players.nameMaxLength')),
   ]);
 
-  return z.object(Object.fromEntries(playerFields));
+  return z.object(Object.fromEntries(playerFields)).superRefine((data, ctx) => {
+    const seenNames = new Map<string, string>();
+    const reportedFields = new Set<string>();
+
+    Object.entries(data as Record<string, string>).forEach(
+      ([fieldName, name]) => {
+        const normalizedName = name.trim().toLowerCase();
+        if (!normalizedName) return;
+
+        const firstFieldName = seenNames.get(normalizedName);
+        if (firstFieldName) {
+          [firstFieldName, fieldName].forEach((duplicateFieldName) => {
+            if (reportedFields.has(duplicateFieldName)) return;
+            reportedFields.add(duplicateFieldName);
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: t('players.playerNameExists'),
+              path: [duplicateFieldName],
+            });
+          });
+          return;
+        }
+
+        seenNames.set(normalizedName, fieldName);
+      },
+    );
+  });
 };
 
 export function PlayersForm() {
