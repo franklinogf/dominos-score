@@ -1,9 +1,12 @@
+import { persistDraftRound } from '@/db/actions/round';
 import { getMultiLoseSetting, getTrioModeSetting } from '@/db/querys/settings';
 import { GameStatus } from '@/lib/enums';
 import type { Player, Score } from '@/lib/types';
 import { calculateRoundOutcomes } from '@/lib/utils';
 import { randomUUID } from 'expo-crypto';
 import { create } from 'zustand';
+
+let draftPersistQueue = Promise.resolve();
 
 type GameState = {
   gameStatus: GameStatus;
@@ -29,12 +32,38 @@ type GameState = {
   addScoreToPlayer: (player: Player, score: number) => void;
   removeScoreFromPlayer: (player: Player, scoreId: string) => void;
   changePlayerActivity: (player: Player, isPlaying: boolean) => void;
-  updateGameStatus: (status: GameStatus) => void;
   endRound: () => void;
   endGame: () => void;
-  updateCurrentGameId: (id: number) => void;
-  restoreGame: (gameId: number, players: Player[], tournamentMode: boolean) => void;
+  restoreGame: (
+    gameId: number,
+    state: {
+      players: Player[];
+      tournamentMode: boolean;
+      gameStatus: GameStatus;
+      currentRoundNumber: number;
+      winnerPlayerId: string | null;
+      loserPlayerId: string | null;
+      winningLimit: number;
+      gameSize: number;
+    },
+  ) => void;
 };
+
+function persistCurrentDraftRound() {
+  const { currentGameId, players } = useGame.getState();
+  if (!currentGameId) return;
+  const playersSnapshot = players.map((player) => ({
+    ...player,
+    score: [...player.score],
+  }));
+  draftPersistQueue = draftPersistQueue
+    .catch(() => undefined)
+    .then(() => persistDraftRound(currentGameId, playersSnapshot));
+}
+
+export async function flushDraftPersistence() {
+  await draftPersistQueue.catch(() => undefined);
+}
 
 function checkWinnerWhenUpdatingScore() {
   const { winningLimit, players, trioMode: isTrioMode } = useGame.getState();
@@ -145,7 +174,6 @@ export const useGame = create<GameState>((set) => ({
       loserPlayerId: null,
       players: [],
     })),
-  updateGameStatus: (status) => set({ gameStatus: status }),
   toggleTournamentMode: () =>
     set((state) => ({
       tournamentMode: !state.tournamentMode,
@@ -192,6 +220,7 @@ export const useGame = create<GameState>((set) => ({
     });
 
     checkWinnerWhenUpdatingScore();
+    persistCurrentDraftRound();
   },
   removeScoreFromPlayer: (player, scoreId) => {
     set((state) => {
@@ -212,22 +241,21 @@ export const useGame = create<GameState>((set) => ({
     });
 
     checkWinnerWhenUpdatingScore();
+    persistCurrentDraftRound();
   },
-  changePlayerActivity: (player, isPlaying) =>
+  changePlayerActivity: (player, isPlaying) => {
     set((state) => {
       const playerId = player.id;
       const updatedPlayers = state.players.map((p) =>
         p.id === playerId ? { ...p, isPlaying } : p,
       );
       return { players: updatedPlayers };
-    }),
-  updateCurrentGameId: (id: number) => set({ currentGameId: id }),
-  restoreGame: (gameId, players, tournamentMode) =>
+    });
+    persistCurrentDraftRound();
+  },
+  restoreGame: (gameId, restoredState) =>
     set({
       currentGameId: gameId,
-      tournamentMode,
-      players,
-      gameStatus: GameStatus.Ready,
-      currentRoundNumber: Math.max(...players.map((p) => p.wins + p.losses), 0) + 1,
+      ...restoredState,
     }),
 }));

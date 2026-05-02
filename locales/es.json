@@ -64,7 +64,13 @@
     "tournamentTie": "Torneo - {{names}} ({{wins}} victorias)",
     "removeScore": "Eliminar Puntuación",
     "removeScoreConfirm": "¿Eliminar {{value}} puntos de {{name}}?",
-    "longPressHint": "Consejo: Mantén presionado el nombre de un jugador para agregar rápidamente {{points}} puntos. Mantén presionada una puntuación para eliminarla. Toca para cerrar."
+    "longPressHint": "Consejo: Mantén presionado el nombre de un jugador para agregar rápidamente {{points}} puntos. Mantén presionada una puntuación para eliminarla. Toca para cerrar.",
+    "resumeGame": "Continuar juego activo",
+    "resumeGameDescription": "Hay un juego sin terminar guardado en este dispositivo.",
+    "resume": "Continuar",
+    "discard": "Descartar",
+    "discardResume": "Descartar juego activo",
+    "discardResumeConfirm": "¿Estás seguro de que quieres descartar este juego activo?"
   },
   "history": {
     "title": "Historial de Juegos",
@@ -137,7 +143,10 @@
     "success": "Éxito",
     "settingsSaved": "¡Configuración guardada exitosamente!",
     "settingsError": "Error al guardar la configuración. Por favor intenta de nuevo.",
-    "loadError": "Error al cargar la configuración"
+    "loadError": "Error al cargar la configuración",
+    "checkForUpdates": "Buscar actualizaciones",
+    "checkForUpdatesDescription": "Abre Google Play para verificar si hay una versión más reciente disponible",
+    "openStoreError": "Error al abrir la tienda de aplicaciones. Por favor intenta de nuevo."
   },
   "players": {
     "addPlayer": "Agregar Jugador",

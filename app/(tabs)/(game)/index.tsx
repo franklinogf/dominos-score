@@ -1,6 +1,7 @@
 import { PartySize } from '@/components/party-size';
 import { PlayersForm } from '@/components/players-form';
 import { WinningLimit } from '@/components/points-selection';
+import { ResumeGameBanner } from '@/components/resume-game-banner';
 import { TournamentSwitch } from '@/components/tournament-switch';
 import { Text } from '@/components/ui/text';
 import { useT } from '@/hooks/use-translation';
@@ -36,6 +37,7 @@ export default function Index() {
             </View>
 
             <TournamentSwitch />
+            <ResumeGameBanner />
             <PartySize />
             <WinningLimit />
             <PlayersForm />

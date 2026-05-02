@@ -2,6 +2,7 @@ import {
   deleteAllGames,
   deleteGame,
   Game,
+  getUnfinishedGame,
   insertGame,
   NewGame,
   updateGameEndedAt,
@@ -14,6 +15,11 @@ import {
 
 export async function addNewGame(newGame: NewGame, playersNames: string[]) {
   try {
+    const unfinishedGame = await getUnfinishedGame();
+    if (unfinishedGame) {
+      await updateGameEndedAt(unfinishedGame.id);
+    }
+
     const game = await insertGame(newGame);
 
     if (game === undefined) {

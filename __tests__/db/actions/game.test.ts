@@ -8,6 +8,7 @@ import {
 import {
   deleteAllGames,
   deleteGame,
+  getUnfinishedGame,
   insertGame,
   updateGameEndedAt,
 } from '@/db/querys/game';
@@ -22,6 +23,7 @@ jest.mock('@/db/querys/game', () => ({
   insertGame: jest.fn(),
   deleteGame: jest.fn().mockResolvedValue(undefined),
   deleteAllGames: jest.fn().mockResolvedValue(undefined),
+  getUnfinishedGame: jest.fn().mockResolvedValue(undefined),
   updateGameEndedAt: jest.fn().mockResolvedValue(undefined),
 }));
 
@@ -39,7 +41,11 @@ const mockGame = {
 };
 const mockPlayer = { id: 10, gameId: 1, name: 'Alice', wins: 0, losses: 0 };
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  (getUnfinishedGame as jest.Mock).mockResolvedValue(undefined);
+  (updateGameEndedAt as jest.Mock).mockResolvedValue(undefined);
+});
 beforeAll(() => jest.spyOn(console, 'error').mockImplementation(() => {}));
 afterAll(() => jest.restoreAllMocks());
 
@@ -56,6 +62,20 @@ describe('addNewGame', () => {
     expect(insertGame).toHaveBeenCalledTimes(1);
     expect(insertPlayers).toHaveBeenCalledWith([{ gameId: 1, name: 'Alice' }]);
     expect(result).toEqual({ game: mockGame, players: [mockPlayer] });
+  });
+
+  it('ends an existing unfinished game before creating a new one', async () => {
+    (getUnfinishedGame as jest.Mock).mockResolvedValue({ id: 99 });
+    (insertGame as jest.Mock).mockResolvedValue(mockGame);
+    (insertPlayers as jest.Mock).mockResolvedValue([mockPlayer]);
+
+    await addNewGame(
+      { gameSize: 2, winningLimit: 150, type: GameType.NORMAL },
+      ['Alice'],
+    );
+
+    expect(updateGameEndedAt).toHaveBeenCalledWith(99);
+    expect(insertGame).toHaveBeenCalledTimes(1);
   });
 
   it('returns undefined and logs error when insertGame returns undefined', async () => {

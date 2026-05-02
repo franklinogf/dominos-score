@@ -64,7 +64,13 @@
     "tournamentTie": "Tournament - {{names}} ({{wins}} wins)",
     "removeScore": "Remove Score",
     "removeScoreConfirm": "Remove {{value}} points from {{name}}?",
-    "longPressHint": "Tip: Long-press a player name to quickly add {{points}} points. Long-press a score to remove it. Tap to dismiss."
+    "longPressHint": "Tip: Long-press a player name to quickly add {{points}} points. Long-press a score to remove it. Tap to dismiss.",
+    "resumeGame": "Resume active game",
+    "resumeGameDescription": "An unfinished game is saved on this device.",
+    "resume": "Resume",
+    "discard": "Discard",
+    "discardResume": "Discard active game",
+    "discardResumeConfirm": "Are you sure you want to discard this active game?"
   },
   "history": {
     "title": "Game History",
@@ -137,7 +143,10 @@
     "success": "Success",
     "settingsSaved": "Settings saved successfully!",
     "settingsError": "Failed to save settings. Please try again.",
-    "loadError": "Failed to load settings"
+    "loadError": "Failed to load settings",
+    "checkForUpdates": "Check for updates",
+    "checkForUpdatesDescription": "Open Google Play to check if a newer version is available",
+    "openStoreError": "Failed to open the app store. Please try again."
   },
   "players": {
     "addPlayer": "Add Player",

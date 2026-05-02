@@ -1,15 +1,26 @@
 import {
   addNewRound,
   addResultsToRound,
+  clearCurrentDraftRound,
   newRoundWithResults,
+  persistDraftRound,
 } from '@/db/actions/round';
 import { incrementPlayerLosses, incrementPlayerWins } from '@/db/querys/player';
-import { insertPlayerToRound, insertRound } from '@/db/querys/round';
+import {
+  clearDraftRoundScores,
+  getOrCreateDraftRound,
+  insertRound,
+  updateRoundWinner,
+  upsertPlayerDraftScores,
+} from '@/db/querys/round';
 import type { Player } from '@/lib/types';
 
 jest.mock('@/db/querys/round', () => ({
   insertRound: jest.fn(),
-  insertPlayerToRound: jest.fn().mockResolvedValue(undefined),
+  getOrCreateDraftRound: jest.fn().mockResolvedValue(10),
+  upsertPlayerDraftScores: jest.fn().mockResolvedValue(undefined),
+  clearDraftRoundScores: jest.fn().mockResolvedValue(undefined),
+  updateRoundWinner: jest.fn().mockResolvedValue(undefined),
 }));
 
 jest.mock('@/db/querys/player', () => ({
@@ -31,7 +42,13 @@ const mkPlayer = (
   score: scores.map((value, i) => ({ id: `s-${id}-${i}`, value })),
 });
 
-beforeEach(() => jest.clearAllMocks());
+beforeEach(() => {
+  jest.clearAllMocks();
+  (getOrCreateDraftRound as jest.Mock).mockResolvedValue(10);
+  (upsertPlayerDraftScores as jest.Mock).mockResolvedValue(undefined);
+  (clearDraftRoundScores as jest.Mock).mockResolvedValue(undefined);
+  (updateRoundWinner as jest.Mock).mockResolvedValue(undefined);
+});
 beforeAll(() => jest.spyOn(console, 'error').mockImplementation(() => {}));
 afterAll(() => jest.restoreAllMocks());
 
@@ -53,15 +70,17 @@ describe('addNewRound', () => {
 });
 
 describe('addResultsToRound', () => {
-  it('calls insertPlayerToRound for each player with stringified scores', async () => {
+  it('upserts scores for each player with stringified scores', async () => {
     const players = [mkPlayer('1', [30, 60]), mkPlayer('2', [100])];
     await addResultsToRound(5, players);
-    expect(insertPlayerToRound).toHaveBeenCalledWith(5, 1, ['30', '60']);
-    expect(insertPlayerToRound).toHaveBeenCalledWith(5, 2, ['100']);
+    expect(upsertPlayerDraftScores).toHaveBeenCalledWith(5, 1, ['30', '60']);
+    expect(upsertPlayerDraftScores).toHaveBeenCalledWith(5, 2, ['100']);
   });
 
   it('does not throw on error', async () => {
-    (insertPlayerToRound as jest.Mock).mockRejectedValueOnce(new Error('fail'));
+    (upsertPlayerDraftScores as jest.Mock).mockRejectedValueOnce(
+      new Error('fail'),
+    );
     await expect(
       addResultsToRound(5, [mkPlayer('1', [30])]),
     ).resolves.not.toThrow();
@@ -69,8 +88,8 @@ describe('addResultsToRound', () => {
 });
 
 describe('newRoundWithResults', () => {
-  it('creates round, stores results, and increments wins/losses', async () => {
-    (insertRound as jest.Mock).mockResolvedValue([{ insertedId: 10 }]);
+  it('uses draft round, stores results, completes round, and increments wins/losses', async () => {
+    (getOrCreateDraftRound as jest.Mock).mockResolvedValue(10);
     const players = [mkPlayer('1', [150]), mkPlayer('2', [50])];
 
     await newRoundWithResults({ gameId: 1, roundWinnerId: 1 }, players, {
@@ -78,14 +97,15 @@ describe('newRoundWithResults', () => {
       multiLose: false,
     });
 
-    expect(insertRound).toHaveBeenCalledTimes(1);
-    expect(insertPlayerToRound).toHaveBeenCalledTimes(2);
+    expect(getOrCreateDraftRound).toHaveBeenCalledWith(1);
+    expect(upsertPlayerDraftScores).toHaveBeenCalledTimes(2);
+    expect(updateRoundWinner).toHaveBeenCalledWith(10, 1);
     expect(incrementPlayerWins).toHaveBeenCalledWith(1);
     expect(incrementPlayerLosses).toHaveBeenCalledWith(2, 1);
   });
 
   it('skips win/loss updates when roundWinnerId is not set', async () => {
-    (insertRound as jest.Mock).mockResolvedValue([{ insertedId: 10 }]);
+    (getOrCreateDraftRound as jest.Mock).mockResolvedValue(10);
     const players = [mkPlayer('1', [50]), mkPlayer('2', [40])];
 
     await newRoundWithResults({ gameId: 1 }, players, {
@@ -93,12 +113,13 @@ describe('newRoundWithResults', () => {
       multiLose: false,
     });
 
+    expect(updateRoundWinner).not.toHaveBeenCalled();
     expect(incrementPlayerWins).not.toHaveBeenCalled();
     expect(incrementPlayerLosses).not.toHaveBeenCalled();
   });
 
   it('applies multiLose=true: player with no scores gets 2 losses', async () => {
-    (insertRound as jest.Mock).mockResolvedValue([{ insertedId: 10 }]);
+    (getOrCreateDraftRound as jest.Mock).mockResolvedValue(10);
     const players = [mkPlayer('1', [150]), mkPlayer('2', [])];
 
     await newRoundWithResults({ gameId: 1, roundWinnerId: 1 }, players, {
@@ -110,7 +131,7 @@ describe('newRoundWithResults', () => {
   });
 
   it('does not throw when insertRound returns no id', async () => {
-    (insertRound as jest.Mock).mockResolvedValue(undefined);
+    (getOrCreateDraftRound as jest.Mock).mockResolvedValue(undefined);
     await expect(
       newRoundWithResults({ gameId: 1, roundWinnerId: 1 }, [], {
         trioMode: false,
@@ -120,12 +141,28 @@ describe('newRoundWithResults', () => {
   });
 
   it('does not throw on error', async () => {
-    (insertRound as jest.Mock).mockRejectedValue(new Error('fail'));
+    (getOrCreateDraftRound as jest.Mock).mockRejectedValue(new Error('fail'));
     await expect(
       newRoundWithResults({ gameId: 1, roundWinnerId: 1 }, [], {
         trioMode: false,
         multiLose: false,
       }),
     ).resolves.not.toThrow();
+  });
+});
+
+describe('persistDraftRound', () => {
+  it('clears and upserts playing players', async () => {
+    await persistDraftRound(1, [mkPlayer('1', [30]), mkPlayer('2', [])]);
+    expect(clearDraftRoundScores).toHaveBeenCalledWith(10);
+    expect(upsertPlayerDraftScores).toHaveBeenCalledWith(10, 1, ['30']);
+    expect(upsertPlayerDraftScores).toHaveBeenCalledWith(10, 2, []);
+  });
+});
+
+describe('clearCurrentDraftRound', () => {
+  it('clears scores for the current draft round', async () => {
+    await clearCurrentDraftRound(1);
+    expect(clearDraftRoundScores).toHaveBeenCalledWith(10);
   });
 });

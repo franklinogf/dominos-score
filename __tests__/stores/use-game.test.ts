@@ -43,13 +43,6 @@ beforeEach(() => {
   (randomUUID as jest.Mock).mockImplementation(() => `uuid-${++uuidCounter}`);
 });
 
-describe('updateGameStatus', () => {
-  it('sets the game status', () => {
-    useGame.getState().updateGameStatus(GameStatus.Ready);
-    expect(useGame.getState().gameStatus).toBe(GameStatus.Ready);
-  });
-});
-
 describe('addScoreToPlayer', () => {
   it('transitions status to InProgress when a score is added', () => {
     const player = mkPlayer('a');
@@ -237,24 +230,54 @@ describe('toggleTournamentMode', () => {
 });
 
 describe('restoreGame', () => {
+  const restoredState = (players: Player[], tournamentMode = false) => ({
+    players,
+    tournamentMode,
+    gameStatus: GameStatus.Ready,
+    currentRoundNumber: 1,
+    winnerPlayerId: null,
+    loserPlayerId: null,
+    winningLimit: 150,
+    gameSize: players.length,
+  });
+
   it('sets gameStatus to Ready', () => {
-    useGame.getState().restoreGame(10, [], false);
+    useGame.getState().restoreGame(10, restoredState([]));
     expect(useGame.getState().gameStatus).toBe(GameStatus.Ready);
   });
 
   it('sets currentGameId and players', () => {
     const players = [mkPlayer('a', [], 2, 1)];
-    useGame.getState().restoreGame(10, players, true);
+    useGame.getState().restoreGame(10, restoredState(players, true));
     expect(useGame.getState().currentGameId).toBe(10);
     expect(useGame.getState().players).toHaveLength(1);
     expect(useGame.getState().tournamentMode).toBe(true);
   });
 
-  it('computes currentRoundNumber as max(wins+losses)+1', () => {
+  it('applies restored round number and game options', () => {
     const players = [mkPlayer('a', [], 3, 1), mkPlayer('b', [], 2, 2)];
-    useGame.getState().restoreGame(5, players, false);
-    // player a: 3+1=4, player b: 2+2=4 → max=4, round=5
+    useGame.getState().restoreGame(5, {
+      ...restoredState(players),
+      currentRoundNumber: 5,
+      winningLimit: 200,
+      gameSize: 4,
+    });
     expect(useGame.getState().currentRoundNumber).toBe(5);
+    expect(useGame.getState().winningLimit).toBe(200);
+    expect(useGame.getState().gameSize).toBe(4);
+  });
+
+  it('applies restored winner and loser state', () => {
+    const players = [mkPlayer('a', [150]), mkPlayer('b', [50])];
+    useGame.getState().restoreGame(5, {
+      ...restoredState(players),
+      gameStatus: GameStatus.Finished,
+      winnerPlayerId: 'a',
+      loserPlayerId: 'b',
+    });
+    expect(useGame.getState().gameStatus).toBe(GameStatus.Finished);
+    expect(useGame.getState().winnerPlayerId).toBe('a');
+    expect(useGame.getState().loserPlayerId).toBe('b');
   });
 });
 
@@ -296,11 +319,6 @@ describe('simple setters', () => {
   it('updateWinningLimit sets winningLimit', () => {
     useGame.getState().updateWinningLimit(200);
     expect(useGame.getState().winningLimit).toBe(200);
-  });
-
-  it('updateCurrentGameId sets currentGameId', () => {
-    useGame.getState().updateCurrentGameId(99);
-    expect(useGame.getState().currentGameId).toBe(99);
   });
 
   it('addPlayers replaces the players list and resets currentRoundNumber', () => {

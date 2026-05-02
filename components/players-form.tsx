@@ -5,7 +5,7 @@ import { Text } from '@/components/ui/text';
 import { Button } from '@/components/ui/button';
 import { addNewGame } from '@/db/actions/game';
 import { useT } from '@/hooks/use-translation';
-import { GameStatus, GameType } from '@/lib/enums';
+import { GameType } from '@/lib/enums';
 import { Player } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useGame } from '@/stores/use-game';
@@ -66,9 +66,7 @@ export function PlayersForm() {
   const schema = useMemo(() => createPlayersSchema(gameSize, t), [gameSize, t]);
   const tournamentMode = useGame((state) => state.tournamentMode);
   const inputRef = useRef<TextInput[]>([]);
-  const updateGameStatus = useGame((state) => state.updateGameStatus);
   const winningLimit = useGame((state) => state.winningLimit);
-  const updateCurrentGameId = useGame((state) => state.updateCurrentGameId);
   const {
     control,
     formState: { errors },
@@ -116,13 +114,10 @@ export function PlayersForm() {
       }));
 
       addPlayers(newPlayers);
-      updateCurrentGameId(game.id);
-
       if (tournamentMode) {
-        router.push('/modal');
+        router.push({ pathname: '/modal', params: { gameId: game.id } });
       } else {
-        updateGameStatus(GameStatus.Ready);
-        router.replace('/game');
+        router.replace({ pathname: '/game', params: { gameId: game.id } });
       }
     } catch (error) {
       console.error('Error creating game:', error);

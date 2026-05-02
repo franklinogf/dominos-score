@@ -5,7 +5,7 @@ import {
   DEFAULT_MULTI_LOSE,
   DEFAULT_TRIO_MODE,
 } from '@/lib/constants';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { migrate } from 'drizzle-orm/expo-sqlite/migrator';
 import * as SQLite from 'expo-sqlite';
@@ -40,9 +40,32 @@ export async function initializeDatabase() {
     await migrate(db, migrations);
     console.log('Database migrated successfully');
 
+    await assertRequiredTablesExist();
     await seedDefaultSettings();
   } catch (error) {
     console.error('Database initialization error:', error);
+    throw error;
+  }
+}
+
+async function assertRequiredTablesExist() {
+  const requiredTables = [
+    'games',
+    'players',
+    'players_rounds',
+    'rounds',
+    'settings',
+  ];
+  const rows = await db.all<{ name: string }>(
+    sql`SELECT name FROM sqlite_master WHERE type = 'table'`,
+  );
+  const tableNames = new Set(rows.map((row) => row.name));
+  const missingTables = requiredTables.filter((table) => !tableNames.has(table));
+
+  if (missingTables.length > 0) {
+    throw new Error(
+      `Database migration missing tables: ${missingTables.join(', ')}`,
+    );
   }
 }
 

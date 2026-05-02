@@ -3,19 +3,20 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { Text } from '@/components/ui/text';
-import { addPlayerToGame } from '@/db/actions/game';
+import { addPlayerToGame, removeGame } from '@/db/actions/game';
+import { getGameById } from '@/db/querys/game';
 import { useT } from '@/hooks/use-translation';
 import { BIG_PARTY_SIZES } from '@/lib/constants';
-import { GameStatus } from '@/lib/enums';
+import { buildRestoredGameState } from '@/lib/game-restore';
 import { Player } from '@/lib/types';
 import { useAddPlayerDialog } from '@/stores/use-add-player-dialog';
 import { useGame } from '@/stores/use-game';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Trash2Icon } from 'lucide-react-native';
+import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
-import { useMemo } from 'react';
 import { Alert, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
@@ -25,15 +26,47 @@ const MAX_PLAYERS = parseInt(BIG_PARTY_SIZES[BIG_PARTY_SIZES.length - 1], 10);
 export default function TournamentModal() {
   const { t } = useT();
   const players = useGame((state) => state.players);
-  const gameStatus = useGame((state) => state.gameStatus);
-  const updateGameStatus = useGame((state) => state.updateGameStatus);
-
+  const endGame = useGame((state) => state.endGame);
   const trioMode = useGame((state) => state.trioMode);
+  const currentGameId = useGame((state) => state.currentGameId);
+  const currentRoundNumber = useGame((state) => state.currentRoundNumber);
+  const restoreGame = useGame((state) => state.restoreGame);
+  const { gameId } = useLocalSearchParams<{ gameId?: string }>();
+  const routeGameId = gameId ? Number(gameId) : currentGameId;
+
+  useEffect(() => {
+    const hydrateGame = async () => {
+      if (!routeGameId || Number.isNaN(routeGameId)) {
+        router.replace('/');
+        return;
+      }
+
+      if (currentGameId === routeGameId && players.length > 0) {
+        return;
+      }
+
+      const game = await getGameById(routeGameId);
+      if (!game || game.endedAt) {
+        router.replace('/');
+        return;
+      }
+
+      restoreGame(routeGameId, buildRestoredGameState(game, trioMode));
+    };
+
+    hydrateGame();
+  }, [currentGameId, players.length, restoreGame, routeGameId, trioMode]);
 
   const maxActivePlayers = trioMode ? 3 : 4;
   const minActivePlayers = trioMode ? 3 : 2;
 
   const activePlayersCount = players.filter((p) => p.isPlaying).length;
+  const canCancelTournament =
+    currentRoundNumber === 1 &&
+    players.every(
+      (player) =>
+        player.wins === 0 && player.losses === 0 && player.score.length === 0,
+    );
 
   function handleSubmit() {
     if (
@@ -47,15 +80,16 @@ export default function TournamentModal() {
 
     // Dismiss modal and navigate to game, preventing back navigation
     router.dismissAll();
-    router.replace('/game');
+    router.replace({ pathname: '/game', params: { gameId: routeGameId } });
   }
 
-  function handleBack() {
-    router.back();
-    updateGameStatus(
-      gameStatus === GameStatus.Ready ? GameStatus.NotStarted : gameStatus,
-    );
+  async function handleCancel() {
     impactAsync(ImpactFeedbackStyle.Light);
+    if (routeGameId && !Number.isNaN(routeGameId)) {
+      await removeGame(routeGameId);
+      endGame();
+    }
+    router.replace('/');
   }
   return (
     <SafeAreaView className="flex-1 bg-background">
@@ -111,9 +145,9 @@ export default function TournamentModal() {
             </Text>
           </Button>
 
-          {gameStatus === GameStatus.NotStarted && (
+          {canCancelTournament && (
             <View className="mt-4">
-              <Button variant="outline" onPress={handleBack}>
+              <Button variant="outline" onPress={handleCancel}>
                 <Text>{t('common.cancel')}</Text>
               </Button>
             </View>
@@ -278,6 +312,8 @@ function AddPlayerDialog() {
   const close = useAddPlayerDialog((state) => state.close);
   const players = useGame((state) => state.players);
   const currentGameId = useGame((state) => state.currentGameId);
+  const { gameId } = useLocalSearchParams<{ gameId?: string }>();
+  const routeGameId = gameId ? Number(gameId) : currentGameId;
 
   const schema = useMemo(
     () =>
@@ -314,14 +350,14 @@ function AddPlayerDialog() {
   const addPlayer = useGame((state) => state.addPlayer);
 
   const onSubmit = async (data: { playerName: string }) => {
-    if (!currentGameId) {
+    if (!routeGameId || Number.isNaN(routeGameId)) {
       console.error('No current game ID');
       return;
     }
 
     try {
       const player = await addPlayerToGame(
-        currentGameId,
+        routeGameId,
         data.playerName.trim(),
       );
 

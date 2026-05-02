@@ -50,7 +50,16 @@ export async function getUnfinishedGame() {
     const game = await db.query.gamesTable.findFirst({
       where: (t, { isNull }) => isNull(t.endedAt),
       orderBy: (t, { desc }) => [desc(t.createdAt)],
-      with: { players: true },
+      with: {
+        rounds: {
+          with: {
+            playersToRounds: {
+              with: { player: true },
+            },
+          },
+        },
+        players: true,
+      },
     });
     return game ?? null;
   } catch (error) {

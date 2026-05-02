@@ -3,16 +3,15 @@ import { Text } from '@/components/ui/text';
 import { Alert, View } from 'react-native';
 
 import { endGame as endGameInDb } from '@/db/actions/game';
-import { newRoundWithResults } from '@/db/actions/round';
+import { clearCurrentDraftRound, newRoundWithResults } from '@/db/actions/round';
 import { useT } from '@/hooks/use-translation';
 import { GameStatus } from '@/lib/enums';
-import { useGame } from '@/stores/use-game';
+import { flushDraftPersistence, useGame } from '@/stores/use-game';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { router } from 'expo-router';
 
 export function GameEndingButtons() {
   const { t } = useT();
-  const updateGameStatus = useGame((state) => state.updateGameStatus);
   const tournamentMode = useGame((state) => state.tournamentMode);
   const trioMode = useGame((state) => state.trioMode);
   const multiLose = useGame((state) => state.multiLose);
@@ -41,6 +40,11 @@ export function GameEndingButtons() {
         style: 'destructive',
         onPress: async () => {
           impactAsync(ImpactFeedbackStyle.Heavy);
+          await flushDraftPersistence();
+
+          if (currentGameId && gameStatus !== GameStatus.Finished) {
+            await clearCurrentDraftRound(currentGameId);
+          }
 
           if (
             gameStatus === GameStatus.Finished &&
@@ -48,7 +52,7 @@ export function GameEndingButtons() {
             winnerPlayerId
           ) {
             // Pass the actual winner ID (highest scorer) in trio mode
-            newRoundWithResults(
+            await newRoundWithResults(
               {
                 gameId: currentGameId,
                 roundWinnerId: Number(winnerPlayerId),
@@ -59,7 +63,10 @@ export function GameEndingButtons() {
           }
           endRound();
           if (tournamentMode) {
-            router.push('/modal');
+            router.push({
+              pathname: '/modal',
+              params: { gameId: currentGameId },
+            });
           }
         },
       },
@@ -76,13 +83,14 @@ export function GameEndingButtons() {
       {
         text: endGameLabel,
         style: 'destructive',
-        onPress: () => {
+        onPress: async () => {
           impactAsync(ImpactFeedbackStyle.Heavy);
+          await flushDraftPersistence();
           if (currentGameId) {
-            endGameInDb(currentGameId);
+            await endGameInDb(currentGameId);
           }
-          updateGameStatus(GameStatus.NotStarted);
           endGame();
+          router.replace('/');
         },
       },
     ]);

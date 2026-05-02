@@ -7,54 +7,84 @@ import { useColorScheme } from 'nativewind';
 import { initializeDatabase } from '@/db/database';
 import { getUnfinishedGame } from '@/db/querys/game';
 import { getThemeSetting } from '@/db/querys/settings';
-import { GameType } from '@/lib/enums';
-import { Player } from '@/lib/types';
+import { buildRestoredGameState } from '@/lib/game-restore';
 import { useGame } from '@/stores/use-game';
 import { PortalHost } from '@rn-primitives/portal';
-import { useEffect } from 'react';
-import { Platform, useColorScheme as useSystemColorScheme } from 'react-native';
+import { useEffect, useState } from 'react';
+import {
+  Platform,
+  View,
+  useColorScheme as useSystemColorScheme,
+} from 'react-native';
+import { Text } from '@/components/ui/text';
 
 export default function RootLayout() {
   const { colorScheme, setColorScheme } = useColorScheme();
   const systemColorScheme = useSystemColorScheme();
   const loadSettings = useGame((state) => state.loadSettings);
   const restoreGame = useGame((state) => state.restoreGame);
+  const [isDbReady, setIsDbReady] = useState(false);
+  const [initError, setInitError] = useState<Error | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     const initialize = async () => {
-      await initializeDatabase();
-      // Load settings after database is initialized
-      await loadSettings();
-      // Restore any in-progress game from a previous session
-      const unfinished = await getUnfinishedGame();
-      if (unfinished) {
-        const players: Player[] = unfinished.players.map((p) => ({
-          id: String(p.id),
-          name: p.name,
-          wins: p.wins,
-          losses: p.losses,
-          isPlaying: false,
-          score: [],
-        }));
-        restoreGame(
-          unfinished.id,
-          players,
-          unfinished.type === GameType.TOURNAMENT,
-        );
-      }
-      // Load and apply theme
-      const theme = await getThemeSetting();
-      if (theme === 'system') {
-        setColorScheme(
-          systemColorScheme === 'unspecified' ? 'system' : systemColorScheme,
-        );
-      } else {
-        setColorScheme(theme);
+      try {
+        await initializeDatabase();
+        // Load settings after database is initialized
+        await loadSettings();
+        // Restore any in-progress game from a previous session
+        const unfinished = await getUnfinishedGame();
+        if (unfinished) {
+          const { trioMode } = useGame.getState();
+          restoreGame(
+            unfinished.id,
+            buildRestoredGameState(unfinished, trioMode),
+          );
+        }
+        // Load and apply theme
+        const theme = await getThemeSetting();
+        if (theme === 'system') {
+          setColorScheme(
+            systemColorScheme === 'unspecified' ? 'system' : systemColorScheme,
+          );
+        } else {
+          setColorScheme(theme);
+        }
+
+        if (isMounted) {
+          setIsDbReady(true);
+        }
+      } catch (error) {
+        console.error('App initialization failed:', error);
+        if (isMounted) {
+          setInitError(
+            error instanceof Error ? error : new Error(String(error)),
+          );
+        }
       }
     };
 
     initialize();
+
+    return () => {
+      isMounted = false;
+    };
   }, [loadSettings, setColorScheme, systemColorScheme, restoreGame]);
+
+  if (!isDbReady) {
+    return (
+      <>
+        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+        <View className="flex-1 items-center justify-center bg-background px-6">
+          <Text className="text-center text-muted-foreground">
+            {initError ? 'Unable to initialize app data.' : 'Loading...'}
+          </Text>
+        </View>
+      </>
+    );
+  }
 
   return (
     <>
