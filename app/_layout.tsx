@@ -4,21 +4,23 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useColorScheme } from 'nativewind';
 
-import { initializeDatabase } from '@/db/database';
+import { Text } from '@/components/ui/text';
+import { expoDB, initializeDatabase } from '@/db/database';
 import { getUnfinishedGame } from '@/db/querys/game';
 import { getThemeSetting } from '@/db/querys/settings';
 import { buildRestoredGameState } from '@/lib/game-restore';
 import { useGame } from '@/stores/use-game';
 import { PortalHost } from '@rn-primitives/portal';
+import { useDrizzleStudio } from 'expo-drizzle-studio-plugin';
 import { useEffect, useState } from 'react';
 import {
   Platform,
   View,
   useColorScheme as useSystemColorScheme,
 } from 'react-native';
-import { Text } from '@/components/ui/text';
 
 export default function RootLayout() {
+  useDrizzleStudio(expoDB);
   const { colorScheme, setColorScheme } = useColorScheme();
   const systemColorScheme = useSystemColorScheme();
   const loadSettings = useGame((state) => state.loadSettings);

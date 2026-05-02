@@ -10,16 +10,15 @@ import { drizzle } from 'drizzle-orm/expo-sqlite';
 import { migrate } from 'drizzle-orm/expo-sqlite/migrator';
 import * as SQLite from 'expo-sqlite';
 import * as schema from './schema';
-// import { eq } from 'drizzle-orm';
 
-const expo = SQLite.openDatabaseSync('db.db');
+export const expoDB = SQLite.openDatabaseSync('db.db');
 
-export const db = drizzle(expo, { schema });
+export const db = drizzle(expoDB, { schema });
 
 // Function to delete/close the database connection for cleanup
 export function deleteDatabase() {
   try {
-    expo.closeSync();
+    expoDB.closeSync();
     console.log('Database connection closed');
     SQLite.deleteDatabaseSync('db.db');
     console.log('Database deleted');
@@ -60,7 +59,9 @@ async function assertRequiredTablesExist() {
     sql`SELECT name FROM sqlite_master WHERE type = 'table'`,
   );
   const tableNames = new Set(rows.map((row) => row.name));
-  const missingTables = requiredTables.filter((table) => !tableNames.has(table));
+  const missingTables = requiredTables.filter(
+    (table) => !tableNames.has(table),
+  );
 
   if (missingTables.length > 0) {
     throw new Error(
