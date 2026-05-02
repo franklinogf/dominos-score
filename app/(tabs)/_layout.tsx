@@ -27,7 +27,7 @@ export default function TabsLayout() {
           minimizeBehavior={isIos ? 'onScrollDown' : undefined}
           rippleColor={!isIos ? currentTheme.accent : undefined}
         >
-          <NativeTabs.Trigger name="(game)">
+          <NativeTabs.Trigger name="(game)" disableAutomaticContentInsets>
             <NativeTabs.Trigger.Label
               selectedStyle={{ color: currentTheme.foreground }}
             >
@@ -47,7 +47,7 @@ export default function TabsLayout() {
               ),
             })}
           </NativeTabs.Trigger>
-          <NativeTabs.Trigger name="history">
+          <NativeTabs.Trigger name="history" disableAutomaticContentInsets>
             <NativeTabs.Trigger.Label
               selectedStyle={{ color: currentTheme.foreground }}
             >
@@ -67,7 +67,7 @@ export default function TabsLayout() {
               ),
             })}
           </NativeTabs.Trigger>
-          <NativeTabs.Trigger name="settings">
+          <NativeTabs.Trigger name="settings" disableAutomaticContentInsets>
             <NativeTabs.Trigger.Label
               selectedStyle={{ color: currentTheme.foreground }}
             >

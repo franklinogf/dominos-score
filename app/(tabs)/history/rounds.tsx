@@ -13,7 +13,7 @@ import { useFocusEffect } from 'expo-router';
 import { useLocalSearchParams } from 'expo-router/build/hooks';
 import { useCallback, useState } from 'react';
 import { FlatList, ScrollView, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 // Component for displaying game summary
 function GameSummary({
@@ -60,12 +60,18 @@ function GameSummary({
 // Component for no rounds display
 function NoRoundsDisplay({
   game,
+  bottomPadding,
 }: {
   game: NonNullable<GameWithRoundsAndPlayers>;
+  bottomPadding: number;
 }) {
   const { t } = useT();
   return (
-    <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
+    <ScrollView
+      className="flex-1"
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ paddingBottom: bottomPadding }}
+    >
       <GameSummary game={game} />
 
       <View className="bg-card border border-border rounded-lg p-4 mb-4">
@@ -127,8 +133,10 @@ function NoRoundsDisplay({
 // Component for single round display
 function SingleRoundDisplay({
   game,
+  bottomPadding,
 }: {
   game: NonNullable<GameWithRoundsAndPlayers>;
+  bottomPadding: number;
 }) {
   const { t } = useT();
   return (
@@ -136,6 +144,7 @@ function SingleRoundDisplay({
       showsVerticalScrollIndicator={false}
       bounces={false}
       className="flex-1"
+      contentContainerStyle={{ paddingBottom: bottomPadding }}
     >
       <GameSummary game={game} />
 
@@ -239,8 +248,10 @@ function SingleRoundDisplay({
 // Component for multiple rounds display
 function MultipleRoundsDisplay({
   game,
+  bottomPadding,
 }: {
   game: NonNullable<GameWithRoundsAndPlayers>;
+  bottomPadding: number;
 }) {
   const { t } = useT();
   return (
@@ -248,6 +259,7 @@ function MultipleRoundsDisplay({
       showsVerticalScrollIndicator={false}
       bounces={false}
       className="flex-1"
+      contentContainerStyle={{ paddingBottom: bottomPadding }}
     >
       <GameSummary game={game} />
 
@@ -386,6 +398,7 @@ function MultipleRoundsDisplay({
 }
 
 export default function HistoryRounds() {
+  const insets = useSafeAreaInsets();
   const [game, setGame] = useState<GameWithRoundsAndPlayers | null>(null);
   const gameId = useLocalSearchParams<{ gameId: string }>().gameId;
   const { t } = useT();
@@ -407,27 +420,32 @@ export default function HistoryRounds() {
 
   if (!game) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center">
+      <SafeAreaView
+        edges={['top', 'left', 'right']}
+        className="flex-1 items-center justify-center"
+      >
         <Text>{t('history.loadingGameData')}</Text>
       </SafeAreaView>
     );
   }
 
+  const bottomPadding = Math.max(insets.bottom, 12);
+
   return (
     <SafeAreaView
-      edges={['bottom', 'left', 'right']}
-      className="flex-1 bg-background px-4 pt-4 pb-20"
+      edges={['top', 'left', 'right']}
+      className="flex-1 bg-background px-4 pt-4"
     >
       <Text variant="h1" className="text-center mb-6">
         {t('history.gameDetails')}
       </Text>
 
       {game.rounds.length === 0 ? (
-        <NoRoundsDisplay game={game} />
+        <NoRoundsDisplay game={game} bottomPadding={bottomPadding} />
       ) : game.rounds.length === 1 ? (
-        <SingleRoundDisplay game={game} />
+        <SingleRoundDisplay game={game} bottomPadding={bottomPadding} />
       ) : (
-        <MultipleRoundsDisplay game={game} />
+        <MultipleRoundsDisplay game={game} bottomPadding={bottomPadding} />
       )}
     </SafeAreaView>
   );

@@ -13,7 +13,7 @@ import { Link } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Alert, FlatList, View } from 'react-native';
 import Animated, { FadeOut } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 function GameCardSkeleton() {
   return (
@@ -159,6 +159,7 @@ function GameCard({
 
 export default function HistoryIndex() {
   const { t } = useT();
+  const insets = useSafeAreaInsets();
   const [games, setGames] = useState<GameWithRounds[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const currentGameId = useGame((state) => state.currentGameId);
@@ -232,8 +233,13 @@ export default function HistoryIndex() {
     }, [loadGames]),
   );
 
+  const bottomPadding = Math.max(insets.bottom, 12);
+
   return (
-    <SafeAreaView className="flex-1 bg-background px-4 py-6">
+    <SafeAreaView
+      edges={['top', 'left', 'right']}
+      className="flex-1 bg-background px-4 py-6"
+    >
       <Text variant="h1" className="text-center mb-4">
         {t('history.title')}
       </Text>
@@ -285,7 +291,7 @@ export default function HistoryIndex() {
             />
           )}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 20 }}
+          contentContainerStyle={{ paddingBottom: bottomPadding }}
         />
       )}
     </SafeAreaView>
