@@ -34,12 +34,14 @@ import {
   Alert,
   Keyboard,
   KeyboardAvoidingView,
+  Linking,
   Platform,
+  ScrollView,
   TouchableWithoutFeedback,
   useColorScheme as useSystemColorScheme,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { z } from 'zod';
 
 interface FieldGroupProps {
@@ -97,7 +99,12 @@ const settingsSchema = (t: (key: string) => string) =>
 
 type SettingsFormData = z.infer<ReturnType<typeof settingsSchema>>;
 
+const ANDROID_PACKAGE_ID = 'com.franklinogf.dominosscore';
+const ANDROID_MARKET_URL = `market://details?id=${ANDROID_PACKAGE_ID}`;
+const ANDROID_PLAY_STORE_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE_ID}`;
+
 export default function Settings() {
+  const insets = useSafeAreaInsets();
   const [isLoading, setIsLoading] = useState(true);
   const setTrioMode = useGame((state) => state.setTrioMode);
   const setMultiLose = useGame((state) => state.setMultiLose);
@@ -192,10 +199,38 @@ export default function Settings() {
     }
   };
 
+  const handleCheckForUpdates = async () => {
+    impactAsync(ImpactFeedbackStyle.Light);
+
+    try {
+      const canOpenMarket = await Linking.canOpenURL(ANDROID_MARKET_URL);
+      if (canOpenMarket) {
+        await Linking.openURL(ANDROID_MARKET_URL);
+        return;
+      }
+
+      await Linking.openURL(ANDROID_PLAY_STORE_URL);
+    } catch (error) {
+      console.error('Failed to open app store:', error);
+      impactAsync(ImpactFeedbackStyle.Heavy);
+      Alert.alert(t('common.error'), t('settings.openStoreError'));
+    }
+  };
+
+  const bottomPadding = Math.max(insets.bottom, 12);
+
   return (
-    <SafeAreaView className="flex-1 bg-background px-6 py-4">
+    <SafeAreaView
+      edges={['top', 'left', 'right']}
+      className="flex-1 bg-background px-6 py-4"
+    >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View className="flex-1">
+        <ScrollView
+          className="flex-1"
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: bottomPadding }}
+        >
           <Text variant="h1" className="text-center mb-6">
             {t('settings.title')}
           </Text>
@@ -348,6 +383,18 @@ export default function Settings() {
                 />
               </FieldGroup>
 
+              {Platform.OS === 'android' && (
+                <FieldGroup
+                  id="updates"
+                  label={t('settings.checkForUpdates')}
+                  description={t('settings.checkForUpdatesDescription')}
+                >
+                  <Button variant="outline" onPress={handleCheckForUpdates}>
+                    <Text>{t('settings.checkForUpdates')}</Text>
+                  </Button>
+                </FieldGroup>
+              )}
+
               <Button
                 onPress={handleSubmit(onSubmit)}
                 disabled={!isDirty || isSubmitting}
@@ -359,7 +406,7 @@ export default function Settings() {
               </Button>
             </KeyboardAvoidingView>
           )}
-        </View>
+        </ScrollView>
       </TouchableWithoutFeedback>
     </SafeAreaView>
   );
