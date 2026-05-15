@@ -31,7 +31,7 @@ export default function TabsLayout() {
             <NativeTabs.Trigger.Label
               selectedStyle={{ color: currentTheme.foreground }}
             >
-              {t($ => $.navigation.game)}
+              {t(($) => $.navigation.game)}
             </NativeTabs.Trigger.Label>
             {Platform.select({
               ios: <NativeTabs.Trigger.Icon sf="gamecontroller.fill" />,
@@ -51,7 +51,7 @@ export default function TabsLayout() {
             <NativeTabs.Trigger.Label
               selectedStyle={{ color: currentTheme.foreground }}
             >
-              {t($ => $.navigation.history)}
+              {t(($) => $.navigation.history)}
             </NativeTabs.Trigger.Label>
             {Platform.select({
               ios: <NativeTabs.Trigger.Icon sf="clock.fill" />,
@@ -71,7 +71,7 @@ export default function TabsLayout() {
             <NativeTabs.Trigger.Label
               selectedStyle={{ color: currentTheme.foreground }}
             >
-              {t($ => $.navigation.settings)}
+              {t(($) => $.navigation.settings)}
             </NativeTabs.Trigger.Label>
             {Platform.select({
               ios: <NativeTabs.Trigger.Icon sf="gearshape.fill" />,

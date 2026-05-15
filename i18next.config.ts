@@ -1,7 +1,6 @@
-import { defineConfig } from 'i18next-cli';
 import { defaultNS } from './lib/i18n';
 
-export default defineConfig({
+export default {
   locales: ['en', 'es'],
   extract: {
     input: 'app/**/*.{js,jsx,ts,tsx}',
@@ -11,4 +10,4 @@ export default defineConfig({
   lint: {
     ignore: ['components/ui/*'],
   },
-});
+};

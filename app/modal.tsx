@@ -105,13 +105,13 @@ export default function TournamentModal() {
           {trioMode && (
             <View className="mt-4 mx-4 p-3 bg-warning/10 border border-warning/30 rounded-lg">
               <Text className="text-center text-foreground font-medium text-sm">
-                {t($ => $.game.trioModeEnabled)}
+                {t(($) => $.game.trioModeEnabled)}
               </Text>
               <Text className="text-center text-muted-foreground text-xs mt-1">
-                {t($ => $.game.trioModeExactly3)}
+                {t(($) => $.game.trioModeExactly3)}
               </Text>
               <Text className="text-center text-muted-foreground text-xs mt-1">
-                {t($ => $.game.disableInSettings)}
+                {t(($) => $.game.disableInSettings)}
               </Text>
             </View>
           )}
@@ -138,19 +138,19 @@ export default function TournamentModal() {
           >
             <Text>
               {activePlayersCount < minActivePlayers
-                ? t($ => $.game.selectAtLeast, {
-                count: minActivePlayers
-              })
+                ? t(($) => $.game.selectAtLeast, {
+                    count: minActivePlayers,
+                  })
                 : activePlayersCount > maxActivePlayers
-                  ? t($ => $.game.tooManyPlayers)
-                  : t($ => $.game.startGame)}
+                  ? t(($) => $.game.tooManyPlayers)
+                  : t(($) => $.game.startGame)}
             </Text>
           </Button>
 
           {canCancelTournament && (
             <View className="mt-4">
               <Button variant="outline" onPress={handleCancel}>
-                <Text>{t($ => $.common.cancel)}</Text>
+                <Text>{t(($) => $.common.cancel)}</Text>
               </Button>
             </View>
           )}
@@ -181,18 +181,18 @@ function PlayersList() {
 
   const handleRemovePlayer = (player: Player) => {
     Alert.alert(
-      t($ => $.players.removePlayer),
-      t($ => $.players.removePlayerConfirm, {
-        name: player.name
+      t(($) => $.players.removePlayer),
+      t(($) => $.players.removePlayerConfirm, {
+        name: player.name,
       }),
       [
         {
-          text: t($ => $.common.cancel),
+          text: t(($) => $.common.cancel),
           style: 'cancel',
           onPress: () => impactAsync(ImpactFeedbackStyle.Light),
         },
         {
-          text: t($ => $.common.delete),
+          text: t(($) => $.common.delete),
           style: 'destructive',
           onPress: () => {
             impactAsync(ImpactFeedbackStyle.Medium);
@@ -212,10 +212,12 @@ function PlayersList() {
     <View className="mt-6 flex-1">
       <View className="mb-4 items-center px-4 py-3 bg-muted/20 rounded-lg">
         <Text variant="muted" className="text-center text-base font-medium">
-          {activePlayersCount} {t($ => $.game.selected)}
+          {activePlayersCount} {t(($) => $.game.selected)}
         </Text>
         <Text variant="muted" className="text-xs mt-1">
-          {trioMode ? t($ => $.game.select3Players) : t($ => $.game.select2to4Players)}
+          {trioMode
+            ? t(($) => $.game.select3Players)
+            : t(($) => $.game.select2to4Players)}
         </Text>
       </View>
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
@@ -258,8 +260,8 @@ function PlayersList() {
                         ${player.isPlaying ? 'text-muted-foreground' : 'text-muted-foreground/70'}
                       `}
                       >
-                        {player.wins} {t($ => $.game.wins)} • {player.losses}{' '}
-                        {t($ => $.game.losses)}
+                        {player.wins} {t(($) => $.game.wins)} • {player.losses}{' '}
+                        {t(($) => $.game.losses)}
                       </Text>
                     )}
                   </View>
@@ -298,10 +300,10 @@ function PlayersList() {
           >
             <Text>
               {canAddMorePlayers
-                ? `+ ${t($ => $.players.addPlayer)}`
-                : t($ => $.players.maxPlayersReached, {
-                count: MAX_PLAYERS
-              })}
+                ? `+ ${t(($) => $.players.addPlayer)}`
+                : t(($) => $.players.maxPlayersReached, {
+                    count: MAX_PLAYERS,
+                  })}
             </Text>
           </Button>
         </View>
@@ -324,10 +326,16 @@ function AddPlayerDialog() {
       z.object({
         playerName: z
           .string()
-          .min(1, t($ => $.validation.required, {
-          field: t($ => $.players.playerName)
-        }))
-          .max(10, t($ => $.players.nameMaxLength))
+          .min(
+            1,
+            t(($) => $.validation.required, {
+              field: t(($) => $.players.playerName),
+            }),
+          )
+          .max(
+            10,
+            t(($) => $.players.nameMaxLength),
+          )
           .refine(
             (name) => {
               const normalizedName = name.trim().toLowerCase();
@@ -335,7 +343,7 @@ function AddPlayerDialog() {
                 (p) => p.name.trim().toLowerCase() === normalizedName,
               );
             },
-            { message: t($ => $.players.playerNameExists) },
+            { message: t(($) => $.players.playerNameExists) },
           ),
       }),
     [players, t],
@@ -399,14 +407,14 @@ function AddPlayerDialog() {
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="min-w-full">
         <DialogTitle>
-          <Text variant="large">{t($ => $.players.addPlayerTitle)}</Text>
+          <Text variant="large">{t(($) => $.players.addPlayerTitle)}</Text>
         </DialogTitle>
 
         <InputField
           autoFocus
           name="playerName"
           control={control}
-          placeholder={t($ => $.players.addPlayerPlaceholder)}
+          placeholder={t(($) => $.players.addPlayerPlaceholder)}
           error={errors.playerName?.message}
           autoCapitalize="words"
           className="mt-4"
@@ -414,10 +422,10 @@ function AddPlayerDialog() {
 
         <View className="mt-6 flex-row justify-end gap-3">
           <Button variant="outline" onPress={handleClose}>
-            <Text>{t($ => $.common.cancel)}</Text>
+            <Text>{t(($) => $.common.cancel)}</Text>
           </Button>
           <Button onPress={handleSubmit(onSubmit)}>
-            <Text>{t($ => $.game.add)}</Text>
+            <Text>{t(($) => $.game.add)}</Text>
           </Button>
         </View>
       </DialogContent>

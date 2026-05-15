@@ -95,7 +95,7 @@ export default function Game() {
           <GameEndingButtons />
           {tournamentMode && (
             <Text variant="muted" className="text-center text-xs mt-1">
-              {t($ => $.game.round)} {currentRoundNumber}
+              {t(($) => $.game.round)} {currentRoundNumber}
             </Text>
           )}
         </View>

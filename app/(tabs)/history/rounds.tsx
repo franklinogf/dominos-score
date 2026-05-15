@@ -31,8 +31,8 @@ function GameSummary({
         <View className="flex-1">
           <Text variant="h3" className="text-foreground mb-1">
             {game.type === GameType.NORMAL
-              ? t($ => $.history.gameType)
-              : t($ => $.history.tournamentType)}
+              ? t(($) => $.history.gameType)
+              : t(($) => $.history.tournamentType)}
           </Text>
           <Text variant="muted" className="text-sm">
             {formatDate(game.createdAt)}
@@ -42,17 +42,17 @@ function GameSummary({
           <Text className="text-sm font-medium text-muted-foreground">
             {game.rounds.length}{' '}
             {game.rounds.length === 1
-              ? t($ => $.history.round)
-              : t($ => $.history.rounds)}
+              ? t(($) => $.history.round)
+              : t(($) => $.history.rounds)}
           </Text>
         </View>
       </View>
       <View className="flex-row justify-between">
         <Text variant="small" className="text-muted-foreground">
-          {t($ => $.history.playersLabel)}: {game.gameSize}
+          {t(($) => $.history.playersLabel)}: {game.gameSize}
         </Text>
         <Text variant="small" className="text-muted-foreground">
-          {t($ => $.history.winningLimit)}: {game.winningLimit}
+          {t(($) => $.history.winningLimit)}: {game.winningLimit}
         </Text>
       </View>
     </View>
@@ -77,13 +77,13 @@ function NoRoundsDisplay({
       <GameSummary game={game} />
       <View className="bg-card border border-border rounded-lg p-4 mb-4">
         <Text variant="h3" className="text-center mb-4 text-foreground">
-          {t($ => $.history.gameSetup)}
+          {t(($) => $.history.gameSetup)}
         </Text>
 
         {/* Players List - just showing they were registered */}
         <View className="space-y-3">
           <Text variant="default" className="font-medium mb-2">
-            {t($ => $.history.registeredPlayers)}:
+            {t(($) => $.history.registeredPlayers)}:
           </Text>
           {game.players.map((player, index) => (
             <View
@@ -101,7 +101,7 @@ function NoRoundsDisplay({
                 </Text>
               </View>
               <Text className="text-xs text-muted-foreground">
-                {t($ => $.history.readyToPlay)}
+                {t(($) => $.history.readyToPlay)}
               </Text>
             </View>
           ))}
@@ -113,16 +113,16 @@ function NoRoundsDisplay({
             <Text className="text-warning-foreground font-bold text-sm">!</Text>
           </View>
           <Text variant="h4" className="text-foreground font-medium">
-            {t($ => $.history.gameNotStarted)}
+            {t(($) => $.history.gameNotStarted)}
           </Text>
         </View>
         <Text className="text-muted-foreground text-sm leading-5">
-          {t($ => $.history.gameNotStartedDesc)}
+          {t(($) => $.history.gameNotStartedDesc)}
         </Text>
       </View>
       <View className="bg-muted/20 border border-border rounded-lg p-4">
         <Text variant="muted" className="text-center text-sm">
-          {t($ => $.history.whenRoundsPlayed)}
+          {t(($) => $.history.whenRoundsPlayed)}
         </Text>
       </View>
     </ScrollView>
@@ -148,7 +148,7 @@ function SingleRoundDisplay({
       <GameSummary game={game} />
       <View className="bg-card border border-border rounded-lg p-4 mb-4">
         <Text variant="h3" className="text-center mb-4 text-foreground">
-          {t($ => $.history.gameResults)}
+          {t(($) => $.history.gameResults)}
         </Text>
 
         {/* Players List with Scores */}
@@ -184,8 +184,8 @@ function SingleRoundDisplay({
                         {player.name}
                       </Text>
                       <Text className="text-sm text-muted-foreground">
-                        {player.wins} {t($ => $.game.wins)} • {player.losses}{' '}
-                        {t($ => $.game.losses)}
+                        {player.wins} {t(($) => $.game.wins)} • {player.losses}{' '}
+                        {t(($) => $.game.losses)}
                       </Text>
                     </View>
                   </View>
@@ -194,7 +194,7 @@ function SingleRoundDisplay({
                       {totalScore}
                     </Text>
                     <Text className="text-xs text-muted-foreground">
-                      {t($ => $.history.points)}
+                      {t(($) => $.history.points)}
                     </Text>
                   </View>
                 </View>
@@ -205,7 +205,7 @@ function SingleRoundDisplay({
                       variant="small"
                       className="text-muted-foreground mb-1"
                     >
-                      {t($ => $.history.roundScores)}:
+                      {t(($) => $.history.roundScores)}:
                     </Text>
                     <View className="flex-row flex-wrap">
                       {scores.map((score, scoreIndex) => (
@@ -222,7 +222,7 @@ function SingleRoundDisplay({
                 {(!scores || scores.length === 0) && (
                   <View className="ml-11">
                     <Text variant="small" className="text-muted-foreground">
-                      {t($ => $.history.noScoresRecorded)}
+                      {t(($) => $.history.noScoresRecorded)}
                     </Text>
                   </View>
                 )}
@@ -233,7 +233,7 @@ function SingleRoundDisplay({
       </View>
       <View className="bg-muted/20 border border-border rounded-lg p-4">
         <Text variant="muted" className="text-center">
-          {t($ => $.history.singleRoundGame)}
+          {t(($) => $.history.singleRoundGame)}
         </Text>
       </View>
     </ScrollView>
@@ -260,7 +260,7 @@ function MultipleRoundsDisplay({
       {/* Overall Standings */}
       <View className="bg-card border border-border rounded-lg p-4 mb-4">
         <Text variant="h3" className="text-center mb-4 text-foreground">
-          {t($ => $.history.finalStandings)}
+          {t(($) => $.history.finalStandings)}
         </Text>
 
         <View className="space-y-2">
@@ -289,10 +289,10 @@ function MultipleRoundsDisplay({
               </View>
               <View className="items-end">
                 <Text className="text-sm font-medium">
-                  {player.wins} {t($ => $.game.wins)}
+                  {player.wins} {t(($) => $.game.wins)}
                 </Text>
                 <Text className="text-xs text-muted-foreground">
-                  {player.losses} {t($ => $.game.losses)}
+                  {player.losses} {t(($) => $.game.losses)}
                 </Text>
               </View>
             </View>
@@ -302,7 +302,7 @@ function MultipleRoundsDisplay({
       {/* Rounds Breakdown */}
       <View className="bg-card border border-border rounded-lg p-4 mb-4">
         <Text variant="h3" className="text-center mb-4 text-foreground">
-          {t($ => $.history.roundByRound)}
+          {t(($) => $.history.roundByRound)}
         </Text>
 
         <FlatList
@@ -314,13 +314,13 @@ function MultipleRoundsDisplay({
             <View className="border-b border-border py-4 last:border-b-0">
               <View className="flex-row justify-between items-center mb-3">
                 <Text variant="h4" className="font-medium">
-                  {t($ => $.history.roundNumber, {
-                    number: index + 1
+                  {t(($) => $.history.roundNumber, {
+                    number: index + 1,
                   })}
                 </Text>
                 {round.roundWinnerId && (
                   <Text variant="small" className="text-primary font-medium">
-                    {t($ => $.game.winner)}:{' '}
+                    {t(($) => $.game.winner)}:{' '}
                     {game.players.find((p) => p.id === round.roundWinnerId)
                       ?.name || 'Unknown'}
                   </Text>
@@ -363,7 +363,7 @@ function MultipleRoundsDisplay({
                             variant="small"
                             className="text-muted-foreground"
                           >
-                            {t($ => $.history.noScores)}
+                            {t(($) => $.history.noScores)}
                           </Text>
                         )}
                       </View>
@@ -374,7 +374,7 @@ function MultipleRoundsDisplay({
 
               {!round.roundWinnerId && !round.playersToRounds.length && (
                 <Text variant="small" className="text-muted-foreground mt-2">
-                  {t($ => $.history.roundNotCompleted)}
+                  {t(($) => $.history.roundNotCompleted)}
                 </Text>
               )}
             </View>
@@ -384,8 +384,8 @@ function MultipleRoundsDisplay({
       </View>
       <View className="bg-muted/20 border border-border rounded-lg p-4">
         <Text variant="muted" className="text-center">
-          {t($ => $.history.multipleRoundsGame, {
-            count: game.rounds.length
+          {t(($) => $.history.multipleRoundsGame, {
+            count: game.rounds.length,
           })}
         </Text>
       </View>
@@ -420,7 +420,7 @@ export default function HistoryRounds() {
         edges={['top', 'left', 'right']}
         className="flex-1 items-center justify-center"
       >
-        <Text>{t($ => $.history.loadingGameData)}</Text>
+        <Text>{t(($) => $.history.loadingGameData)}</Text>
       </SafeAreaView>
     );
   }
@@ -433,7 +433,7 @@ export default function HistoryRounds() {
       className="flex-1 bg-background px-4 pt-4"
     >
       <Text variant="h1" className="text-center mb-6">
-        {t($ => $.history.gameDetails)}
+        {t(($) => $.history.gameDetails)}
       </Text>
       {game.rounds.length === 0 ? (
         <NoRoundsDisplay game={game} bottomPadding={bottomPadding} />
