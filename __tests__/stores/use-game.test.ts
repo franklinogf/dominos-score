@@ -1,13 +1,8 @@
-import { getMultiLoseSetting, getTrioModeSetting } from '@/db/querys/settings';
+import { db } from '@/db/database';
 import { GameStatus } from '@/lib/enums';
 import type { Player } from '@/lib/types';
 import { useGame } from '@/stores/use-game';
 import { randomUUID } from 'expo-crypto';
-
-jest.mock('@/db/querys/settings', () => ({
-  getTrioModeSetting: jest.fn().mockResolvedValue(false),
-  getMultiLoseSetting: jest.fn().mockResolvedValue(false),
-}));
 
 const INITIAL_STATE = {
   gameStatus: GameStatus.NotStarted,
@@ -41,6 +36,7 @@ beforeEach(() => {
   useGame.setState(INITIAL_STATE);
   let uuidCounter = 0;
   (randomUUID as jest.Mock).mockImplementation(() => `uuid-${++uuidCounter}`);
+  (db.query.settingsTable.findFirst as jest.Mock).mockResolvedValue(undefined);
 });
 
 describe('addScoreToPlayer', () => {
@@ -283,15 +279,16 @@ describe('restoreGame', () => {
 
 describe('loadSettings', () => {
   it('loads trioMode and multiLose from settings and applies them to the store', async () => {
-    (getTrioModeSetting as jest.Mock).mockResolvedValueOnce(true);
-    (getMultiLoseSetting as jest.Mock).mockResolvedValueOnce(true);
+    (db.query.settingsTable.findFirst as jest.Mock)
+      .mockResolvedValueOnce({ value: 'true' })
+      .mockResolvedValueOnce({ value: 'true' });
     await useGame.getState().loadSettings();
     expect(useGame.getState().trioMode).toBe(true);
     expect(useGame.getState().multiLose).toBe(true);
   });
 
-  it('does not throw when settings query fails', async () => {
-    (getTrioModeSetting as jest.Mock).mockRejectedValueOnce(
+  it('does not throw when the settings query fails', async () => {
+    (db.query.settingsTable.findFirst as jest.Mock).mockRejectedValueOnce(
       new Error('DB error'),
     );
     await expect(useGame.getState().loadSettings()).resolves.not.toThrow();
