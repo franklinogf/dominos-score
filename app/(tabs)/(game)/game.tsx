@@ -3,7 +3,6 @@ import { GameScore } from '@/components/game-score';
 import { GameTotal } from '@/components/game-total';
 import { PlayersButtons } from '@/components/players-buttons';
 import { ScoreModal } from '@/components/score-modal';
-import { Separator } from '@/components/ui/separator';
 import { Text } from '@/components/ui/text';
 import { getGameById } from '@/db/querys/game';
 import { useTournamentTitle } from '@/hooks/use-tournament-title';
@@ -19,6 +18,10 @@ import {
   SafeAreaView,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+
+const IOS_FLOATING_TAB_CLEARANCE = 25;
+const ANDROID_TAB_CLEARANCE = 80;
+const MIN_BOTTOM_PADDING = 15;
 
 export default function Game() {
   useKeepAwake();
@@ -37,7 +40,13 @@ export default function Game() {
 
   const navigation = useNavigation();
   const title = useTournamentTitle();
-  const bottomPadding = Math.max(insets.bottom, 12);
+  const tabClearance = Platform.select({
+    ios: IOS_FLOATING_TAB_CLEARANCE,
+    android: ANDROID_TAB_CLEARANCE,
+    default: 0,
+  });
+  const bottomPadding =
+    Math.max(insets.bottom, MIN_BOTTOM_PADDING) + tabClearance;
 
   useEffect(() => {
     const hydrateGame = async () => {
@@ -102,15 +111,11 @@ export default function Game() {
 
         <PlayersButtons />
 
-        <Separator className="mt-2" />
-
-        <View className="flex-1">
+        <View className="mt-3 flex-1 rounded-lg border border-border bg-card/60">
           <GameScore />
         </View>
 
-        <Separator className="my-2" />
-
-        <View className="h-36">
+        <View className="mt-2 h-32 rounded-lg border border-border bg-card px-1 py-2">
           <GameTotal />
         </View>
 

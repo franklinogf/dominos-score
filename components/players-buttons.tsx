@@ -11,6 +11,7 @@ import {
 } from '@/lib/constants';
 import { GameStatus } from '@/lib/enums';
 import { Player } from '@/lib/types';
+import { cn } from '@/lib/utils';
 import { useGame } from '@/stores/use-game';
 import { useScoreModal } from '@/stores/use-score-modal';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
@@ -81,8 +82,8 @@ export function PlayersButtons() {
               variant="small"
               className="text-muted-foreground text-center flex-1"
             >
-              {t($ => $.game.longPressHint, {
-                points: longPressScore
+              {t(($) => $.game.longPressHint, {
+                points: longPressScore,
               })}
             </Text>
           </Pressable>
@@ -106,23 +107,29 @@ function PlayerButton({
   const { open: openModal } = useScoreModal();
 
   const gameStatus = useGame((state) => state.gameStatus);
+  const winnerPlayerId = useGame((state) => state.winnerPlayerId);
+  const loserPlayerId = useGame((state) => state.loserPlayerId);
+  const trioMode = useGame((state) => state.trioMode);
   const isIos = Platform.OS === 'ios';
+  const isWinner = player.id === winnerPlayerId;
+  const isLoser = trioMode && player.id === loserPlayerId;
+  const isFinished = gameStatus === GameStatus.Finished;
 
   const handleAddCustomScore = () => {
     impactAsync(ImpactFeedbackStyle.Light);
     if (isIos) {
       Alert.prompt(
-        t($ => $.game.addScore),
-        t($ => $.game.enterScoreFor, {
-          name: player.name
+        t(($) => $.game.addScore),
+        t(($) => $.game.enterScoreFor, {
+          name: player.name,
         }),
         [
           {
-            text: t($ => $.common.cancel),
+            text: t(($) => $.common.cancel),
             style: 'cancel',
           },
           {
-            text: t($ => $.game.add),
+            text: t(($) => $.game.add),
             onPress: (score: string | undefined) => {
               // Allow empty input to cancel without error
               if (!score || score.trim() === '') {
@@ -154,8 +161,13 @@ function PlayerButton({
             impactAsync(ImpactFeedbackStyle.Heavy);
             addScoreToPlayer(player, doublePressScore);
           }}
-          disabled={gameStatus === GameStatus.Finished}
-          className="px-0 relative overflow-hidden"
+          disabled={isFinished}
+          className={cn('relative overflow-hidden px-1', {
+            'border-success bg-success/10 active:bg-success/15': isWinner,
+            'border-destructive bg-destructive/10 active:bg-destructive/15':
+              isLoser,
+          })}
+          variant={isWinner || isLoser ? 'outline' : 'default'}
           size="lg"
           onPress={handleAddCustomScore}
           onLongPress={() => {
@@ -165,16 +177,23 @@ function PlayerButton({
           }}
         >
           {player.losses > 0 && (
-            <Text className="absolute -top-0.5 left-0.5 text-red-500/90 font-bold text-3xl">
+            <Text className="absolute left-1 top-1 min-w-5 rounded bg-destructive px-1 text-center text-xs font-bold text-destructive-foreground">
               {player.losses}
             </Text>
           )}
           {player.wins > 0 && (
-            <Text className="absolute -top-0.5 right-0.5 text-green-500/90 font-bold text-3xl">
+            <Text className="absolute right-1 top-1 min-w-5 rounded bg-success px-1 text-center text-xs font-bold text-success-foreground">
               {player.wins}
             </Text>
           )}
-          <Text className="line-clamp-1 uppercase">{player.name}</Text>
+          <Text
+            className={cn('line-clamp-1 px-5 text-center uppercase', {
+              'text-success': isWinner,
+              'text-destructive': isLoser,
+            })}
+          >
+            {player.name}
+          </Text>
         </DoubleTapButton>
       </View>
     </>

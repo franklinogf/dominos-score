@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { Player } from '@/lib/types';
+import { cn } from '@/lib/utils';
 import { useGame } from '@/stores/use-game';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { useEffect, useRef } from 'react';
@@ -43,7 +44,7 @@ export function PlayerScoreList({ player }: { player: Player }) {
   return (
     <Animated.FlatList
       ref={flatListRef}
-      className="mt-2 flex-1 px-2"
+      className="flex-1 px-1 py-2"
       itemLayoutAnimation={SequencedTransition}
       data={player.score}
       keyExtractor={(item) => item.id}
@@ -53,29 +54,31 @@ export function PlayerScoreList({ player }: { player: Player }) {
           <Animated.View
             entering={ZoomIn}
             exiting={FlipOutXUp}
-            className="mb-2 w-[85px] max-w-[100px] mx-auto"
+            className="mx-auto mb-2 w-[76px] max-w-[92px]"
           >
             <Button
               disabled={
                 (player.id === winnerPlayerId && !isLastItem) ||
                 (player.id !== winnerPlayerId && winnerPlayerId !== null)
               }
-              className="p-0"
+              className={cn('h-11 p-0', {
+                'bg-muted/50': winnerPlayerId !== null,
+              })}
               onLongPress={() => {
                 impactAsync(ImpactFeedbackStyle.Heavy);
                 Alert.alert(
-                  t($ => $.game.removeScore),
-                  t($ => $.game.removeScoreConfirm, {
+                  t(($) => $.game.removeScore),
+                  t(($) => $.game.removeScoreConfirm, {
                     value: item.value,
-                    name: player.name
+                    name: player.name,
                   }),
                   [
                     {
-                      text: t($ => $.common.cancel),
+                      text: t(($) => $.common.cancel),
                       style: 'cancel',
                     },
                     {
-                      text: t($ => $.common.ok),
+                      text: t(($) => $.common.ok),
                       style: 'destructive',
                       onPress: () => removeScoreFromPlayer(player, item.id),
                     },
@@ -85,7 +88,9 @@ export function PlayerScoreList({ player }: { player: Player }) {
               variant="outline"
               size="lg"
             >
-              <Text className="text-2xl">{item.value}</Text>
+              <Text className="text-xl font-semibold tabular-nums">
+                {item.value}
+              </Text>
             </Button>
           </Animated.View>
         );

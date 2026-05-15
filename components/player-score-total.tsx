@@ -27,6 +27,7 @@ export function PlayerScoreTotal({ player }: { player: Player }) {
   const shouldShowWinner = isWinner;
   const shouldShowLoser = trioMode && isLoser;
 
+  const remaining = Math.max(winningLimit - total, 0);
   const progress = Math.min(total / winningLimit, 1);
   const isNearLimit = progress >= 0.75 && !shouldShowWinner;
 
@@ -94,30 +95,52 @@ export function PlayerScoreTotal({ player }: { player: Player }) {
   }));
 
   return (
-    <View className="flex-1 px-2">
-      <Animated.View style={animatedStyle}>
+    <View className="flex-1 px-1">
+      <View
+        className={cn(
+          'h-full rounded-md border border-border bg-background p-2',
+          {
+            'border-success bg-success/10': shouldShowWinner,
+            'border-destructive bg-destructive/10': shouldShowLoser,
+          },
+        )}
+      >
         <Text
-          className={cn('text-2xl font-extrabold text-center', {
+          className={cn('mb-1 text-center text-xs font-medium uppercase', {
             'text-success': shouldShowWinner,
             'text-destructive': shouldShowLoser,
+            'text-muted-foreground': !shouldShowWinner && !shouldShowLoser,
           })}
+          numberOfLines={1}
         >
-          {total}
+          {player.name}
         </Text>
-      </Animated.View>
-      <Text variant="muted" className="text-center text-lg font-medium">
-        {winningLimit - total}
-      </Text>
-      <View className="mt-1 h-1.5 rounded-full bg-muted overflow-hidden">
-        <Animated.View
-          style={progressBarStyle}
-          className={cn('h-full rounded-full', {
-            'bg-success': shouldShowWinner,
-            'bg-destructive': shouldShowLoser,
-            'bg-warning': isNearLimit,
-            'bg-primary': !shouldShowWinner && !shouldShowLoser && !isNearLimit,
-          })}
-        />
+        <Animated.View style={animatedStyle}>
+          <Text
+            className={cn('text-center text-3xl font-extrabold tabular-nums', {
+              'text-success': shouldShowWinner,
+              'text-destructive': shouldShowLoser,
+            })}
+          >
+            {total}
+          </Text>
+        </Animated.View>
+
+        <Text className="text-center text-base font-semibold tabular-nums">
+          {remaining}
+        </Text>
+        <View className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
+          <Animated.View
+            style={progressBarStyle}
+            className={cn('h-full rounded-full', {
+              'bg-success': shouldShowWinner,
+              'bg-destructive': shouldShowLoser,
+              'bg-warning': isNearLimit,
+              'bg-primary':
+                !shouldShowWinner && !shouldShowLoser && !isNearLimit,
+            })}
+          />
+        </View>
       </View>
     </View>
   );
