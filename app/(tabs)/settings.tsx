@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -25,8 +26,19 @@ import { useGame } from '@/stores/use-game';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { useFocusEffect } from 'expo-router';
-import { Moon, Smartphone, Sun } from 'lucide-react-native';
+import {
+  Download,
+  Gamepad2,
+  Moon,
+  Palette,
+  Save,
+  Smartphone,
+  Sun,
+  Zap,
+} from 'lucide-react-native';
+import type { LucideIcon } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
+import type { ReactNode } from 'react';
 import { useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -51,17 +63,37 @@ interface FieldGroupProps {
   id: string;
   label: string;
   description?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 function FieldGroup({ id, label, description, children }: FieldGroupProps) {
   return (
-    <View className="my-3">
+    <View className="mb-5">
       <View className="mb-3">
         <Label htmlFor={id} className="text-base font-medium">
           {label}
         </Label>
         {description && <Text variant="muted">{description}</Text>}
+      </View>
+      {children}
+    </View>
+  );
+}
+
+function SettingsSection({
+  title,
+  icon,
+  children,
+}: {
+  title: string;
+  icon: LucideIcon;
+  children: ReactNode;
+}) {
+  return (
+    <View className="mb-4 rounded-lg border border-border bg-card p-4">
+      <View className="mb-4 flex-row items-center gap-2">
+        <Icon as={icon} className="text-primary" size={18} />
+        <Text variant="large">{title}</Text>
       </View>
       {children}
     </View>
@@ -257,163 +289,202 @@ export default function Settings() {
               behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
               className="flex-1"
             >
-              <FieldGroup
-                id="longPressScore"
-                label={t(($) => $.settings.longPressScore)}
-                description={t(($) => $.settings.longPressScoreDescription)}
+              <SettingsSection
+                title={t(($) => $.settings.scoringShortcuts)}
+                icon={Zap}
               >
-                <Controller
-                  control={control}
-                  name="longPressScore"
-                  render={({ field: { onChange, value } }) => (
-                    <Input
-                      id="longPressScore"
-                      value={value}
-                      onChangeText={onChange}
-                      placeholder={t(
-                        ($) => $.settings.longPressScorePlaceholder,
-                      )}
-                      keyboardType="number-pad"
-                      maxLength={3}
-                    />
-                  )}
-                />
+                <FieldGroup
+                  id="longPressScore"
+                  label={t(($) => $.settings.longPressScore)}
+                  description={t(($) => $.settings.longPressScoreDescription)}
+                >
+                  <Controller
+                    control={control}
+                    name="longPressScore"
+                    render={({ field: { onChange, value } }) => (
+                      <Input
+                        id="longPressScore"
+                        value={value}
+                        onChangeText={onChange}
+                        placeholder={t(
+                          ($) => $.settings.longPressScorePlaceholder,
+                        )}
+                        keyboardType="number-pad"
+                        maxLength={3}
+                      />
+                    )}
+                  />
 
-                {errors.longPressScore && (
-                  <Text className="text-destructive text-sm mt-2">
-                    {errors.longPressScore.message}
-                  </Text>
-                )}
-              </FieldGroup>
-
-              <FieldGroup
-                id="doublePressScore"
-                label={t(($) => $.settings.doublePressScore)}
-                description={t(($) => $.settings.doublePressScoreDescription)}
-              >
-                <Controller
-                  control={control}
-                  name="doublePressScore"
-                  render={({ field: { onChange, value } }) => (
-                    <Input
-                      id="doublePressScore"
-                      value={value}
-                      onChangeText={onChange}
-                      placeholder={t(
-                        ($) => $.settings.longPressScorePlaceholder,
-                      )}
-                      keyboardType="number-pad"
-                      maxLength={3}
-                    />
+                  {errors.longPressScore && (
+                    <Text className="text-destructive text-sm mt-2">
+                      {errors.longPressScore.message}
+                    </Text>
                   )}
-                />
-                {errors.doublePressScore && (
-                  <Text className="text-destructive text-sm mt-2">
-                    {errors.doublePressScore.message}
-                  </Text>
-                )}
-              </FieldGroup>
+                </FieldGroup>
 
-              <FieldGroup
-                id="trioMode"
-                label={t(($) => $.settings.trioMode)}
-                description={t(($) => $.settings.trioModeDescription)}
-              >
-                <Controller
-                  control={control}
-                  name="trioMode"
-                  render={({ field: { onChange, value } }) => (
-                    <View className="flex-row items-center space-x-2">
-                      <Switch checked={value} onCheckedChange={onChange} />
-                      <Text variant="default" className="ml-3">
-                        {value
-                          ? t(($) => $.settings.enabled)
-                          : t(($) => $.settings.disabled)}
-                      </Text>
-                    </View>
+                <FieldGroup
+                  id="doublePressScore"
+                  label={t(($) => $.settings.doublePressScore)}
+                  description={t(($) => $.settings.doublePressScoreDescription)}
+                >
+                  <Controller
+                    control={control}
+                    name="doublePressScore"
+                    render={({ field: { onChange, value } }) => (
+                      <Input
+                        id="doublePressScore"
+                        value={value}
+                        onChangeText={onChange}
+                        placeholder={t(
+                          ($) => $.settings.longPressScorePlaceholder,
+                        )}
+                        keyboardType="number-pad"
+                        maxLength={3}
+                      />
+                    )}
+                  />
+                  {errors.doublePressScore && (
+                    <Text className="text-destructive text-sm mt-2">
+                      {errors.doublePressScore.message}
+                    </Text>
                   )}
-                />
-              </FieldGroup>
-              <FieldGroup
-                id="multiLose"
-                label={t(($) => $.settings.multiLose)}
-                description={t(($) => $.settings.multiLoseDescription)}
-              >
-                <Controller
-                  control={control}
-                  name="multiLose"
-                  render={({ field: { onChange, value } }) => (
-                    <View className="flex-row items-center space-x-2">
-                      <Switch checked={value} onCheckedChange={onChange} />
-                      <Text variant="default" className="ml-3">
-                        {value
-                          ? t(($) => $.settings.enabled)
-                          : t(($) => $.settings.disabled)}
-                      </Text>
-                    </View>
-                  )}
-                />
-              </FieldGroup>
+                </FieldGroup>
+              </SettingsSection>
 
-              <FieldGroup
-                id="theme"
-                label={t(($) => $.settings.theme)}
-                description={t(($) => $.settings.themeDescription)}
+              <SettingsSection
+                title={t(($) => $.settings.gameRules)}
+                icon={Gamepad2}
               >
-                <Controller
-                  control={control}
-                  name="theme"
-                  render={({ field: { onChange, value } }) => (
-                    <ToggleGroup
-                      type="single"
-                      value={value}
-                      onValueChange={(val) => {
-                        if (val) {
-                          impactAsync(ImpactFeedbackStyle.Light);
-                          onChange(val as ThemeOption);
-                        }
-                      }}
-                      className="justify-start"
-                    >
-                      <ToggleGroupItem
-                        value="light"
-                        aria-label={t(($) => $.settings.themeLight)}
-                        className="flex-row items-center gap-2 px-4"
+                <FieldGroup
+                  id="trioMode"
+                  label={t(($) => $.settings.trioMode)}
+                  description={t(($) => $.settings.trioModeDescription)}
+                >
+                  <Controller
+                    control={control}
+                    name="trioMode"
+                    render={({ field: { onChange, value } }) => (
+                      <View className="flex-row items-center justify-between gap-4">
+                        <Text variant="default">
+                          {value
+                            ? t(($) => $.settings.enabled)
+                            : t(($) => $.settings.disabled)}
+                        </Text>
+                        <Switch checked={value} onCheckedChange={onChange} />
+                      </View>
+                    )}
+                  />
+                </FieldGroup>
+                <FieldGroup
+                  id="multiLose"
+                  label={t(($) => $.settings.multiLose)}
+                  description={t(($) => $.settings.multiLoseDescription)}
+                >
+                  <Controller
+                    control={control}
+                    name="multiLose"
+                    render={({ field: { onChange, value } }) => (
+                      <View className="flex-row items-center justify-between gap-4">
+                        <Text variant="default">
+                          {value
+                            ? t(($) => $.settings.enabled)
+                            : t(($) => $.settings.disabled)}
+                        </Text>
+                        <Switch checked={value} onCheckedChange={onChange} />
+                      </View>
+                    )}
+                  />
+                </FieldGroup>
+              </SettingsSection>
+
+              <SettingsSection
+                title={t(($) => $.settings.appearance)}
+                icon={Palette}
+              >
+                <FieldGroup
+                  id="theme"
+                  label={t(($) => $.settings.theme)}
+                  description={t(($) => $.settings.themeDescription)}
+                >
+                  <Controller
+                    control={control}
+                    name="theme"
+                    render={({ field: { onChange, value } }) => (
+                      <ToggleGroup
+                        type="single"
+                        value={value}
+                        onValueChange={(val) => {
+                          if (val) {
+                            impactAsync(ImpactFeedbackStyle.Light);
+                            onChange(val as ThemeOption);
+                          }
+                        }}
+                        className="justify-start"
                       >
-                        <Sun size={18} className="text-foreground" />
-                        <Text>{t(($) => $.settings.themeLight)}</Text>
-                      </ToggleGroupItem>
-                      <ToggleGroupItem
-                        value="dark"
-                        aria-label={t(($) => $.settings.themeDark)}
-                        className="flex-row items-center gap-2 px-4"
-                      >
-                        <Moon size={18} className="text-foreground" />
-                        <Text>{t(($) => $.settings.themeDark)}</Text>
-                      </ToggleGroupItem>
-                      <ToggleGroupItem
-                        value="system"
-                        aria-label={t(($) => $.settings.themeSystem)}
-                        className="flex-row items-center gap-2 px-4"
-                      >
-                        <Smartphone size={18} className="text-foreground" />
-                        <Text>{t(($) => $.settings.themeSystem)}</Text>
-                      </ToggleGroupItem>
-                    </ToggleGroup>
-                  )}
-                />
-              </FieldGroup>
+                        <ToggleGroupItem
+                          value="light"
+                          aria-label={t(($) => $.settings.themeLight)}
+                          className="flex-row items-center gap-2 px-4"
+                        >
+                          <Icon
+                            as={Sun}
+                            className="text-foreground"
+                            size={18}
+                          />
+                          <Text>{t(($) => $.settings.themeLight)}</Text>
+                        </ToggleGroupItem>
+                        <ToggleGroupItem
+                          value="dark"
+                          aria-label={t(($) => $.settings.themeDark)}
+                          className="flex-row items-center gap-2 px-4"
+                        >
+                          <Icon
+                            as={Moon}
+                            className="text-foreground"
+                            size={18}
+                          />
+                          <Text>{t(($) => $.settings.themeDark)}</Text>
+                        </ToggleGroupItem>
+                        <ToggleGroupItem
+                          value="system"
+                          aria-label={t(($) => $.settings.themeSystem)}
+                          className="flex-row items-center gap-2 px-4"
+                        >
+                          <Icon
+                            as={Smartphone}
+                            className="text-foreground"
+                            size={18}
+                          />
+                          <Text>{t(($) => $.settings.themeSystem)}</Text>
+                        </ToggleGroupItem>
+                      </ToggleGroup>
+                    )}
+                  />
+                </FieldGroup>
+              </SettingsSection>
 
               {Platform.OS === 'android' && (
-                <FieldGroup
-                  id="updates"
-                  label={t(($) => $.settings.checkForUpdates)}
-                  description={t(($) => $.settings.checkForUpdatesDescription)}
+                <SettingsSection
+                  title={t(($) => $.settings.appUpdates)}
+                  icon={Download}
                 >
-                  <Button variant="outline" onPress={handleCheckForUpdates}>
-                    <Text>{t(($) => $.settings.checkForUpdates)}</Text>
-                  </Button>
-                </FieldGroup>
+                  <FieldGroup
+                    id="updates"
+                    label={t(($) => $.settings.checkForUpdates)}
+                    description={t(
+                      ($) => $.settings.checkForUpdatesDescription,
+                    )}
+                  >
+                    <Button variant="outline" onPress={handleCheckForUpdates}>
+                      <Icon
+                        as={Download}
+                        className="text-foreground"
+                        size={17}
+                      />
+                      <Text>{t(($) => $.settings.checkForUpdates)}</Text>
+                    </Button>
+                  </FieldGroup>
+                </SettingsSection>
               )}
 
               <Button
@@ -421,6 +492,7 @@ export default function Settings() {
                 disabled={!isDirty || isSubmitting}
                 className="mt-8"
               >
+                <Icon as={Save} className="text-primary-foreground" size={17} />
                 <Text>
                   {isSubmitting
                     ? t(($) => $.settings.saving)
