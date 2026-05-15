@@ -116,6 +116,9 @@ const numericScoreField = (
 const ANDROID_PACKAGE_ID = 'com.franklinogf.dominosscore';
 const ANDROID_MARKET_URL = `market://details?id=${ANDROID_PACKAGE_ID}`;
 const ANDROID_PLAY_STORE_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE_ID}`;
+const ANDROID_TAB_CLEARANCE = 112;
+const IOS_TAB_CLEARANCE = 32;
+const MIN_BOTTOM_PADDING = 12;
 
 export default function Settings() {
   const insets = useSafeAreaInsets();
@@ -262,7 +265,13 @@ export default function Settings() {
     }
   };
 
-  const bottomPadding = Math.max(insets.bottom, 12);
+  const tabClearance = Platform.select({
+    android: ANDROID_TAB_CLEARANCE,
+    ios: IOS_TAB_CLEARANCE,
+    default: 0,
+  });
+  const bottomPadding =
+    Math.max(insets.bottom, MIN_BOTTOM_PADDING) + tabClearance;
 
   return (
     <SafeAreaView
