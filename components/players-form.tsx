@@ -4,66 +4,79 @@ import { Text } from '@/components/ui/text';
 
 import { Button } from '@/components/ui/button';
 import { addNewGame } from '@/db/actions/game';
-import { useT } from '@/hooks/use-translation';
 import { GameType } from '@/lib/enums';
 import { Player } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useGame } from '@/stores/use-game';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
-import { useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { Alert, Platform, ScrollView, TextInput, View } from 'react-native';
 import { z } from 'zod';
 
 // Create dynamic schema based on game size
-const createPlayersSchema = (
-  gameSize: number,
-  t: (key: string, options?: any) => string,
-) => {
-  const playerFields = Array.from({ length: gameSize }, (_, index) => [
-    `player${index}`,
-    z
-      .string()
-      .min(1, t('players.nameRequired', { number: index + 1 }))
-      .max(10, t('players.nameMaxLength')),
-  ]);
-
-  return z.object(Object.fromEntries(playerFields)).superRefine((data, ctx) => {
-    const seenNames = new Map<string, string>();
-    const reportedFields = new Set<string>();
-
-    Object.entries(data as Record<string, string>).forEach(
-      ([fieldName, name]) => {
-        const normalizedName = name.trim().toLowerCase();
-        if (!normalizedName) return;
-
-        const firstFieldName = seenNames.get(normalizedName);
-        if (firstFieldName) {
-          [firstFieldName, fieldName].forEach((duplicateFieldName) => {
-            if (reportedFields.has(duplicateFieldName)) return;
-            reportedFields.add(duplicateFieldName);
-            ctx.addIssue({
-              code: z.ZodIssueCode.custom,
-              message: t('players.playerNameExists'),
-              path: [duplicateFieldName],
-            });
-          });
-          return;
-        }
-
-        seenNames.set(normalizedName, fieldName);
-      },
-    );
-  });
-};
 
 export function PlayersForm() {
-  const { t } = useT();
+  const { t } = useTranslation();
   const gameSize = useGame((state) => state.gameSize);
   const players = useGame((state) => state.players);
   const addPlayers = useGame((state) => state.addPlayers);
-  const schema = useMemo(() => createPlayersSchema(gameSize, t), [gameSize, t]);
+  const createPlayersSchema = useCallback(
+    (gameSize: number) => {
+      const playerFields = Array.from({ length: gameSize }, (_, index) => [
+        `player${index}`,
+        z
+          .string()
+          .min(
+            1,
+            t(($) => $.players.nameRequired, {
+              number: index + 1,
+            }),
+          )
+          .max(
+            10,
+            t(($) => $.players.nameMaxLength),
+          ),
+      ]);
+
+      return z
+        .object(Object.fromEntries(playerFields))
+        .superRefine((data, ctx) => {
+          const seenNames = new Map<string, string>();
+          const reportedFields = new Set<string>();
+
+          Object.entries(data as Record<string, string>).forEach(
+            ([fieldName, name]) => {
+              const normalizedName = name.trim().toLowerCase();
+              if (!normalizedName) return;
+
+              const firstFieldName = seenNames.get(normalizedName);
+              if (firstFieldName) {
+                [firstFieldName, fieldName].forEach((duplicateFieldName) => {
+                  if (reportedFields.has(duplicateFieldName)) return;
+                  reportedFields.add(duplicateFieldName);
+                  ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    message: t(($) => $.players.playerNameExists),
+                    path: [duplicateFieldName],
+                  });
+                });
+                return;
+              }
+
+              seenNames.set(normalizedName, fieldName);
+            },
+          );
+        });
+    },
+    [t],
+  );
+  const schema = useMemo(
+    () => createPlayersSchema(gameSize),
+    [gameSize, createPlayersSchema],
+  );
   const tournamentMode = useGame((state) => state.tournamentMode);
   const inputRef = useRef<TextInput[]>([]);
   const winningLimit = useGame((state) => state.winningLimit);
@@ -85,6 +98,7 @@ export function PlayersForm() {
     index,
     fieldName: `player${index}` as const,
   }));
+  const type = tournamentMode ? GameType.TOURNAMENT : GameType.NORMAL;
 
   const onSubmit = async (data: Record<string, string>) => {
     try {
@@ -92,14 +106,17 @@ export function PlayersForm() {
       const result = await addNewGame(
         {
           gameSize,
-          type: tournamentMode ? GameType.TOURNAMENT : GameType.NORMAL,
+          type,
           winningLimit,
         },
         playersNames,
       );
 
       if (result === undefined) {
-        Alert.alert(t('common.error'), t('errors.gameCreationFailed'));
+        Alert.alert(
+          t(($) => $.common.error),
+          t(($) => $.errors.gameCreationFailed),
+        );
         return;
       }
       const { game, players } = result;
@@ -122,8 +139,8 @@ export function PlayersForm() {
     } catch (error) {
       console.error('Error creating game:', error);
       Alert.alert(
-        t('common.error'),
-        t('errors.gameCreationFailed') + '| ' + error,
+        t(($) => $.common.error),
+        t(($) => $.errors.gameCreationFailed) + '| ' + error,
       );
     }
   };
@@ -154,7 +171,9 @@ export function PlayersForm() {
               htmlFor={`player-name-${item.index}`}
               className="font-bold text-xl mb-2"
             >
-              {t('players.playerNumber', { number: item.index + 1 })}
+              {t(($) => $.players.playerNumber, {
+                number: item.index + 1,
+              })}
             </Label>
             <Controller
               control={control}
@@ -180,7 +199,7 @@ export function PlayersForm() {
                   id={`player-name-${item.index}`}
                   value={value}
                   onChangeText={onChange}
-                  placeholder={t('players.enterPlayerName', {
+                  placeholder={t(($) => $.players.enterPlayerName, {
                     number: item.index + 1,
                   })}
                 />
@@ -197,7 +216,9 @@ export function PlayersForm() {
       <View className="px-4 pb-2">
         <Button onPress={handleSubmit(onSubmit)} size="lg">
           <Text>
-            {tournamentMode ? t('game.startTournament') : t('game.startGame')}
+            {tournamentMode
+              ? t(($) => $.game.startTournament)
+              : t(($) => $.game.startGame)}
           </Text>
         </Button>
       </View>

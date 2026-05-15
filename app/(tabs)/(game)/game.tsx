@@ -6,7 +6,6 @@ import { ScoreModal } from '@/components/score-modal';
 import { Separator } from '@/components/ui/separator';
 import { Text } from '@/components/ui/text';
 import { getGameById } from '@/db/querys/game';
-import { useT } from '@/hooks/use-translation';
 import { useTournamentTitle } from '@/hooks/use-tournament-title';
 import { buildRestoredGameState } from '@/lib/game-restore';
 import { useGame } from '@/stores/use-game';
@@ -14,13 +13,17 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useKeepAwake } from 'expo-keep-awake';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Platform, View } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 export default function Game() {
   useKeepAwake();
   const insets = useSafeAreaInsets();
-  const { t } = useT();
+  const { t } = useTranslation();
   const players = useGame((state) => state.players);
   const activePlayersCount = players.filter((p) => p.isPlaying).length;
   const tournamentMode = useGame((state) => state.tournamentMode);
@@ -92,7 +95,7 @@ export default function Game() {
           <GameEndingButtons />
           {tournamentMode && (
             <Text variant="muted" className="text-center text-xs mt-1">
-              {t('game.round')} {currentRoundNumber}
+              {t($ => $.game.round)} {currentRoundNumber}
             </Text>
           )}
         </View>

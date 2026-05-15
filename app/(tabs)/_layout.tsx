@@ -1,16 +1,16 @@
-import { useT } from '@/hooks/use-translation';
 import { NAV_THEME, THEME } from '@/lib/theme';
 import FontAwesome from '@expo/vector-icons/FontAwesome5';
 import { ThemeProvider } from '@react-navigation/native';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { useColorScheme } from 'nativewind';
+import { useTranslation } from 'react-i18next';
 import { Platform } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 export default function TabsLayout() {
   const isIos = Platform.OS === 'ios';
   const { colorScheme } = useColorScheme();
-  const { t } = useT();
+  const { t } = useTranslation();
 
   const currentTheme = THEME[colorScheme ?? 'dark'];
 
@@ -31,7 +31,7 @@ export default function TabsLayout() {
             <NativeTabs.Trigger.Label
               selectedStyle={{ color: currentTheme.foreground }}
             >
-              {t('navigation.game')}
+              {t($ => $.navigation.game)}
             </NativeTabs.Trigger.Label>
             {Platform.select({
               ios: <NativeTabs.Trigger.Icon sf="gamecontroller.fill" />,
@@ -51,7 +51,7 @@ export default function TabsLayout() {
             <NativeTabs.Trigger.Label
               selectedStyle={{ color: currentTheme.foreground }}
             >
-              {t('navigation.history')}
+              {t($ => $.navigation.history)}
             </NativeTabs.Trigger.Label>
             {Platform.select({
               ios: <NativeTabs.Trigger.Icon sf="clock.fill" />,
@@ -71,7 +71,7 @@ export default function TabsLayout() {
             <NativeTabs.Trigger.Label
               selectedStyle={{ color: currentTheme.foreground }}
             >
-              {t('navigation.settings')}
+              {t($ => $.navigation.settings)}
             </NativeTabs.Trigger.Label>
             {Platform.select({
               ios: <NativeTabs.Trigger.Icon sf="gearshape.fill" />,

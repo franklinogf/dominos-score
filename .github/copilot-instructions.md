@@ -196,14 +196,14 @@ Use Zod with i18n for error messages:
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useT } from '@/hooks/use-translation';
+import { useTranslation } from 'react-i18next'
 
 const createSchema = (t: TFunction) => z.object({
   playerName: z.string().min(1, t('validation.nameRequired')),
 });
 
 function MyForm() {
-  const { t } = useT();
+  const { t } = useTranslation();
   const { control, handleSubmit } = useForm({
     resolver: zodResolver(createSchema(t)),
   });
@@ -215,14 +215,14 @@ function MyForm() {
 Use the `useT()` hook (wrapper around react-i18next):
 
 ```tsx
-import { useT } from '@/hooks/use-translation';
+import { useTranslation } from 'react-i18next'
 
 function MyComponent() {
-  const { t } = useT();
+  const { t } = useTranslation();
   
   return (
-    <Text>{t('game.score')}</Text>
-    <Text>{t('game.playerWins', { name: 'John' })}</Text>
+    <Text>{t($ => $.game.score)}</Text>
+    <Text>{t($ => $.game.playerWins, { name: 'John' })}</Text>
   );
 }
 ```

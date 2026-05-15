@@ -5,7 +5,6 @@ import { Switch } from '@/components/ui/switch';
 import { Text } from '@/components/ui/text';
 import { addPlayerToGame, removeGame } from '@/db/actions/game';
 import { getGameById } from '@/db/querys/game';
-import { useT } from '@/hooks/use-translation';
 import { BIG_PARTY_SIZES } from '@/lib/constants';
 import { buildRestoredGameState } from '@/lib/game-restore';
 import { Player } from '@/lib/types';
@@ -17,6 +16,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { Trash2Icon } from 'lucide-react-native';
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { Alert, Pressable, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { z } from 'zod';
@@ -24,7 +24,7 @@ import { z } from 'zod';
 const MAX_PLAYERS = parseInt(BIG_PARTY_SIZES[BIG_PARTY_SIZES.length - 1], 10);
 
 export default function TournamentModal() {
-  const { t } = useT();
+  const { t } = useTranslation();
   const players = useGame((state) => state.players);
   const endGame = useGame((state) => state.endGame);
   const trioMode = useGame((state) => state.trioMode);
@@ -96,22 +96,22 @@ export default function TournamentModal() {
       <View className="flex-1 px-6 py-4">
         <View className="mb-6 pt-2">
           <Text variant="h1" className="text-center">
-            {t('game.tournament')}
+            {t(($) => $.game.tournament)}
           </Text>
           <Text className="text-center text-muted-foreground mt-2">
-            {t('game.selectPlayersForRound')}
+            {t(($) => $.game.selectPlayersForRound)}
           </Text>
 
           {trioMode && (
             <View className="mt-4 mx-4 p-3 bg-warning/10 border border-warning/30 rounded-lg">
               <Text className="text-center text-foreground font-medium text-sm">
-                {t('game.trioModeEnabled')}
+                {t($ => $.game.trioModeEnabled)}
               </Text>
               <Text className="text-center text-muted-foreground text-xs mt-1">
-                {t('game.trioModeExactly3')}
+                {t($ => $.game.trioModeExactly3)}
               </Text>
               <Text className="text-center text-muted-foreground text-xs mt-1">
-                {t('game.disableInSettings')}
+                {t($ => $.game.disableInSettings)}
               </Text>
             </View>
           )}
@@ -138,17 +138,19 @@ export default function TournamentModal() {
           >
             <Text>
               {activePlayersCount < minActivePlayers
-                ? t('game.selectAtLeast', { count: minActivePlayers })
+                ? t($ => $.game.selectAtLeast, {
+                count: minActivePlayers
+              })
                 : activePlayersCount > maxActivePlayers
-                  ? t('game.tooManyPlayers')
-                  : t('game.startGame')}
+                  ? t($ => $.game.tooManyPlayers)
+                  : t($ => $.game.startGame)}
             </Text>
           </Button>
 
           {canCancelTournament && (
             <View className="mt-4">
               <Button variant="outline" onPress={handleCancel}>
-                <Text>{t('common.cancel')}</Text>
+                <Text>{t($ => $.common.cancel)}</Text>
               </Button>
             </View>
           )}
@@ -159,7 +161,7 @@ export default function TournamentModal() {
 }
 
 function PlayersList() {
-  const { t } = useT();
+  const { t } = useTranslation();
   const players = useGame((state) => state.players);
   const updatePlayerActivity = useGame((state) => state.changePlayerActivity);
   const removePlayer = useGame((state) => state.removePlayer);
@@ -179,16 +181,18 @@ function PlayersList() {
 
   const handleRemovePlayer = (player: Player) => {
     Alert.alert(
-      t('players.removePlayer'),
-      t('players.removePlayerConfirm', { name: player.name }),
+      t($ => $.players.removePlayer),
+      t($ => $.players.removePlayerConfirm, {
+        name: player.name
+      }),
       [
         {
-          text: t('common.cancel'),
+          text: t($ => $.common.cancel),
           style: 'cancel',
           onPress: () => impactAsync(ImpactFeedbackStyle.Light),
         },
         {
-          text: t('common.delete'),
+          text: t($ => $.common.delete),
           style: 'destructive',
           onPress: () => {
             impactAsync(ImpactFeedbackStyle.Medium);
@@ -208,13 +212,12 @@ function PlayersList() {
     <View className="mt-6 flex-1">
       <View className="mb-4 items-center px-4 py-3 bg-muted/20 rounded-lg">
         <Text variant="muted" className="text-center text-base font-medium">
-          {activePlayersCount} {t('game.selected')}
+          {activePlayersCount} {t($ => $.game.selected)}
         </Text>
         <Text variant="muted" className="text-xs mt-1">
-          {trioMode ? t('game.select3Players') : t('game.select2to4Players')}
+          {trioMode ? t($ => $.game.select3Players) : t($ => $.game.select2to4Players)}
         </Text>
       </View>
-
       <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
         <View className="bg-card rounded-xl border border-border/50 overflow-hidden shadow-sm">
           {players.map((player, index) => {
@@ -255,13 +258,12 @@ function PlayersList() {
                         ${player.isPlaying ? 'text-muted-foreground' : 'text-muted-foreground/70'}
                       `}
                       >
-                        {player.wins} {t('game.wins')} • {player.losses}{' '}
-                        {t('game.losses')}
+                        {player.wins} {t($ => $.game.wins)} • {player.losses}{' '}
+                        {t($ => $.game.losses)}
                       </Text>
                     )}
                   </View>
                 </View>
-
                 <View className="flex-row items-center gap-3">
                   {canRemovePlayers && !player.isPlaying && (
                     <Pressable
@@ -296,8 +298,10 @@ function PlayersList() {
           >
             <Text>
               {canAddMorePlayers
-                ? `+ ${t('players.addPlayer')}`
-                : t('players.maxPlayersReached', { count: MAX_PLAYERS })}
+                ? `+ ${t($ => $.players.addPlayer)}`
+                : t($ => $.players.maxPlayersReached, {
+                count: MAX_PLAYERS
+              })}
             </Text>
           </Button>
         </View>
@@ -307,7 +311,7 @@ function PlayersList() {
 }
 
 function AddPlayerDialog() {
-  const { t } = useT();
+  const { t } = useTranslation();
   const isOpen = useAddPlayerDialog((state) => state.isOpen);
   const close = useAddPlayerDialog((state) => state.close);
   const players = useGame((state) => state.players);
@@ -320,8 +324,10 @@ function AddPlayerDialog() {
       z.object({
         playerName: z
           .string()
-          .min(1, t('validation.required', { field: t('players.playerName') }))
-          .max(10, t('players.nameMaxLength'))
+          .min(1, t($ => $.validation.required, {
+          field: t($ => $.players.playerName)
+        }))
+          .max(10, t($ => $.players.nameMaxLength))
           .refine(
             (name) => {
               const normalizedName = name.trim().toLowerCase();
@@ -329,7 +335,7 @@ function AddPlayerDialog() {
                 (p) => p.name.trim().toLowerCase() === normalizedName,
               );
             },
-            { message: t('players.playerNameExists') },
+            { message: t($ => $.players.playerNameExists) },
           ),
       }),
     [players, t],
@@ -356,10 +362,7 @@ function AddPlayerDialog() {
     }
 
     try {
-      const player = await addPlayerToGame(
-        routeGameId,
-        data.playerName.trim(),
-      );
+      const player = await addPlayerToGame(routeGameId, data.playerName.trim());
 
       if (player) {
         // Update store with player (existing or new)
@@ -396,14 +399,14 @@ function AddPlayerDialog() {
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="min-w-full">
         <DialogTitle>
-          <Text variant="large">{t('players.addPlayerTitle')}</Text>
+          <Text variant="large">{t($ => $.players.addPlayerTitle)}</Text>
         </DialogTitle>
 
         <InputField
           autoFocus
           name="playerName"
           control={control}
-          placeholder={t('players.addPlayerPlaceholder')}
+          placeholder={t($ => $.players.addPlayerPlaceholder)}
           error={errors.playerName?.message}
           autoCapitalize="words"
           className="mt-4"
@@ -411,10 +414,10 @@ function AddPlayerDialog() {
 
         <View className="mt-6 flex-row justify-end gap-3">
           <Button variant="outline" onPress={handleClose}>
-            <Text>{t('common.cancel')}</Text>
+            <Text>{t($ => $.common.cancel)}</Text>
           </Button>
           <Button onPress={handleSubmit(onSubmit)}>
-            <Text>{t('game.add')}</Text>
+            <Text>{t($ => $.game.add)}</Text>
           </Button>
         </View>
       </DialogContent>

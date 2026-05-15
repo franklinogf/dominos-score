@@ -1,19 +1,21 @@
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
 import { endGame as endGameInDb } from '@/db/actions/game';
-import { useT } from '@/hooks/use-translation';
 import { useGame } from '@/stores/use-game';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Alert, View } from 'react-native';
 
 export function ResumeGameBanner() {
-  const { t } = useT();
+  const { t } = useTranslation();
   const currentGameId = useGame((state) => state.currentGameId);
   const players = useGame((state) => state.players);
   const tournamentMode = useGame((state) => state.tournamentMode);
   const endGame = useGame((state) => state.endGame);
-  const activePlayersCount = players.filter((player) => player.isPlaying).length;
+  const activePlayersCount = players.filter(
+    (player) => player.isPlaying,
+  ).length;
 
   if (!currentGameId || players.length === 0) return null;
 
@@ -29,13 +31,13 @@ export function ResumeGameBanner() {
 
   const handleDiscard = () => {
     impactAsync(ImpactFeedbackStyle.Light);
-    Alert.alert(t('game.discardResume'), t('game.discardResumeConfirm'), [
+    Alert.alert(t($ => $.game.discardResume), t($ => $.game.discardResumeConfirm), [
       {
-        text: t('common.cancel'),
+        text: t($ => $.common.cancel),
         style: 'cancel',
       },
       {
-        text: t('game.discard'),
+        text: t($ => $.game.discard),
         style: 'destructive',
         onPress: async () => {
           impactAsync(ImpactFeedbackStyle.Heavy);
@@ -49,14 +51,14 @@ export function ResumeGameBanner() {
   return (
     <View className="mx-4 mb-2 rounded-lg border border-border bg-card p-3">
       <Text className="font-semibold text-foreground">
-        {t('game.resumeGame')}
+        {t($ => $.game.resumeGame)}
       </Text>
       <Text variant="muted" className="mt-1 text-sm">
-        {t('game.resumeGameDescription')}
+        {t($ => $.game.resumeGameDescription)}
       </Text>
       <View className="mt-3 flex-row gap-2">
         <Button className="flex-1" size="sm" onPress={handleResume}>
-          <Text>{t('game.resume')}</Text>
+          <Text>{t($ => $.game.resume)}</Text>
         </Button>
         <Button
           className="flex-1"
@@ -64,7 +66,7 @@ export function ResumeGameBanner() {
           variant="outline"
           onPress={handleDiscard}
         >
-          <Text>{t('game.discard')}</Text>
+          <Text>{t($ => $.game.discard)}</Text>
         </Button>
       </View>
     </View>

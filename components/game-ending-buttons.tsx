@@ -3,15 +3,18 @@ import { Text } from '@/components/ui/text';
 import { Alert, View } from 'react-native';
 
 import { endGame as endGameInDb } from '@/db/actions/game';
-import { clearCurrentDraftRound, newRoundWithResults } from '@/db/actions/round';
-import { useT } from '@/hooks/use-translation';
+import {
+  clearCurrentDraftRound,
+  newRoundWithResults,
+} from '@/db/actions/round';
 import { GameStatus } from '@/lib/enums';
 import { flushDraftPersistence, useGame } from '@/stores/use-game';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 export function GameEndingButtons() {
-  const { t } = useT();
+  const { t } = useTranslation();
   const tournamentMode = useGame((state) => state.tournamentMode);
   const trioMode = useGame((state) => state.trioMode);
   const multiLose = useGame((state) => state.multiLose);
@@ -23,16 +26,16 @@ export function GameEndingButtons() {
   const playingPlayers = players.filter((p) => p.isPlaying);
   const endGame = useGame((state) => state.endGame);
 
-  const endRoundLabel = tournamentMode ? t('game.endRound') : t('game.restart');
+  const endRoundLabel = tournamentMode ? t($ => $.game.endRound) : t($ => $.game.restart);
   const endGameLabel = tournamentMode
-    ? t('game.endTournament')
-    : t('game.endGame');
+    ? t($ => $.game.endTournament)
+    : t($ => $.game.endGame);
 
   const handleEndRound = () => {
     impactAsync(ImpactFeedbackStyle.Medium);
-    Alert.alert(endRoundLabel, t('game.endRoundConfirm'), [
+    Alert.alert(endRoundLabel, t($ => $.game.endRoundConfirm), [
       {
-        text: t('common.cancel'),
+        text: t($ => $.common.cancel),
         style: 'cancel',
       },
       {
@@ -75,9 +78,9 @@ export function GameEndingButtons() {
 
   const handleEndGame = () => {
     impactAsync(ImpactFeedbackStyle.Medium);
-    Alert.alert(endGameLabel, t('game.endGameConfirm'), [
+    Alert.alert(endGameLabel, t($ => $.game.endGameConfirm), [
       {
-        text: t('common.cancel'),
+        text: t($ => $.common.cancel),
         style: 'cancel',
       },
       {

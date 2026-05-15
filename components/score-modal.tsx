@@ -7,27 +7,27 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Text } from '@/components/ui/text';
-import { useT } from '@/hooks/use-translation';
 import { useGame } from '@/stores/use-game';
 import { useScoreModal } from '@/stores/use-score-modal';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { z } from 'zod';
 
-const createSchema = (t: (key: string, options?: any) => string) => {
-  return z.object({
-    score: z.coerce
-      .number()
-      .min(1, t('validation.min', { field: t('game.score'), value: 1 })),
-  });
-};
-
 export function ScoreModal() {
-  const { t } = useT();
+  const { t } = useTranslation();
   const { isOpen, close, playerId } = useScoreModal();
   const addScoreToPlayer = useGame((state) => state.addScoreToPlayer);
-  const schema = createSchema(t);
+  const schema = z.object({
+    score: z.coerce.number().min(
+      1,
+      t(($) => $.validation.min, {
+        field: t(($) => $.game.score),
+        value: 1,
+      }),
+    ),
+  });
   const {
     control,
     formState: { errors, isSubmitting },
@@ -60,24 +60,26 @@ export function ScoreModal() {
       <DialogContent className="min-w-full">
         <DialogHeader>
           <DialogTitle>
-            <Text variant="large">{t('game.addScore')}</Text>
+            <Text variant="large">{t(($) => $.game.addScore)}</Text>
           </DialogTitle>
         </DialogHeader>
         <InputField
           autoFocus
           name="score"
           control={control}
-          label={t('game.enterScoreFor', { name: player.name })}
+          label={t(($) => $.game.enterScoreFor, {
+            name: player.name,
+          })}
           error={errors.score?.message}
           keyboardType="number-pad"
           labelClassName="font-bold text-xl mb-2"
         />
         <View className="mt-4 flex-row justify-end">
           <Button className="mr-2" variant="outline" onPress={onClose}>
-            <Text>{t('common.cancel')}</Text>
+            <Text>{t(($) => $.common.cancel)}</Text>
           </Button>
           <Button onPress={handleSubmit(onSubmit)} disabled={isSubmitting}>
-            <Text>{t('game.add')}</Text>
+            <Text>{t(($) => $.game.add)}</Text>
           </Button>
         </View>
       </DialogContent>

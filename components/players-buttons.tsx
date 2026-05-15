@@ -5,8 +5,10 @@ import {
   getLongPressScoreSetting,
   getSetting,
 } from '@/db/querys/settings';
-import { useT } from '@/hooks/use-translation';
-import { DEFAULT_LONG_PRESS_SCORE, DEFAULT_DOUBLE_PRESS_SCORE } from '@/lib/constants';
+import {
+  DEFAULT_DOUBLE_PRESS_SCORE,
+  DEFAULT_LONG_PRESS_SCORE,
+} from '@/lib/constants';
 import { GameStatus } from '@/lib/enums';
 import { Player } from '@/lib/types';
 import { useGame } from '@/stores/use-game';
@@ -15,12 +17,13 @@ import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { useFocusEffect } from 'expo-router';
 import { Info } from 'lucide-react-native';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, Platform, Pressable, View } from 'react-native';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { DoubleTapButton } from './ui/double-tap-button';
 
 export function PlayersButtons() {
-  const { t } = useT();
+  const { t } = useTranslation();
   const players = useGame((state) => state.players);
   const activePlayers = players.filter((p) => p.isPlaying);
   const [longPressScore, setLongPressScore] = useState<number>(
@@ -78,7 +81,9 @@ export function PlayersButtons() {
               variant="small"
               className="text-muted-foreground text-center flex-1"
             >
-              {t('game.longPressHint', { points: longPressScore })}
+              {t($ => $.game.longPressHint, {
+                points: longPressScore
+              })}
             </Text>
           </Pressable>
         </Animated.View>
@@ -96,7 +101,7 @@ function PlayerButton({
   longPressScore: number | null;
   doublePressScore: number;
 }) {
-  const { t } = useT();
+  const { t } = useTranslation();
   const addScoreToPlayer = useGame((state) => state.addScoreToPlayer);
   const { open: openModal } = useScoreModal();
 
@@ -107,15 +112,17 @@ function PlayerButton({
     impactAsync(ImpactFeedbackStyle.Light);
     if (isIos) {
       Alert.prompt(
-        t('game.addScore'),
-        t('game.enterScoreFor', { name: player.name }),
+        t($ => $.game.addScore),
+        t($ => $.game.enterScoreFor, {
+          name: player.name
+        }),
         [
           {
-            text: t('common.cancel'),
+            text: t($ => $.common.cancel),
             style: 'cancel',
           },
           {
-            text: t('game.add'),
+            text: t($ => $.game.add),
             onPress: (score: string | undefined) => {
               // Allow empty input to cancel without error
               if (!score || score.trim() === '') {

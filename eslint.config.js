@@ -6,6 +6,9 @@ module.exports = defineConfig([
   expoConfig,
   {
     // extends: ['prettier'],
+    rules: {
+      'import/no-named-as-default-member': 'off',
+    },
     ignores: ['dist/*'],
   },
 ]);

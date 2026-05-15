@@ -41,7 +41,10 @@ import {
   useColorScheme as useSystemColorScheme,
   View,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 import { z } from 'zod';
 
 interface FieldGroupProps {
@@ -78,27 +81,6 @@ const numericScoreField = (
     .refine((val) => Number(val) > 0, positive)
     .refine((val) => Number(val) <= 999, max);
 
-const settingsSchema = (t: (key: string) => string) =>
-  z.object({
-    longPressScore: numericScoreField(
-      t('settings.longPressScoreRequired'),
-      t('settings.longPressScoreInvalid'),
-      t('settings.longPressScorePositive'),
-      t('settings.longPressScoreMax'),
-    ),
-    doublePressScore: numericScoreField(
-      t('settings.doublePressScoreRequired'),
-      t('settings.longPressScoreInvalid'),
-      t('settings.longPressScorePositive'),
-      t('settings.longPressScoreMax'),
-    ),
-    trioMode: z.boolean(),
-    multiLose: z.boolean(),
-    theme: z.enum(THEME_OPTIONS),
-  });
-
-type SettingsFormData = z.infer<ReturnType<typeof settingsSchema>>;
-
 const ANDROID_PACKAGE_ID = 'com.franklinogf.dominosscore';
 const ANDROID_MARKET_URL = `market://details?id=${ANDROID_PACKAGE_ID}`;
 const ANDROID_PLAY_STORE_URL = `https://play.google.com/store/apps/details?id=${ANDROID_PACKAGE_ID}`;
@@ -112,6 +94,25 @@ export default function Settings() {
   const { setColorScheme } = useColorScheme();
   const systemColorScheme = useSystemColorScheme();
 
+  const settingsSchema = z.object({
+    longPressScore: numericScoreField(
+      t(($) => $.settings.longPressScoreRequired),
+      t(($) => $.settings.longPressScoreInvalid),
+      t(($) => $.settings.longPressScorePositive),
+      t(($) => $.settings.longPressScoreMax),
+    ),
+    doublePressScore: numericScoreField(
+      t(($) => $.settings.doublePressScoreRequired),
+      t(($) => $.settings.longPressScoreInvalid),
+      t(($) => $.settings.longPressScorePositive),
+      t(($) => $.settings.longPressScoreMax),
+    ),
+    trioMode: z.boolean(),
+    multiLose: z.boolean(),
+    theme: z.enum(THEME_OPTIONS),
+  });
+  type SettingsFormData = z.infer<typeof settingsSchema>;
+
   const {
     control,
     handleSubmit,
@@ -119,7 +120,7 @@ export default function Settings() {
     formState: { errors, isDirty, isSubmitting },
     reset,
   } = useForm<SettingsFormData>({
-    resolver: zodResolver(settingsSchema(t)),
+    resolver: zodResolver(settingsSchema),
     defaultValues: {
       longPressScore: DEFAULT_LONG_PRESS_SCORE.toString(),
       doublePressScore: DEFAULT_DOUBLE_PRESS_SCORE.toString(),
@@ -161,7 +162,10 @@ export default function Settings() {
         setIsLoading(false);
       } catch (error) {
         console.error('Failed to load settings:', error);
-        Alert.alert(t('common.error'), t('settings.loadError'));
+        Alert.alert(
+          t(($) => $.common.error),
+          t(($) => $.settings.loadError),
+        );
         setIsLoading(false);
       }
     };
@@ -189,12 +193,18 @@ export default function Settings() {
       applyTheme(data.theme);
       reset(data);
       impactAsync(ImpactFeedbackStyle.Medium);
-      Alert.alert(t('settings.success'), t('settings.settingsSaved'));
+      Alert.alert(
+        t(($) => $.settings.success),
+        t(($) => $.settings.settingsSaved),
+      );
       Keyboard.dismiss();
     } catch (error) {
       console.error('Failed to save settings:', error);
       impactAsync(ImpactFeedbackStyle.Heavy);
-      Alert.alert(t('common.error'), t('settings.settingsError'));
+      Alert.alert(
+        t(($) => $.common.error),
+        t(($) => $.settings.settingsError),
+      );
       Keyboard.dismiss();
     }
   };
@@ -213,7 +223,10 @@ export default function Settings() {
     } catch (error) {
       console.error('Failed to open app store:', error);
       impactAsync(ImpactFeedbackStyle.Heavy);
-      Alert.alert(t('common.error'), t('settings.openStoreError'));
+      Alert.alert(
+        t(($) => $.common.error),
+        t(($) => $.settings.openStoreError),
+      );
     }
   };
 
@@ -232,12 +245,12 @@ export default function Settings() {
           contentContainerStyle={{ paddingBottom: bottomPadding }}
         >
           <Text variant="h1" className="text-center mb-6">
-            {t('settings.title')}
+            {t(($) => $.settings.title)}
           </Text>
 
           {isLoading ? (
             <Text className="text-center text-muted-foreground">
-              {t('common.loading')}
+              {t(($) => $.common.loading)}
             </Text>
           ) : (
             <KeyboardAvoidingView
@@ -246,8 +259,8 @@ export default function Settings() {
             >
               <FieldGroup
                 id="longPressScore"
-                label={t('settings.longPressScore')}
-                description={t('settings.longPressScoreDescription')}
+                label={t(($) => $.settings.longPressScore)}
+                description={t(($) => $.settings.longPressScoreDescription)}
               >
                 <Controller
                   control={control}
@@ -257,7 +270,9 @@ export default function Settings() {
                       id="longPressScore"
                       value={value}
                       onChangeText={onChange}
-                      placeholder={t('settings.longPressScorePlaceholder')}
+                      placeholder={t(
+                        ($) => $.settings.longPressScorePlaceholder,
+                      )}
                       keyboardType="number-pad"
                       maxLength={3}
                     />
@@ -273,8 +288,8 @@ export default function Settings() {
 
               <FieldGroup
                 id="doublePressScore"
-                label={t('settings.doublePressScore')}
-                description={t('settings.doublePressScoreDescription')}
+                label={t(($) => $.settings.doublePressScore)}
+                description={t(($) => $.settings.doublePressScoreDescription)}
               >
                 <Controller
                   control={control}
@@ -284,7 +299,9 @@ export default function Settings() {
                       id="doublePressScore"
                       value={value}
                       onChangeText={onChange}
-                      placeholder={t('settings.longPressScorePlaceholder')}
+                      placeholder={t(
+                        ($) => $.settings.longPressScorePlaceholder,
+                      )}
                       keyboardType="number-pad"
                       maxLength={3}
                     />
@@ -299,8 +316,8 @@ export default function Settings() {
 
               <FieldGroup
                 id="trioMode"
-                label={t('settings.trioMode')}
-                description={t('settings.trioModeDescription')}
+                label={t(($) => $.settings.trioMode)}
+                description={t(($) => $.settings.trioModeDescription)}
               >
                 <Controller
                   control={control}
@@ -309,7 +326,9 @@ export default function Settings() {
                     <View className="flex-row items-center space-x-2">
                       <Switch checked={value} onCheckedChange={onChange} />
                       <Text variant="default" className="ml-3">
-                        {value ? t('settings.enabled') : t('settings.disabled')}
+                        {value
+                          ? t(($) => $.settings.enabled)
+                          : t(($) => $.settings.disabled)}
                       </Text>
                     </View>
                   )}
@@ -317,8 +336,8 @@ export default function Settings() {
               </FieldGroup>
               <FieldGroup
                 id="multiLose"
-                label={t('settings.multiLose')}
-                description={t('settings.multiLoseDescription')}
+                label={t(($) => $.settings.multiLose)}
+                description={t(($) => $.settings.multiLoseDescription)}
               >
                 <Controller
                   control={control}
@@ -327,7 +346,9 @@ export default function Settings() {
                     <View className="flex-row items-center space-x-2">
                       <Switch checked={value} onCheckedChange={onChange} />
                       <Text variant="default" className="ml-3">
-                        {value ? t('settings.enabled') : t('settings.disabled')}
+                        {value
+                          ? t(($) => $.settings.enabled)
+                          : t(($) => $.settings.disabled)}
                       </Text>
                     </View>
                   )}
@@ -336,8 +357,8 @@ export default function Settings() {
 
               <FieldGroup
                 id="theme"
-                label={t('settings.theme')}
-                description={t('settings.themeDescription')}
+                label={t(($) => $.settings.theme)}
+                description={t(($) => $.settings.themeDescription)}
               >
                 <Controller
                   control={control}
@@ -356,27 +377,27 @@ export default function Settings() {
                     >
                       <ToggleGroupItem
                         value="light"
-                        aria-label={t('settings.themeLight')}
+                        aria-label={t(($) => $.settings.themeLight)}
                         className="flex-row items-center gap-2 px-4"
                       >
                         <Sun size={18} className="text-foreground" />
-                        <Text>{t('settings.themeLight')}</Text>
+                        <Text>{t(($) => $.settings.themeLight)}</Text>
                       </ToggleGroupItem>
                       <ToggleGroupItem
                         value="dark"
-                        aria-label={t('settings.themeDark')}
+                        aria-label={t(($) => $.settings.themeDark)}
                         className="flex-row items-center gap-2 px-4"
                       >
                         <Moon size={18} className="text-foreground" />
-                        <Text>{t('settings.themeDark')}</Text>
+                        <Text>{t(($) => $.settings.themeDark)}</Text>
                       </ToggleGroupItem>
                       <ToggleGroupItem
                         value="system"
-                        aria-label={t('settings.themeSystem')}
+                        aria-label={t(($) => $.settings.themeSystem)}
                         className="flex-row items-center gap-2 px-4"
                       >
                         <Smartphone size={18} className="text-foreground" />
-                        <Text>{t('settings.themeSystem')}</Text>
+                        <Text>{t(($) => $.settings.themeSystem)}</Text>
                       </ToggleGroupItem>
                     </ToggleGroup>
                   )}
@@ -386,11 +407,11 @@ export default function Settings() {
               {Platform.OS === 'android' && (
                 <FieldGroup
                   id="updates"
-                  label={t('settings.checkForUpdates')}
-                  description={t('settings.checkForUpdatesDescription')}
+                  label={t(($) => $.settings.checkForUpdates)}
+                  description={t(($) => $.settings.checkForUpdatesDescription)}
                 >
                   <Button variant="outline" onPress={handleCheckForUpdates}>
-                    <Text>{t('settings.checkForUpdates')}</Text>
+                    <Text>{t(($) => $.settings.checkForUpdates)}</Text>
                   </Button>
                 </FieldGroup>
               )}
@@ -401,7 +422,9 @@ export default function Settings() {
                 className="mt-8"
               >
                 <Text>
-                  {isSubmitting ? t('settings.saving') : t('common.save')}
+                  {isSubmitting
+                    ? t(($) => $.settings.saving)
+                    : t(($) => $.common.save)}
                 </Text>
               </Button>
             </KeyboardAvoidingView>

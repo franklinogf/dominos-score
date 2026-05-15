@@ -3,7 +3,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
 import { removeAllGames, removeGame } from '@/db/actions/game';
 import { type GameWithRounds, getAllGames } from '@/db/querys/game';
-import { useT } from '@/hooks/use-translation';
 import { GameType } from '@/lib/enums';
 import { formatDate } from '@/lib/utils';
 import { useGame } from '@/stores/use-game';
@@ -11,9 +10,13 @@ import { useFocusEffect } from '@react-navigation/native';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { Link } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Alert, FlatList, View } from 'react-native';
 import Animated, { FadeOut } from 'react-native-reanimated';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 function GameCardSkeleton() {
   return (
@@ -56,19 +59,21 @@ function GameCard({
   onDelete: (gameId: number) => void;
   isCurrentGame: boolean;
 }) {
-  const { t } = useT();
+  const { t } = useTranslation();
   const handleDelete = () => {
     impactAsync(ImpactFeedbackStyle.Light);
     Alert.alert(
-      t('history.deleteGame'),
-      t('history.deleteConfirm', { type: game.type.toLowerCase() }),
+      t($ => $.history.deleteGame),
+      t($ => $.history.deleteConfirm, {
+        type: game.type.toLowerCase()
+      }),
       [
         {
-          text: t('common.cancel'),
+          text: t($ => $.common.cancel),
           style: 'cancel',
         },
         {
-          text: t('common.delete'),
+          text: t($ => $.common.delete),
           style: 'destructive',
           onPress: () => {
             impactAsync(ImpactFeedbackStyle.Heavy);
@@ -90,13 +95,13 @@ function GameCard({
             <View className="flex-row items-center mb-1">
               <Text variant="h3" className="text-foreground">
                 {game.type === GameType.NORMAL
-                  ? t('game.newGame')
-                  : t('game.tournament')}
+                  ? t($ => $.game.newGame)
+                  : t($ => $.game.tournament)}
               </Text>
               {isCurrentGame && (
                 <View className="ml-2 bg-primary px-2 py-1 rounded">
                   <Text className="text-primary-foreground text-xs font-medium">
-                    {t('history.current')}
+                    {t($ => $.history.current)}
                   </Text>
                 </View>
               )}
@@ -109,8 +114,8 @@ function GameCard({
             <Text className="text-sm font-medium text-muted-foreground">
               {game.rounds.length}{' '}
               {game.rounds.length === 1
-                ? t('history.round')
-                : t('history.rounds').toLowerCase()}
+                ? t($ => $.history.round)
+                : t($ => $.history.rounds).toLowerCase()}
             </Text>
           </View>
         </View>
@@ -118,10 +123,10 @@ function GameCard({
         <View className="flex-row justify-between items-center">
           <View className="flex-row">
             <Text variant="small" className="mr-2">
-              {t('history.playersLabel')}: {game.gameSize}
+              {t($ => $.history.playersLabel)}: {game.gameSize}
             </Text>
             <Text variant="small">
-              {t('history.limitLabel')}: {game.winningLimit}
+              {t($ => $.history.limitLabel)}: {game.winningLimit}
             </Text>
           </View>
 
@@ -135,7 +140,7 @@ function GameCard({
               }}
             >
               <Button variant="outline" size="sm">
-                <Text className="text-xs">{t('history.viewDetails')}</Text>
+                <Text className="text-xs">{t($ => $.history.viewDetails)}</Text>
               </Button>
             </Link>
             {!isCurrentGame && (
@@ -146,7 +151,7 @@ function GameCard({
                 onPress={handleDelete}
               >
                 <Text className="text-xs text-destructive">
-                  {t('common.delete')}
+                  {t($ => $.common.delete)}
                 </Text>
               </Button>
             )}
@@ -158,7 +163,7 @@ function GameCard({
 }
 
 export default function HistoryIndex() {
-  const { t } = useT();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const [games, setGames] = useState<GameWithRounds[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -193,7 +198,7 @@ export default function HistoryIndex() {
         console.log('Game deleted successfully');
       } catch (error) {
         console.error('Failed to delete game:', error);
-        Alert.alert(t('common.error'), t('history.deleteFailed'));
+        Alert.alert(t($ => $.common.error), t($ => $.history.deleteFailed));
         impactAsync(ImpactFeedbackStyle.Heavy);
       }
     },
@@ -202,13 +207,13 @@ export default function HistoryIndex() {
 
   const handleDeleteAllGames = useCallback(() => {
     impactAsync(ImpactFeedbackStyle.Light);
-    Alert.alert(t('history.deleteAll'), t('history.deleteAllConfirm'), [
+    Alert.alert(t($ => $.history.deleteAll), t($ => $.history.deleteAllConfirm), [
       {
-        text: t('common.cancel'),
+        text: t($ => $.common.cancel),
         style: 'cancel',
       },
       {
-        text: t('common.delete'),
+        text: t($ => $.common.delete),
         style: 'destructive',
         onPress: async () => {
           try {
@@ -219,7 +224,7 @@ export default function HistoryIndex() {
             impactAsync(ImpactFeedbackStyle.Heavy);
           } catch (error) {
             console.error('Failed to delete all games:', error);
-            Alert.alert(t('common.error'), t('history.deleteAllFailed'));
+            Alert.alert(t($ => $.common.error), t($ => $.history.deleteAllFailed));
             impactAsync(ImpactFeedbackStyle.Heavy);
           }
         },
@@ -241,9 +246,8 @@ export default function HistoryIndex() {
       className="flex-1 bg-background px-4 py-6"
     >
       <Text variant="h1" className="text-center mb-4">
-        {t('history.title')}
+        {t($ => $.history.title)}
       </Text>
-
       {games.length > 0 && !isLoading && (
         <View className="items-center mb-4">
           <Button
@@ -252,12 +256,11 @@ export default function HistoryIndex() {
             onPress={handleDeleteAllGames}
           >
             <Text className="text-xs text-destructive-foreground">
-              {t('history.deleteAll')}
+              {t($ => $.history.deleteAll)}
             </Text>
           </Button>
         </View>
       )}
-
       {isLoading && (
         <View>
           <GameCardSkeleton />
@@ -265,18 +268,16 @@ export default function HistoryIndex() {
           <GameCardSkeleton />
         </View>
       )}
-
       {!isLoading && games.length === 0 && (
         <View className="justify-center items-center">
           <Text className="text-center text-muted-foreground text-lg mb-4">
-            {t('history.noGames')}
+            {t($ => $.history.noGames)}
           </Text>
           <Text className="text-center text-muted-foreground">
-            {t('history.startFirstGame')}
+            {t($ => $.history.startFirstGame)}
           </Text>
         </View>
       )}
-
       {!isLoading && games.length > 0 && (
         <FlatList
           className="flex-1"

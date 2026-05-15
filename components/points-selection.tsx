@@ -1,15 +1,15 @@
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Text } from '@/components/ui/text';
-import { useT } from '@/hooks/use-translation';
 import { POINTS } from '@/lib/constants';
 import { Point } from '@/lib/types';
 import { useGame } from '@/stores/use-game';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 
 export function WinningLimit() {
-  const { t } = useT();
+  const { t } = useTranslation();
   const winningLimit = useGame((state) => state.winningLimit);
   const updateWinningLimit = useGame((state) => state.updateWinningLimit);
 
@@ -28,7 +28,7 @@ export function WinningLimit() {
   return (
     <View className="w-full p-4">
       <Text className="text-center mb-1" variant="large">
-        {t('game.pointsToWin')}
+        {t($ => $.game.pointsToWin)}
       </Text>
       <RadioGroup
         className="text-xl mx-auto flex-row"

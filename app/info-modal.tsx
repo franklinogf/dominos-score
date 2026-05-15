@@ -4,16 +4,16 @@ import { Pressable, ScrollView, View } from 'react-native';
 
 import { Text } from '@/components/ui/text';
 import { getLongPressScoreSetting } from '@/db/querys/settings';
-import { useT } from '@/hooks/use-translation';
 import {
   DEFAULT_DOUBLE_PRESS_SCORE,
   DEFAULT_LONG_PRESS_SCORE,
 } from '@/lib/constants';
 import { useColorScheme } from 'nativewind';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function InfoModal() {
-  const { t } = useT();
+  const { t } = useTranslation();
   const router = useRouter();
   const [longPressScore, setLongPressScore] = useState<number>(
     DEFAULT_LONG_PRESS_SCORE,
@@ -37,27 +37,26 @@ export default function InfoModal() {
     <View className="flex-1 bg-background">
       <View className="flex-row items-center justify-between p-4 border-b border-border">
         <Text className="text-xl font-bold text-foreground">
-          {t('info.title')}
+          {t($ => $.info.title)}
         </Text>
         <Pressable onPress={() => router.back()} className="p-2">
           <XIcon size={24} color={iconColor} />
         </Pressable>
       </View>
-
       <ScrollView className="flex-1 p-4" contentContainerClassName="gap-6 pb-8">
         {/* Controls Section */}
         <View className="gap-3">
           <Text className="text-lg font-semibold text-foreground">
-            {t('info.controlsTitle')}
+            {t($ => $.info.controlsTitle)}
           </Text>
 
           <View className="bg-card rounded-lg p-4 gap-3">
             <View className="gap-1">
               <Text className="font-medium text-foreground">
-                {t('info.tapTitle')}
+                {t($ => $.info.tapTitle)}
               </Text>
               <Text className="text-muted-foreground text-sm">
-                {t('info.tapDescription')}
+                {t($ => $.info.tapDescription)}
               </Text>
             </View>
 
@@ -65,22 +64,11 @@ export default function InfoModal() {
 
             <View className="gap-1">
               <Text className="font-medium text-foreground">
-                {t('info.longPressTitle')}
+                {t($ => $.info.longPressTitle)}
               </Text>
               <Text className="text-muted-foreground text-sm">
-                {t('info.longPressDescription', { amount: longPressScore })}
-              </Text>
-            </View>
-
-            <View className="h-px bg-border" />
-
-            <View className="gap-1">
-              <Text className="font-medium text-foreground">
-                {t('info.doubleTapTitle')}
-              </Text>
-              <Text className="text-muted-foreground text-sm">
-                {t('info.doubleTapDescription', {
-                  amount: DEFAULT_DOUBLE_PRESS_SCORE,
+                {t($ => $.info.longPressDescription, {
+                  amount: longPressScore
                 })}
               </Text>
             </View>
@@ -89,10 +77,23 @@ export default function InfoModal() {
 
             <View className="gap-1">
               <Text className="font-medium text-foreground">
-                {t('info.removeScoreTitle')}
+                {t($ => $.info.doubleTapTitle)}
               </Text>
               <Text className="text-muted-foreground text-sm">
-                {t('info.removeScoreDescription')}
+                {t($ => $.info.doubleTapDescription, {
+                  amount: DEFAULT_DOUBLE_PRESS_SCORE
+                })}
+              </Text>
+            </View>
+
+            <View className="h-px bg-border" />
+
+            <View className="gap-1">
+              <Text className="font-medium text-foreground">
+                {t($ => $.info.removeScoreTitle)}
+              </Text>
+              <Text className="text-muted-foreground text-sm">
+                {t($ => $.info.removeScoreDescription)}
               </Text>
             </View>
           </View>
@@ -101,16 +102,16 @@ export default function InfoModal() {
         {/* Game Modes Section */}
         <View className="gap-3">
           <Text className="text-lg font-semibold text-foreground">
-            {t('info.gameModesTitle')}
+            {t($ => $.info.gameModesTitle)}
           </Text>
 
           <View className="bg-card rounded-lg p-4 gap-3">
             <View className="gap-1">
               <Text className="font-medium text-foreground">
-                {t('info.normalModeTitle')}
+                {t($ => $.info.normalModeTitle)}
               </Text>
               <Text className="text-muted-foreground text-sm">
-                {t('info.normalModeDescription')}
+                {t($ => $.info.normalModeDescription)}
               </Text>
             </View>
 
@@ -118,10 +119,10 @@ export default function InfoModal() {
 
             <View className="gap-1">
               <Text className="font-medium text-foreground">
-                {t('info.tournamentModeTitle')}
+                {t($ => $.info.tournamentModeTitle)}
               </Text>
               <Text className="text-muted-foreground text-sm">
-                {t('info.tournamentModeDescription')}
+                {t($ => $.info.tournamentModeDescription)}
               </Text>
             </View>
           </View>
@@ -130,16 +131,16 @@ export default function InfoModal() {
         {/* Tournament Options Section */}
         <View className="gap-3">
           <Text className="text-lg font-semibold text-foreground">
-            {t('info.tournamentOptionsTitle')}
+            {t($ => $.info.tournamentOptionsTitle)}
           </Text>
 
           <View className="bg-card rounded-lg p-4 gap-3">
             <View className="gap-1">
               <Text className="font-medium text-foreground">
-                🎯 {t('info.trioModeTitle')}
+                🎯 {t($ => $.info.trioModeTitle)}
               </Text>
               <Text className="text-muted-foreground text-sm">
-                {t('info.trioModeDescription')}
+                {t($ => $.info.trioModeDescription)}
               </Text>
             </View>
 
@@ -147,10 +148,10 @@ export default function InfoModal() {
 
             <View className="gap-1">
               <Text className="font-medium text-foreground">
-                ⚡ {t('info.multiLoseTitle')}
+                ⚡ {t($ => $.info.multiLoseTitle)}
               </Text>
               <Text className="text-muted-foreground text-sm">
-                {t('info.multiLoseDescription')}
+                {t($ => $.info.multiLoseDescription)}
               </Text>
             </View>
           </View>
@@ -159,18 +160,18 @@ export default function InfoModal() {
         {/* Tips Section */}
         <View className="gap-3">
           <Text className="text-lg font-semibold text-foreground">
-            {t('info.tipsTitle')}
+            {t($ => $.info.tipsTitle)}
           </Text>
 
           <View className="bg-card rounded-lg p-4 gap-2">
             <Text className="text-muted-foreground text-sm">
-              • {t('info.tip1')}
+              • {t($ => $.info.tip1)}
             </Text>
             <Text className="text-muted-foreground text-sm">
-              • {t('info.tip2')}
+              • {t($ => $.info.tip2)}
             </Text>
             <Text className="text-muted-foreground text-sm">
-              • {t('info.tip3')}
+              • {t($ => $.info.tip3)}
             </Text>
           </View>
         </View>

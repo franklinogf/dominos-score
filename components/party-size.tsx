@@ -1,13 +1,13 @@
 import { Text } from '@/components/ui/text';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { useT } from '@/hooks/use-translation';
 import { BIG_PARTY_SIZES, PARTY_SIZES } from '@/lib/constants';
 import { useGame } from '@/stores/use-game';
 import * as Haptics from 'expo-haptics';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
 
 export function PartySize() {
-  const { t } = useT();
+  const { t } = useTranslation();
   const gameSize = useGame((state) => state.gameSize);
   const updateGameSize = useGame((state) => state.updateGameSize);
   const tournamentMode = useGame((state) => state.tournamentMode);
@@ -22,7 +22,7 @@ export function PartySize() {
   return (
     <View className="w-full mt-4">
       <Text className="text-center mb-1" variant="large">
-        {t('game.partySize')}
+        {t($ => $.game.partySize)}
       </Text>
       <ScrollView
         className="mx-auto"

@@ -1,31 +1,29 @@
-import * as Localization from 'expo-localization';
+import { getLocales } from 'expo-localization';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 // Import translation files
-import en from '@/locales/en.json';
-import es from '@/locales/es.json';
+import enTranslations from '@/locales/en/translations';
+import esTranslations from '@/locales/es/translations';
 
-const resources = {
+export const defaultNS = 'translations';
+export const resources = {
   en: {
-    translation: en,
+    translations: enTranslations,
   },
   es: {
-    translation: es,
+    translations: esTranslations,
   },
 };
 
-// eslint-disable-next-line import/no-named-as-default-member
 i18n.use(initReactI18next).init({
-  compatibilityJSON: 'v4',
   resources,
-  lng: Localization.getLocales()[0]?.languageCode || 'en', // Use device language or fallback to English
+  lng: getLocales()[0]?.languageCode || 'en', // Use device language or fallback to English
   fallbackLng: 'en',
-
+  defaultNS,
   interpolation: {
     escapeValue: false, // React already does escaping
   },
-
   react: {
     useSuspense: false, // Disable suspense for React Native
   },
