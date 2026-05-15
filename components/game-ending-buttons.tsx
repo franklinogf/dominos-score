@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Icon } from '@/components/ui/icon';
 import { Text } from '@/components/ui/text';
 import { Alert, View } from 'react-native';
 
@@ -11,6 +12,7 @@ import { GameStatus } from '@/lib/enums';
 import { flushDraftPersistence, useGame } from '@/stores/use-game';
 import { impactAsync, ImpactFeedbackStyle } from 'expo-haptics';
 import { router } from 'expo-router';
+import { Flag, RotateCcw, Trophy } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 
 export function GameEndingButtons() {
@@ -26,77 +28,87 @@ export function GameEndingButtons() {
   const playingPlayers = players.filter((p) => p.isPlaying);
   const endGame = useGame((state) => state.endGame);
 
-  const endRoundLabel = tournamentMode ? t($ => $.game.endRound) : t($ => $.game.restart);
+  const endRoundLabel = tournamentMode
+    ? t(($) => $.game.endRound)
+    : t(($) => $.game.restart);
   const endGameLabel = tournamentMode
-    ? t($ => $.game.endTournament)
-    : t($ => $.game.endGame);
+    ? t(($) => $.game.endTournament)
+    : t(($) => $.game.endGame);
 
   const handleEndRound = () => {
     impactAsync(ImpactFeedbackStyle.Medium);
-    Alert.alert(endRoundLabel, t($ => $.game.endRoundConfirm), [
-      {
-        text: t($ => $.common.cancel),
-        style: 'cancel',
-      },
-      {
-        text: endRoundLabel,
-        style: 'destructive',
-        onPress: async () => {
-          impactAsync(ImpactFeedbackStyle.Heavy);
-          await flushDraftPersistence();
-
-          if (currentGameId && gameStatus !== GameStatus.Finished) {
-            await clearCurrentDraftRound(currentGameId);
-          }
-
-          if (
-            gameStatus === GameStatus.Finished &&
-            currentGameId &&
-            winnerPlayerId
-          ) {
-            // Pass the actual winner ID (highest scorer) in trio mode
-            await newRoundWithResults(
-              {
-                gameId: currentGameId,
-                roundWinnerId: Number(winnerPlayerId),
-              },
-              playingPlayers,
-              { trioMode, multiLose },
-            );
-          }
-          endRound();
-          if (tournamentMode) {
-            router.push({
-              pathname: '/modal',
-              params: { gameId: currentGameId },
-            });
-          }
+    Alert.alert(
+      endRoundLabel,
+      t(($) => $.game.endRoundConfirm),
+      [
+        {
+          text: t(($) => $.common.cancel),
+          style: 'cancel',
         },
-      },
-    ]);
+        {
+          text: endRoundLabel,
+          style: 'destructive',
+          onPress: async () => {
+            impactAsync(ImpactFeedbackStyle.Heavy);
+            await flushDraftPersistence();
+
+            if (currentGameId && gameStatus !== GameStatus.Finished) {
+              await clearCurrentDraftRound(currentGameId);
+            }
+
+            if (
+              gameStatus === GameStatus.Finished &&
+              currentGameId &&
+              winnerPlayerId
+            ) {
+              // Pass the actual winner ID (highest scorer) in trio mode
+              await newRoundWithResults(
+                {
+                  gameId: currentGameId,
+                  roundWinnerId: Number(winnerPlayerId),
+                },
+                playingPlayers,
+                { trioMode, multiLose },
+              );
+            }
+            endRound();
+            if (tournamentMode) {
+              router.push({
+                pathname: '/modal',
+                params: { gameId: currentGameId },
+              });
+            }
+          },
+        },
+      ],
+    );
   };
 
   const handleEndGame = () => {
     impactAsync(ImpactFeedbackStyle.Medium);
-    Alert.alert(endGameLabel, t($ => $.game.endGameConfirm), [
-      {
-        text: t($ => $.common.cancel),
-        style: 'cancel',
-      },
-      {
-        text: endGameLabel,
-        style: 'destructive',
-        onPress: async () => {
-          impactAsync(ImpactFeedbackStyle.Heavy);
-          await flushDraftPersistence();
-          if (currentGameId) {
-            await endGameInDb(currentGameId);
-          }
-          endGame();
-          router.replace('/');
+    Alert.alert(
+      endGameLabel,
+      t(($) => $.game.endGameConfirm),
+      [
+        {
+          text: t(($) => $.common.cancel),
+          style: 'cancel',
         },
-      },
-    ]);
+        {
+          text: endGameLabel,
+          style: 'destructive',
+          onPress: async () => {
+            impactAsync(ImpactFeedbackStyle.Heavy);
+            await flushDraftPersistence();
+            if (currentGameId) {
+              await endGameInDb(currentGameId);
+            }
+            endGame();
+            router.replace('/');
+          },
+        },
+      ],
+    );
   };
 
   return (
@@ -106,6 +118,11 @@ export function GameEndingButtons() {
         className="flex-1 bg-warning active:bg-warning/80"
         onPress={handleEndRound}
       >
+        <Icon
+          as={tournamentMode ? Trophy : RotateCcw}
+          className="text-warning-foreground"
+          size={16}
+        />
         <Text>{endRoundLabel}</Text>
       </Button>
 
@@ -115,6 +132,7 @@ export function GameEndingButtons() {
         className="flex-1"
         onPress={handleEndGame}
       >
+        <Icon as={Flag} className="text-destructive-foreground" size={16} />
         <Text>{endGameLabel}</Text>
       </Button>
     </View>

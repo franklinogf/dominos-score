@@ -26,12 +26,12 @@ export function WinningLimit() {
   }
 
   return (
-    <View className="w-full p-4">
-      <Text className="text-center mb-1" variant="large">
-        {t($ => $.game.pointsToWin)}
+    <View className="w-full">
+      <Text className="mb-3" variant="large">
+        {t(($) => $.game.pointsToWin)}
       </Text>
       <RadioGroup
-        className="text-xl mx-auto flex-row"
+        className="text-xl flex-row gap-5"
         value={winningLimit.toString()}
         onValueChange={(value) => onValueChange(value as Point)}
       >
@@ -39,7 +39,7 @@ export function WinningLimit() {
           <View key={point} className="flex-row items-center gap-2">
             <RadioGroupItem className="size-8" value={point} id={`r${point}`} />
             <Label
-              className="text-2xl"
+              className="text-2xl font-semibold"
               onPress={onLabelPress(point)}
               htmlFor={`r${point}`}
             >

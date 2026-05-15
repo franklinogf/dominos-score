@@ -20,17 +20,18 @@ export function PartySize() {
   }
 
   return (
-    <View className="w-full mt-4">
-      <Text className="text-center mb-1" variant="large">
-        {t($ => $.game.partySize)}
+    <View className="w-full">
+      <Text className="mb-3" variant="large">
+        {t(($) => $.game.partySize)}
       </Text>
       <ScrollView
-        className="mx-auto"
+        className="w-full"
         horizontal
         bounces={false}
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          justifyContent: 'center',
+          flexGrow: 1,
+          justifyContent: 'flex-start',
           alignItems: 'center',
         }}
       >
@@ -69,7 +70,7 @@ function PartySizeButton({
 }) {
   return (
     <ToggleGroupItem isFirst={isFirst} isLast={isLast} value={label}>
-      <Text className="text-4xl">{label}</Text>
+      <Text className="text-3xl font-semibold">{label}</Text>
     </ToggleGroupItem>
   );
 }

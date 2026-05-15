@@ -4,6 +4,7 @@ import { WinningLimit } from '@/components/points-selection';
 import { ResumeGameBanner } from '@/components/resume-game-banner';
 import { TournamentSwitch } from '@/components/tournament-switch';
 import { Text } from '@/components/ui/text';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Keyboard,
@@ -13,6 +14,14 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+function SetupSection({ children }: { children: ReactNode }) {
+  return (
+    <View className="mx-4 mb-3 rounded-lg border border-border bg-card p-4">
+      {children}
+    </View>
+  );
+}
 
 export default function Index() {
   const { t } = useTranslation();
@@ -30,16 +39,22 @@ export default function Index() {
           onPress={Keyboard.dismiss}
         >
           <View className="flex-1">
-            <View className="pt-4">
+            <View className="pt-4 px-4">
               <Text variant="h1" className="text-center mb-6">
-                {t($ => $.game.title)}
+                {t(($) => $.game.title)}
               </Text>
             </View>
 
-            <TournamentSwitch />
+            <SetupSection>
+              <TournamentSwitch />
+            </SetupSection>
             <ResumeGameBanner />
-            <PartySize />
-            <WinningLimit />
+            <SetupSection>
+              <PartySize />
+            </SetupSection>
+            <SetupSection>
+              <WinningLimit />
+            </SetupSection>
             <PlayersForm />
           </View>
         </TouchableWithoutFeedback>
