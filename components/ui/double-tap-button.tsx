@@ -18,7 +18,7 @@ export function DoubleTapButton({
       timeoutRef.current = null;
       onDoublePress();
     } else {
-      setTimeout(() => {
+      timeoutRef.current = setTimeout(() => {
         onPress?.(e);
         timeoutRef.current = null;
       }, 300);
